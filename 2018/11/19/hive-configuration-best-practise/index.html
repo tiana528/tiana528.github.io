@@ -110,14 +110,14 @@
 
 
   <meta name="description" content="This article aims at introducing what are the manually configured settings that override the default during using hive. environmentThis article is based on hive 2.3, hadoop 2.7, running hive on mapred">
-<meta name="keywords" content="hive,hadoop">
+<meta name="keywords" content="hadoop,hive">
 <meta property="og:type" content="article">
 <meta property="og:title" content="hive configuration understanding">
 <meta property="og:url" content="https://tiana528.github.io/2018/11/19/hive-configuration-best-practise/index.html">
 <meta property="og:site_name" content="Yan&#39;s Notes">
 <meta property="og:description" content="This article aims at introducing what are the manually configured settings that override the default during using hive. environmentThis article is based on hive 2.3, hadoop 2.7, running hive on mapred">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-11-28T14:35:39.114Z">
+<meta property="og:updated_time" content="2018-12-08T03:21:01.684Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hive configuration understanding">
 <meta name="twitter:description" content="This article aims at introducing what are the manually configured settings that override the default during using hive. environmentThis article is based on hive 2.3, hadoop 2.7, running hive on mapred">
@@ -424,7 +424,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-11-28 23:35:39" itemprop="dateModified" datetime="2018-11-28T23:35:39+09:00">2018-11-28</time>
+                <time title="Modified: 2018-12-08 12:21:01" itemprop="dateModified" datetime="2018-12-08T12:21:01+09:00">2018-12-08</time>
               
             
           </span>
@@ -484,7 +484,7 @@
       
         <p>This article aims at introducing what are the manually configured settings that override the default during using hive.</p>
 <h2 id="environment"><a href="#environment" class="headerlink" title="environment"></a>environment</h2><p>This article is based on hive 2.3, hadoop 2.7, running hive on mapreduce.</p>
-<h2 id="background"><a href="#background" class="headerlink" title="background"></a>background</h2><p>Hive and hadoop have many configurations and it is not striaightforward to know what is the best practice to set the values for commercial usage. I am trying to list up all configurations that we can special take care of.</p>
+<h2 id="background"><a href="#background" class="headerlink" title="background"></a>background</h2><p>Hive and hadoop have many configurations and it is not striaightforward to know what configurations need to be override manually. This article aims at listing up all such configurations that we can special take care of.</p>
 <h2 id="configuration-reference"><a href="#configuration-reference" class="headerlink" title="configuration reference"></a>configuration reference</h2><p>There are the links of the latest explanations of the configurations in the official wiki . </p>
 <ul>
 <li>hadoop<ul>
@@ -499,9 +499,10 @@
 </ul>
 </li>
 </ul>
-<h2 id="configuration-best-practise"><a href="#configuration-best-practise" class="headerlink" title="configuration best practise"></a>configuration best practise</h2><p>These are the configurations that need to take special care and be configured manually to override the default value.</p>
+<h2 id="overridden-configurations"><a href="#overridden-configurations" class="headerlink" title="overridden configurations"></a>overridden configurations</h2><p>These are the configurations that need to take special care and be configured manually to override the default value.</p>
 <ul>
-<li>Basic settings<ul>
+<li><p>Basic settings</p>
+<ul>
 <li>purpose<ul>
 <li>There are some basic settings.</li>
 </ul>
@@ -513,11 +514,24 @@
 <li>explain : This configures the default file system. By default, it is local file system, change it to use distributed file system.</li>
 </ul>
 </li>
+<li>mapreduce.framework.name<ul>
+<li>default : local</li>
+<li>configured : yarn</li>
+<li>explain : The runtime framework for executing MapReduce jobs. Can be one of local, classic or yarn.</li>
+</ul>
+</li>
+<li>yarn.resourcemanager.hostname <ul>
+<li>default:  0.0.0.0</li>
+<li>configured: <the real="" ip=""></the></li>
+<li>explain: The hostname of the RM.</li>
 </ul>
 </li>
 </ul>
 </li>
-<li>Enable yarn log aggregation<ul>
+</ul>
+</li>
+<li><p>Enable yarn log aggregation</p>
+<ul>
 <li>purpose <ul>
 <li>By default, yanr log aggregation is disabled, and yarn logs(container logs) are saved in the local of the instances where the containers run. In order to check the log, it is needed to first check the instance ip of a container, then login the instance and open the corresponding log file. When yarn log aggregation is enabled, the container’s log will be aggregated to some configured place(HDFS, s3, etc.), and it is able to check the yarn log through the yarn UI, which becomes much simpler.</li>
 </ul>
@@ -538,6 +552,12 @@
 <li>yarn.log-aggregation.retain-seconds<ul>
 <li>default : -1</li>
 <li>explain : This specifies how long the aggregated logs will be kept. The default value -1 indicates keeping the logs forever. Too big value may cause a waste of disk resource, too small may make you cannot find logs when investigate recent issues. 2 weeks or so may be helpful.</li>
+</ul>
+</li>
+<li>yarn.nodemanager.log-aggregation.compression-type<ul>
+<li>default: none</li>
+<li>configured: gz</li>
+<li>explain: If, and how, aggregated logs should be compressed.</li>
 </ul>
 </li>
 <li>mapreduce.job.userlog.retain.hours<ul>
@@ -586,7 +606,171 @@
 <li>There are also other settings as needed. I will leave it as TODO.</li>
 </ul>
 </li>
-<li>helpful links<br>  -<a href="https://cwiki.apache.org/confluence/display/Hive/SQL+Standard+Based+Hive+Authorization" target="_blank" rel="noopener">SQL Standard Based Hive Authorization</a></li>
+<li>helpful links<ul>
+<li><a href="https://cwiki.apache.org/confluence/display/Hive/SQL+Standard+Based+Hive+Authorization" target="_blank" rel="noopener">SQL Standard Based Hive Authorization</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Enable HDFS compression<ul>
+<li>configuration<ul>
+<li>io.compression.codecs<ul>
+<li>default : </li>
+<li>configured :  org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.BZip2Codec,org.apache.hadoop.io.compress.DeflateCodec,org.apache.hadoop.io.compress.SnappyCodec</li>
+<li>explain : A comma-separated list of the compression codec classes that can be used for compression/decompression which precedence of others loaded by from the classpath.</li>
+</ul>
+</li>
+<li>mapreduce.map.output.compress<ul>
+<li>default : false</li>
+<li>configured : true</li>
+<li>explain : Compress the output of map before sending accross the network.</li>
+</ul>
+</li>
+<li>mapreduce.map.output.compress.codec<ul>
+<li>default : org.apache.hadoop.io.compress.DefaultCodec</li>
+<li>configured : org.apache.hadoop.io.compress.SnappyCodec or org.apache.hadoop.io.compress.GzipCodec</li>
+<li>explain : If the map outputs are compressed, how should they be compressed?</li>
+</ul>
+</li>
+<li>mapreduce.output.fileoutputformat.compress.type<ul>
+<li>default : RECORD</li>
+<li>configured : BLOCK</li>
+<li>explain : If the job outputs are to compressed as SequenceFiles, how should they be compressed?</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Fail jobs when exceed disk usage<ul>
+<li>configuration<ul>
+<li>mapreduce.job.dfs.storage.capacity.kill-limit-exceed<ul>
+<li>default : true</li>
+<li>configured : false</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>dfs related<ul>
+<li>configuration<ul>
+<li>dfs.namenode.avoid.read.stale.datanode<ul>
+<li>default : false</li>
+<li>configured : true</li>
+</ul>
+</li>
+<li>dfs.namenode.avoid.write.stale.datanode<ul>
+<li>default : false</li>
+<li>configured : true</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>save job result in s3(option)<ul>
+<li>configuration<ul>
+<li>mapreduce.jobhistory.done-dir <ul>
+<li>default: ${yarn.app.mapreduce.am.staging-dir}/history/done </li>
+<li>configured: s3 path</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>speculative configs<ul>
+<li>configuration<ul>
+<li>mapreduce.map.speculative <ul>
+<li>default: true</li>
+<li>configured: false</li>
+</ul>
+</li>
+<li>mapreduce.reduce.speculative<ul>
+<li>default: true</li>
+<li>configured: false</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>enable namenode restart<ul>
+<li>configuration<ul>
+<li>yarn.nodemanager.recovery.enabled<ul>
+<li>default: false</li>
+<li>configured: true</li>
+</ul>
+</li>
+<li>yarn.nodemanager.address<ul>
+<li>default:  ${yarn.nodemanager.hostname}:0</li>
+<li>configured: 0.0.0.0:45454</li>
+<li>explain: Default value makes namenode use different port before and after a restart, and the running clients will be broken after the restart, explicitly setting the port can solve the issue.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://hadoop.apache.org/docs/r2.8.0/hadoop-yarn/hadoop-yarn-site/NodeManager.html" target="_blank" rel="noopener">helpful links</a></li>
+</ul>
+</li>
+<li>enable resource manager restart<ul>
+<li>configuration<ul>
+<li>yarn.resourcemanager.recovery.enabled<ul>
+<li>default: false</li>
+<li>configured: true</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://hadoop.apache.org/docs/r2.7.5/hadoop-yarn/hadoop-yarn-site/ResourceManagerRestart.html" target="_blank" rel="noopener">helpful link</a></li>
+</ul>
+</li>
+<li>hive configs<ul>
+<li>configuration<ul>
+<li>hive.auto.convert.join<ul>
+<li>configured: false</li>
+</ul>
+</li>
+<li>hive.auto.convert.join.noconditionaltask<ul>
+<li>configured: false</li>
+</ul>
+</li>
+<li>hive.exec.compress.intermediate<ul>
+<li>configured: true</li>
+</ul>
+</li>
+<li>hive.exec.parallel<ul>
+<li>configured: true</li>
+</ul>
+</li>
+<li>hive.fetch.task.conversion<ul>
+<li>default: more</li>
+<li>configured: none</li>
+</ul>
+</li>
+<li>hive.groupby.orderby.position.alias<ul>
+<li>configured: true</li>
+</ul>
+</li>
+<li>hive.log.explain.output<ul>
+<li>configured: true</li>
+</ul>
+</li>
+<li>hive.mapred.reduce.tasks.speculative.execution<ul>
+<li>configured: false</li>
+</ul>
+</li>
+<li>hive.optimize.reducededuplication<ul>
+<li>configured: false</li>
+</ul>
+</li>
+<li>hive.resultset.use.unique.column.names<ul>
+<li>configured: false</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -613,9 +797,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/hive/" rel="tag"># hive</a>
-          
             <a href="/tags/hadoop/" rel="tag"># hadoop</a>
+          
+            <a href="/tags/hive/" rel="tag"># hive</a>
           
         </div>
       
@@ -773,7 +957,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#environment"><span class="nav-text">environment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#background"><span class="nav-text">background</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#configuration-reference"><span class="nav-text">configuration reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#configuration-best-practise"><span class="nav-text">configuration best practise</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#environment"><span class="nav-text">environment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#background"><span class="nav-text">background</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#configuration-reference"><span class="nav-text">configuration reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#overridden-configurations"><span class="nav-text">overridden configurations</span></a></li></ol></div>
             
 
           </div>
