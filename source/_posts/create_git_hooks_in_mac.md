@@ -192,6 +192,11 @@ if is_quote_found:
     exit(1)
 exit(0)
 ```
+  Note : It is needed to install python3 and pyymal for running this python hook.
+  ```bash
+  brew install python3
+  pip3 install pyyaml
+  ```
 ### Preventing push to the master branch
 (Script is [from](https://github.com/smiley/git-hooks/blob/master/pre-push/prevent-push-to-protected-branch.sh))
 
