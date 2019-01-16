@@ -109,25 +109,24 @@
 
 
 
-  <meta name="description" content="backgroundWhen running hive jobs in hadoop clusters on mapreduce, we always set the limitation of how much local and hdfs disk a job can use at most. Such limitation is per job basis and it can preven">
-<meta name="keywords" content="hadoop,hive">
+  <meta name="description" content="BackgroundThis article aims at discussing how hive generic User-defined function(GenericUDF) works. In the java doc, it says GenericUDF can do short-circuit evaluations using DeferedObject. But what i">
 <meta property="og:type" content="article">
-<meta property="og:title" content="How to fast fail hive jobs">
-<meta property="og:url" content="https://tiana528.github.io/2018/11/15/hive-job-fast-fail/index.html">
+<meta property="og:title" content="hive GenericUDF and DeferredJavaObject analysis">
+<meta property="og:url" content="https://tiana528.github.io/2019/01/09/hive-DeferredJavaObject/index.html">
 <meta property="og:site_name" content="Yan&#39;s Notes">
-<meta property="og:description" content="backgroundWhen running hive jobs in hadoop clusters on mapreduce, we always set the limitation of how much local and hdfs disk a job can use at most. Such limitation is per job basis and it can preven">
+<meta property="og:description" content="BackgroundThis article aims at discussing how hive generic User-defined function(GenericUDF) works. In the java doc, it says GenericUDF can do short-circuit evaluations using DeferedObject. But what i">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-11-24T08:57:54.064Z">
+<meta property="og:updated_time" content="2019-01-16T15:09:40.518Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="How to fast fail hive jobs">
-<meta name="twitter:description" content="backgroundWhen running hive jobs in hadoop clusters on mapreduce, we always set the limitation of how much local and hdfs disk a job can use at most. Such limitation is per job basis and it can preven">
+<meta name="twitter:title" content="hive GenericUDF and DeferredJavaObject analysis">
+<meta name="twitter:description" content="BackgroundThis article aims at discussing how hive generic User-defined function(GenericUDF) works. In the java doc, it says GenericUDF can do short-circuit evaluations using DeferedObject. But what i">
 
 
 
 
 
 
-  <link rel="canonical" href="https://tiana528.github.io/2018/11/15/hive-job-fast-fail/">
+  <link rel="canonical" href="https://tiana528.github.io/2019/01/09/hive-DeferredJavaObject/">
 
 
 
@@ -137,7 +136,7 @@
   };
 </script>
 
-  <title>How to fast fail hive jobs | Yan's Notes</title>
+  <title>hive GenericUDF and DeferredJavaObject analysis | Yan's Notes</title>
   
 
 
@@ -365,7 +364,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2018/11/15/hive-job-fast-fail/">
+    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2019/01/09/hive-DeferredJavaObject/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Wang Yan">
@@ -382,7 +381,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">How to fast fail hive jobs
+          <h1 class="post-title" itemprop="name headline">hive GenericUDF and DeferredJavaObject analysis
               
             
           </h1>
@@ -407,7 +406,7 @@
                 
               
 
-              <time title="Created: 2018-11-15 23:37:45" itemprop="dateCreated datePublished" datetime="2018-11-15T23:37:45+09:00">2018-11-15</time>
+              <time title="Created: 2019-01-09 22:06:25" itemprop="dateCreated datePublished" datetime="2019-01-09T22:06:25+09:00">2019-01-09</time>
             
 
             
@@ -424,29 +423,11 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-11-24 17:57:54" itemprop="dateModified" datetime="2018-11-24T17:57:54+09:00">2018-11-24</time>
+                <time title="Modified: 2019-01-17 00:09:40" itemprop="dateModified" datetime="2019-01-17T00:09:40+09:00">2019-01-17</time>
               
             
           </span>
 
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/big-data/" itemprop="url" rel="index"><span itemprop="name">big data</span></a></span>
-
-                
-                
-              
-            </span>
           
 
           
@@ -482,31 +463,107 @@
       
 
       
-        <h2 id="background"><a href="#background" class="headerlink" title="background"></a>background</h2><p>When running hive jobs in hadoop clusters on mapreduce, we always set the limitation of how much local and hdfs disk a job can use at most. Such limitation is per job basis and it can prevent a single job from using up too much disk resource and causing a node or a cluster unstable.</p>
-<p>During running one job, if any task belong to the job finds the limitation is exceeded, the task will fail and at such time, we want to <strong>fast fail the job instead of retrying the failed tasks many times</strong>. Because since the local or hdfs max disk usage limitation is reached, the retry will probably still fail and is not much helpful.</p>
-<h2 id="appoaches"><a href="#appoaches" class="headerlink" title="appoaches"></a>appoaches</h2><p>I will introduce how to configure to fast fail hive jobs when the local or hdfs limitation is exceeded.</p>
-<h3 id="fast-fail-a-job-when-too-much-local-disk-is-used-in-one-node"><a href="#fast-fail-a-job-when-too-much-local-disk-is-used-in-one-node" class="headerlink" title="fast fail a job when too much local disk is used in one node"></a>fast fail a job when too much <em>local disk</em> is used in one node</h3><ul>
-<li><p><strong>hadoop configuration</strong></p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapreduce.job.local-fs.single-disk-limit.bytes<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">value</span>&gt;</span>322122547200<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapreduce.job.local-fs.single-disk-limit.check.kill-limit-exceed<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>implementation detail</strong><br>A task(org.apache.hadoop.mapred.Task) contains a thread checking all local working directories(mapreduce.cluster.local.dir), and will fast fail the job if any local working directory exceeds the limitation.</p>
-</li>
-<li><p><strong>required hadoop version</strong><br>3.1.0 or apply patch <a href="https://issues.apache.org/jira/browse/MAPREDUCE-7022" target="_blank" rel="noopener">MAPREDUCE-7022</a></p>
-</li>
-</ul>
-<h3 id="fast-fail-a-job-when-too-much-hdfs-disk-is-used-in-the-cluster"><a href="#fast-fail-a-job-when-too-much-hdfs-disk-is-used-in-the-cluster" class="headerlink" title="fast fail a job when too much hdfs disk is used in the cluster"></a>fast fail a job when too much <em>hdfs disk</em> is used in the cluster</h3><ul>
-<li><p><strong>configuration</strong></p>
+        <h1 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h1><p>This article aims at discussing how hive generic User-defined function(GenericUDF) works. In the java doc, it says GenericUDF can do short-circuit evaluations using DeferedObject. But what is short-circuit evaluation and how DeferedObject works?</p>
+<h1 id="Description"><a href="#Description" class="headerlink" title="Description"></a>Description</h1><p>Basicly, use GenericUDF when the input or output is complex type, or input arguments have variable length.</p>
+<p>GenericUDF use DeferedObject to pass arguments and achieve lazy-evaluation and short-circuiting.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">interface</span> <span class="title">DeferredObject</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">prepare</span><span class="params">(<span class="keyword">int</span> version)</span> <span class="keyword">throws</span> HiveException</span>;</span><br><span class="line">  <span class="function">Object <span class="title">get</span><span class="params">()</span> <span class="keyword">throws</span> HiveException</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h1 id="Source-code-analysis"><a href="#Source-code-analysis" class="headerlink" title="Source code analysis"></a>Source code analysis</h1><p>We run a sql <code>select abs(c1) from t1</code> and try to analysis how UDF is initialized and processed.</p>
 <ul>
-<li><strong>hive configuration</strong><br>Set hive config hive.exec.scratchdir to per job basis, and set the quota limitation for the path.</li>
-<li><strong>hadoop configuration</strong><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapreduce.job.dfs.storage.capacity.kill-limit-exceed<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<li>Class structure and relationship<ul>
+<li>SelectOperator<ul>
+<li>ExprNodeEvaluator[] eval<ul>
+<li>(actually it is ExprNodeGenericFuncEvaluator)</li>
+</ul>
 </li>
 </ul>
 </li>
-<li><p><strong>internal implementation</strong><br>A subclass of ClusterStorageCapacityExceededException will be thrown if the cluster capacity limitation is exceeded and then YarnChild will fast fail the job.</p>
+<li>ExprNodeGenericFuncEvaluator<ul>
+<li>ExprNodeEvaluator[] children; <ul>
+<li>(actually it is [ExprNodeColumnEvaluator[Column[c1]]])</li>
+</ul>
 </li>
-<li><p><strong>required hadoop version</strong><br>3.3.0 or apply patch <a href="https://issues.apache.org/jira/browse/MAPREDUCE-7148" target="_blank" rel="noopener">MAPREDUCE-7148</a></p>
+<li>GenericUDF.DeferredObject[] deferredChildren;<ul>
+<li>(actually it is org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator$DeferredExprObject and contains the ExprNodeEvaluator)</li>
+</ul>
+</li>
+<li>GenericUDF.DeferredObject[] childrenNeedingPrepare;<ul>
+<li>(actually it contains the same object as deferredChildren in this example)</li>
+</ul>
+</li>
+<li>GenericUDF genericUDF;<ul>
+<li>(actually it is GenericUDFAbs)</li>
+</ul>
 </li>
 </ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>During initialization</p>
+<ul>
+<li>Generate query plan tree<ul>
+<li>SemanticAnalyzer.genPlan</li>
+</ul>
+</li>
+<li><p>Create ExprNodeGenericFuncDesc based on genericUDFClass</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc</span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExprNodeGenericFuncDesc <span class="title">newInstance</span><span class="params">(GenericUDF genericUDF,</span></span></span><br><span class="line"><span class="function"><span class="params">      String funcText,</span></span></span><br><span class="line"><span class="function"><span class="params">      List&lt;ExprNodeDesc&gt; children)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    ObjectInspector oi = genericUDF.initializeAndFoldConstants(childrenOIs);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Initialize GenericUDF</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.udf.generic.GenericUDF</span><br><span class="line"><span class="function"><span class="keyword">public</span> ObjectInspector <span class="title">initializeAndFoldConstants</span><span class="params">(ObjectInspector[] arguments)</span></span></span><br><span class="line"><span class="function">      <span class="keyword">throws</span> UDFArgumentException </span>&#123;</span><br><span class="line"></span><br><span class="line">    ObjectInspector oi = initialize(arguments);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.udf.generic.GenericUDFAbs</span><br><span class="line">  <span class="function"><span class="keyword">public</span> ObjectInspector <span class="title">initialize</span><span class="params">(ObjectInspector[] arguments)</span> <span class="keyword">throws</span> UDFArgumentException </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Initial select operator</p>
+<ul>
+<li><p>Create ExprNodeGenericFuncEvaluator</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.SelectOperator</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initializeOp</span><span class="params">(Configuration hconf)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  eval[i] = ExprNodeEvaluatorFactory.get(colList.get(i), hconf);</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ExprNodeGenericFuncEvaluator</span><span class="params">(ExprNodeGenericFuncDesc expr, Configuration conf)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    children = <span class="keyword">new</span> ExprNodeEvaluator[expr.getChildren().size()];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; children.length; i++) &#123;</span><br><span class="line">      ExprNodeDesc child = expr.getChildren().get(i);</span><br><span class="line">      ExprNodeEvaluator nodeEvaluator = ExprNodeEvaluatorFactory.get(child, conf);</span><br><span class="line">      children[i] = nodeEvaluator;</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Init ExprNodeGenericFuncEvaluator and create DeferredExprObject</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> ObjectInspector <span class="title">initialize</span><span class="params">(ObjectInspector rowInspector)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">     deferredChildren = <span class="keyword">new</span> GenericUDF.DeferredObject[children.length];</span><br><span class="line">     </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ExprNodeGenericFuncEvaluator.DeferredExprObject</span><br><span class="line"> DeferredExprObject(ExprNodeEvaluator eval, <span class="keyword">boolean</span> eager) &#123;</span><br><span class="line">      <span class="keyword">this</span>.eval = eval; <span class="comment">//(ExprNodeEvaluator[Column[c1]])</span></span><br><span class="line">      <span class="keyword">this</span>.eager = eager; (<span class="keyword">false</span>)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>During processing data</p>
+<ul>
+<li><p>select operator process one row</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.SelectOperator</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(Object row, <span class="keyword">int</span> tag)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    output[i] = eval[i].evaluate(row); <span class="comment">//(eval[i] is actually ExprNodeGenericFuncEvaluator)</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Note that <code>row</code> is an LazyStruct object which holds data in binary format</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> Object <span class="title">_evaluate</span><span class="params">(Object row, <span class="keyword">int</span> version)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> genericUDF.evaluate(deferredChildren);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.udf.generic.GenericUDFAbs</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Object <span class="title">evaluate</span><span class="params">(DeferredObject[] arguments)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    Object valObject = arguments[<span class="number">0</span>].get();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Note that arguments[0] is ExprNodeGenericFuncEvaluator&amp;DeferredExprObject</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator</span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">get</span><span class="params">()</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">     ...</span><br><span class="line">     obj = eval.evaluate(rowObject, version); <span class="comment">//(eval is ExprNodeColumnEvaluator)</span></span><br><span class="line">     ...</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeColumnEvaluator</span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> Object <span class="title">_evaluate</span><span class="params">(Object row, <span class="keyword">int</span> version)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">   ...</span><br><span class="line">   <span class="keyword">return</span> inspector.getStructFieldData(row, field); <span class="comment">//(inspector is LazySimpleStructObjectInspector)</span></span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="Summarize"><a href="#Summarize" class="headerlink" title="Summarize"></a>Summarize</h1><ul>
+<li>Processing<ul>
+<li>During intilization<ul>
+<li>hive creates SelectOperator, SelectOperator contains ExprNodeGenericFuncEvaluator, ExprNodeGenericFuncEvaluator contains GenericUDFAbs and DeferredExprObject (DeferredObject), DeferredExprObject contains ExprNodeColumnEvaluator (column[c1]).</li>
+</ul>
+</li>
+<li>During executing<ul>
+<li>SelectOperator processes row which is LazyStruct, and at last passed to LazySimpleStructObjectInspector (getStructFieldData) to get the actual data from binary data.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>lazy-evaluation and short-circuiting<ul>
+<li>We can notice that the value of the attribute which is involved in the UDF calculation is only evaluated just before use. The value is analyzed from binary format. This is very efficient.</li>
+</ul>
+</li>
+</ul>
+<h1 id="Cache-approach-in-GenericUDF"><a href="#Cache-approach-in-GenericUDF" class="headerlink" title="Cache approach in GenericUDF"></a>Cache approach in GenericUDF</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Object <span class="title">evaluate</span><span class="params">(DeferredObject[] arguments)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    Object obj = arguments[<span class="number">0</span>].get();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>The obj got DeferredObject in GenericUDF evaluate function is  an LazyInteger object, it is always the same object even if evaluate function is invoked for processing a different row.</p>
+<p>We should be careful when making use of cache to speedup GenericUDF calculation. Buffer the input and output, and returns buffered output if historical input comes. Since we always get the same object from the DeferredObject, if we use <code>equals</code> function to compare, it will always be true. We need to deep copy the inputs for further comparison. </p>
 
       
     </div>
@@ -528,14 +585,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/hadoop/" rel="tag"># hadoop</a>
-          
-            <a href="/tags/hive/" rel="tag"># hive</a>
-          
-        </div>
-      
 
       
       
@@ -545,15 +594,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2018/12/15/create_git_hooks_in_mac/" rel="next" title="create git hooks in mac">
+                <i class="fa fa-chevron-left"></i> create git hooks in mac
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/11/17/hive-scratch-working-directory/" rel="prev" title="hive scratch directory">
-                hive scratch directory <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -694,7 +743,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#background"><span class="nav-text">background</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#appoaches"><span class="nav-text">appoaches</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#fast-fail-a-job-when-too-much-local-disk-is-used-in-one-node"><span class="nav-text">fast fail a job when too much local disk is used in one node</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fast-fail-a-job-when-too-much-hdfs-disk-is-used-in-the-cluster"><span class="nav-text">fast fail a job when too much hdfs disk is used in the cluster</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Description"><span class="nav-text">Description</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Source-code-analysis"><span class="nav-text">Source code analysis</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Summarize"><span class="nav-text">Summarize</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Cache-approach-in-GenericUDF"><span class="nav-text">Cache approach in GenericUDF</span></a></li></ol></div>
             
 
           </div>
