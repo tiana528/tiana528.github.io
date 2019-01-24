@@ -110,7 +110,7 @@
 
 
   <meta name="description" content="backgroundWhen running hive jobs in hadoop clusters on mapreduce, we always set the limitation of how much local and hdfs disk a job can use at most. Such limitation is per job basis and it can preven">
-<meta name="keywords" content="hive,hadoop">
+<meta name="keywords" content="hadoop,hive">
 <meta property="og:type" content="article">
 <meta property="og:title" content="How to fast fail hive jobs">
 <meta property="og:url" content="https://tiana528.github.io/2018/11/15/hive-job-fast-fail/index.html">
@@ -451,6 +451,17 @@
 
           
             
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/11/15/hive-job-fast-fail/#comments" itemprop="discussionUrl">
+                
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/11/15/hive-job-fast-fail/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
           
 
           
@@ -530,9 +541,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/hive/" rel="tag"># hive</a>
-          
             <a href="/tags/hadoop/" rel="tag"># hadoop</a>
+          
+            <a href="/tags/hive/" rel="tag"># hive</a>
           
         </div>
       
@@ -574,6 +585,13 @@
 
           </div>
           
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
 
   
 
@@ -852,9 +870,30 @@
 
   
 
-
+  
+    <script id="dsq-count-scr" src="https://tiana528.disqus.com/count.js" async></script>
+  
 
   
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://tiana528.github.io/2018/11/15/hive-job-fast-fail/';
+        this.page.identifier = '2018/11/15/hive-job-fast-fail/';
+        this.page.title = 'How to fast fail hive jobs';
+        };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://tiana528.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
+  
+
+
 
 
 
