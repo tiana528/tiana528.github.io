@@ -117,7 +117,7 @@
 <meta property="og:site_name" content="Yan&#39;s Notes">
 <meta property="og:description" content="Wiki descriptionAccording to the wiki: CAP theorem explains that it is impossible for a distributed data store to simultaneously provide more than two out of the following three guarantees:  Consisten">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-01-24T13:32:10.505Z">
+<meta property="og:updated_time" content="2019-01-24T13:58:58.600Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Very basic understanding of CAP theorem">
 <meta name="twitter:description" content="Wiki descriptionAccording to the wiki: CAP theorem explains that it is impossible for a distributed data store to simultaneously provide more than two out of the following three guarantees:  Consisten">
@@ -424,7 +424,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-01-24 22:32:10" itemprop="dateModified" datetime="2019-01-24T22:32:10+09:00">2019-01-24</time>
+                <time title="Modified: 2019-01-24 22:58:58" itemprop="dateModified" datetime="2019-01-24T22:58:58+09:00">2019-01-24</time>
               
             
           </span>
@@ -473,13 +473,13 @@
 <h1 id="Simple-understanding"><a href="#Simple-understanding" class="headerlink" title="Simple understanding"></a>Simple understanding</h1><p>Here explain the theorem using a simple example. Considering there are two nodes, and data is replicated in two nodes.</p>
 <ul>
 <li>If AP, then not C. When network partition happens(P), a write request arrives at one node and success(A), then the data on the two nodes must be inconsistent, meaning C is not satisfied.</li>
-<li>If CP, then not A. When network partition happens(P), the read on either node always get the same value. Then write operation must be forbidden, meaning A is satisfied.</li>
-<li>IF AC, then not P. If write always success(A), read always get the recent write value(C), then network partition must not happen, meaning P is satisfied.</li>
+<li>If CP, then not A. When network partition happens(P), the read on either node always gets the latest written value. Then write operation must be forbidden on both side of the parititons, meaning A is not satisfied.</li>
+<li>IF AC, then not P. If write always successes(A), read always gets the recent written value(C), then network partition must not happen, meaning P is not satisfied.</li>
 </ul>
 <h1 id="Does-it-explain-well"><a href="#Does-it-explain-well" class="headerlink" title="Does it explain well"></a>Does it explain well</h1><p>The above understanding of CAP is not sufficient. CAP is always criticized for being too simplistic and often misleading. Actually, many distributed data systems are not even CP, AP or AC, considering the strict definition. It is difficult for people to understand what is CAP by the above simple description which is explained in a lot of places on the Internet. The following of this article aims at <strong>adding a little more about the missing part of the above CAP theorem description and make it understandable</strong>.</p>
-<h1 id="Definition-of-terms"><a href="#Definition-of-terms" class="headerlink" title="Definition of terms"></a>Definition of terms</h1><p>Before going any further, we need to make precise definition of terms. There are many articles discussing CAP, without clear dinifition and the readers may not have enough knowledge to understand them.</p>
+<h1 id="Definition-of-terms"><a href="#Definition-of-terms" class="headerlink" title="Definition of terms"></a>Definition of terms</h1><p>Before going any further, we need to make precise definition of terms. There are many articles discussing CAP, without clear definition and the readers may not have enough knowledge to understand them.</p>
 <h2 id="Serialization"><a href="#Serialization" class="headerlink" title="Serialization"></a>Serialization</h2><ul>
-<li>serialization is a transaction concept. Multiple transactions are processed in parallel, and each transaction contains one or more instructions. The database needs to <a href="https://en.wikipedia.org/wiki/Schedule_(computer_science" target="_blank" rel="noopener">schedule</a>) how the instructions are executed. Note that different execution orders may result in different result.<ul>
+<li>serialization is a transaction concept. Multiple transactions are processed in parallel, and each transaction contains one or more instructions. The database needs to <a href="https://en.wikipedia.org/wiki/Schedule_(computer_science" target="_blank" rel="noopener">schedule</a> how the instructions are executed. Note that different execution orders may result in different result.<ul>
 <li>For example, start with the status a = 1, b = 3<ul>
 <li>t1<ul>
 <li>i1 : t1 = a</li>
@@ -497,8 +497,7 @@
 </ul>
 </li>
 <li>A transaction schedule is <em>serializable</em> if the outcome is as if transactions are executed atomically and in some sequential order.</li>
-<li>Serializability is considered as the the highest level of isolation between transactions.</li>
-<li>Strict serializability : Serializability + transactions are processed in the “real-time” order. If transaction A finishes before transaction B starts, </li>
+<li>Strict serializability : Serializability + transactions are processed in the “real-time” order.</li>
 </ul>
 <h2 id="How-to-garrantee-serialization"><a href="#How-to-garrantee-serialization" class="headerlink" title="How to garrantee serialization"></a>How to garrantee serialization</h2><ul>
 <li>Using concurrency control protocol  such as <a href="https://en.wikipedia.org/wiki/Two-phase_locking" target="_blank" rel="noopener">2PL</a><ul>
@@ -521,16 +520,17 @@
 </li>
 </ul>
 </li>
+<li>Using other approaches</li>
 </ul>
 <h2 id="Linearizability"><a href="#Linearizability" class="headerlink" title="Linearizability"></a>Linearizability</h2><ul>
-<li><a href="https://en.wikipedia.org/wiki/Linearizability" target="_blank" rel="noopener">Linearizability</a> is from concurrent programming.  Linearizability is originally talking about single objects and not transactions. Nowadays, many papers talk about linearilzability transactions the same as strict serializability, and each transaction contains only one operation. </li>
+<li><a href="https://en.wikipedia.org/wiki/Linearizability" target="_blank" rel="noopener">Linearizability</a> concept is from concurrent programming.  Linearizability is originally talking about single objects and not transactions. Nowadays, many papers talk about linearilzability transactions the same as strict serializability, and each transaction contains only one operation. </li>
 <li>How Linearizability is related with CAP<ul>
 <li>Linearizability is what the CAP Theorem calls Consistency.</li>
 </ul>
 </li>
 </ul>
 <h2 id="Isolation"><a href="#Isolation" class="headerlink" title="Isolation"></a>Isolation</h2><ul>
-<li><a href="https://en.wikipedia.org/wiki/Isolation_(database_systems" target="_blank" rel="noopener">Phantom Read Phenomena</a>)<ul>
+<li><a href="https://en.wikipedia.org/wiki/Isolation_(database_systems" target="_blank" rel="noopener">Phantom Read Phenomena</a><ul>
 <li>Dirty reads<ul>
 <li>A dirty read occurs when a transaction is allowed to read data from a row that has been modified by another running transaction and not yet committed.</li>
 </ul>
@@ -564,7 +564,7 @@
 <li>This is the lowest isolation level. In this level, dirty reads are allowed, so one transaction may see not-yet-committed changes made by other transactions.</li>
 </ul>
 </li>
-<li>There are also incufficient and there are many more.</li>
+<li>There are also incufficient and there are more that can be listed.</li>
 </ul>
 </li>
 <li>How isolation is related in CAP<ul>
@@ -602,11 +602,18 @@
 </ul>
 </li>
 <li>P<ul>
+<li>definition<ul>
 <li>The system continues to function and upholds its consistency guarantees in spite of network partitions. Network partitions are a fact of life. Distributed systems guaranteeing partition tolerance can gracefully recover from partitions once the partition heals.</li>
 </ul>
 </li>
+<li>meaning<ul>
+<li>This is unavoided in a distributed environment. Not only network parition happens, but also network connection timeout can be seen as parititon.</li>
 </ul>
-<p>In a network partition, even if it is only a choice to choose avaialbility or consistency. Many databases are not choosing any of them, since the consistency (linearizability) is so expensive. Actually, there leave a space for the database designers/users to choose a level of balanced consistency and availability according to the use case. Whenever looking into a database, it will be a nice point to check what level of A and C among does it provides during P happens, even it is not perfect A or C according to the CAP definition.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="Summarize"><a href="#Summarize" class="headerlink" title="Summarize"></a>Summarize</h1><p>In a network partition, even if it is only posssible to make a choice between avaialbility or consistency. Many databases are not choosing any of them, since the consistency (linearizability) is so expensive. Actually, this leaves a space for the database designers/users to choose a level of balanced consistency and availability according to the use case. Whenever looking into a database, it will be a good point to check what level of A and C does it provides when P happens, even if it is not perfect A or C according to the CAP definition.</p>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
 <li><a href="https://martin.kleppmann.com/2015/05/11/please-stop-calling-databases-cp-or-ap.html" target="_blank" rel="noopener">please-stop-calling-databases-cp-or-ap</a></li>
 <li><a href="https://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed" target="_blank" rel="noopener">cap-twelve-years-later-how-the-rules-have-changed</a></li>
@@ -805,7 +812,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Wiki-description"><span class="nav-text">Wiki description</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Simple-understanding"><span class="nav-text">Simple understanding</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Does-it-explain-well"><span class="nav-text">Does it explain well</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Definition-of-terms"><span class="nav-text">Definition of terms</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Serialization"><span class="nav-text">Serialization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#How-to-garrantee-serialization"><span class="nav-text">How to garrantee serialization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linearizability"><span class="nav-text">Linearizability</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Isolation"><span class="nav-text">Isolation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#What-isolation-level-are-commercial-databases-providing"><span class="nav-text">What isolation level are commercial databases providing</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Look-back-at-CAP-theorem"><span class="nav-text">Look back at CAP theorem</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-text">Reference</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Wiki-description"><span class="nav-text">Wiki description</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Simple-understanding"><span class="nav-text">Simple understanding</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Does-it-explain-well"><span class="nav-text">Does it explain well</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Definition-of-terms"><span class="nav-text">Definition of terms</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Serialization"><span class="nav-text">Serialization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#How-to-garrantee-serialization"><span class="nav-text">How to garrantee serialization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linearizability"><span class="nav-text">Linearizability</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Isolation"><span class="nav-text">Isolation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#What-isolation-level-are-commercial-databases-providing"><span class="nav-text">What isolation level are commercial databases providing</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Look-back-at-CAP-theorem"><span class="nav-text">Look back at CAP theorem</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Summarize"><span class="nav-text">Summarize</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-text">Reference</span></a></li></ol></div>
             
 
           </div>
