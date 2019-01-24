@@ -109,25 +109,25 @@
 
 
 
-  <meta name="description" content="Whether a job runs in local mode or distributed mode is decided by mapreduce.framework.name. In local mode, the mapper and reducer will run locally in the same JVM with the client. In distributed mode">
-<meta name="keywords" content="hadoop,hive">
+  <meta name="description" content="CAP theoremWiki descriptionAccording to the [wiki](https://en.wikipedia.org/wiki/CAP_theorem): CAP theorem explains that it is impossible for a *distributed data store* to simultaneously provide more">
+<meta name="keywords" content="database">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hadoop local mode and distributed mode">
-<meta property="og:url" content="https://tiana528.github.io/2018/12/09/hadoop-local-and-distributed-mode/index.html">
+<meta property="og:title" content="Very basic understanding of CAP theorem">
+<meta property="og:url" content="https://tiana528.github.io/2019/01/19/hadoop-systems-and-CAP-theorem/index.html">
 <meta property="og:site_name" content="Yan&#39;s Notes">
-<meta property="og:description" content="Whether a job runs in local mode or distributed mode is decided by mapreduce.framework.name. In local mode, the mapper and reducer will run locally in the same JVM with the client. In distributed mode">
+<meta property="og:description" content="CAP theoremWiki descriptionAccording to the [wiki](https://en.wikipedia.org/wiki/CAP_theorem): CAP theorem explains that it is impossible for a *distributed data store* to simultaneously provide more">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-12-11T14:36:27.277Z">
+<meta property="og:updated_time" content="2019-01-24T13:22:50.545Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="hadoop local mode and distributed mode">
-<meta name="twitter:description" content="Whether a job runs in local mode or distributed mode is decided by mapreduce.framework.name. In local mode, the mapper and reducer will run locally in the same JVM with the client. In distributed mode">
+<meta name="twitter:title" content="Very basic understanding of CAP theorem">
+<meta name="twitter:description" content="CAP theoremWiki descriptionAccording to the [wiki](https://en.wikipedia.org/wiki/CAP_theorem): CAP theorem explains that it is impossible for a *distributed data store* to simultaneously provide more">
 
 
 
 
 
 
-  <link rel="canonical" href="https://tiana528.github.io/2018/12/09/hadoop-local-and-distributed-mode/">
+  <link rel="canonical" href="https://tiana528.github.io/2019/01/19/hadoop-systems-and-CAP-theorem/">
 
 
 
@@ -137,7 +137,7 @@
   };
 </script>
 
-  <title>hadoop local mode and distributed mode | Yan's Notes</title>
+  <title>Very basic understanding of CAP theorem | Yan's Notes</title>
   
 
 
@@ -365,7 +365,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2018/12/09/hadoop-local-and-distributed-mode/">
+    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2019/01/19/hadoop-systems-and-CAP-theorem/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Wang Yan">
@@ -382,7 +382,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">hadoop local mode and distributed mode
+          <h1 class="post-title" itemprop="name headline">Very basic understanding of CAP theorem
               
             
           </h1>
@@ -407,7 +407,7 @@
                 
               
 
-              <time title="Created: 2018-12-09 11:55:57" itemprop="dateCreated datePublished" datetime="2018-12-09T11:55:57+09:00">2018-12-09</time>
+              <time title="Created: 2019-01-19 21:46:03" itemprop="dateCreated datePublished" datetime="2019-01-19T21:46:03+09:00">2019-01-19</time>
             
 
             
@@ -424,29 +424,11 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-12-11 23:36:27" itemprop="dateModified" datetime="2018-12-11T23:36:27+09:00">2018-12-11</time>
+                <time title="Modified: 2019-01-24 22:22:50" itemprop="dateModified" datetime="2019-01-24T22:22:50+09:00">2019-01-24</time>
               
             
           </span>
 
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/big-data/" itemprop="url" rel="index"><span itemprop="name">big data</span></a></span>
-
-                
-                
-              
-            </span>
           
 
           
@@ -482,62 +464,157 @@
       
 
       
-        <p>Whether a job runs in local mode or distributed mode is decided by <em>mapreduce.framework.name</em>. In local mode, the mapper and reducer will run locally in the same JVM with the client. In distributed mode, the job will be submitted to the resource manager. This article aims at digging into the related source code.</p>
-<h2 id="Flow-of-execution"><a href="#Flow-of-execution" class="headerlink" title="Flow of execution"></a>Flow of execution</h2><ul>
-<li><p>Create JobClient</p>
-<ul>
-<li>Create <em>JobClient</em> which is primary interact with the cluster.</li>
-<li><p>During JobClient initialization, create <em>Cluster</em> which provides access to the cluster.</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.mapred.JobClient</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(JobConf conf)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">       ...    </span><br><span class="line">       cluster = <span class="keyword">new</span> Cluster(conf);</span><br><span class="line">       ...  </span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+        <h1 id="CAP-theorem"><a href="#CAP-theorem" class="headerlink" title="CAP theorem"></a>CAP theorem</h1><h2 id="Wiki-description"><a href="#Wiki-description" class="headerlink" title="Wiki description"></a>Wiki description</h2><pre><code>According to the [wiki](https://en.wikipedia.org/wiki/CAP_theorem): CAP theorem explains that it is impossible for a *distributed data store* to simultaneously provide more than two out of the following three guarantees:
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Consistency: Every read receives the most recent write or an error.</span><br><span class="line">Availability: Every request receives a (non-error) response – without the guarantee that it contains the most recent write.</span><br><span class="line">Partition tolerance: The system continues to operate despite an arbitrary number of messages being dropped (or delayed) by the network between nodes.</span><br></pre></td></tr></table></figure>
+<h2 id="Simple-understanding"><a href="#Simple-understanding" class="headerlink" title="Simple understanding"></a>Simple understanding</h2><pre><code>- Here explain the theorem using a simple example. Considering there are two nodes, and data is replicated in two nodes.
+- If AP, then not C. When network partition happens(P), a write request arrives at one node and success(A), then the data on the two nodes must be inconsistent, meaning C is not satisfied.
+- If CP, then not A. When network partition happens(P), the read on either node always get the same value. Then write operation must be forbidden, meaning A is satisfied.
+- IF AC, then not P. If write always success(A), read always get the recent write value(C), then network partition must not happen, meaning P is satisfied.
+</code></pre><h2 id="Does-it-explain-well"><a href="#Does-it-explain-well" class="headerlink" title="Does it explain well"></a>Does it explain well</h2><p>The above understanding of CAP is not sufficient. CAP is always criticized for being too simplistic and often misleading. Actually, many distributed data systems are not even CP, AP or AC, considering the strict definition. It is difficult for people to understand what is CAP by the above simple description which is explained in a lot of places on the Internet. The following of this article aims at <strong>adding a little more about the missing part of the above CAP theorem description and make it understandable</strong>.</p>
+<h2 id="Definition-of-terms"><a href="#Definition-of-terms" class="headerlink" title="Definition of terms"></a>Definition of terms</h2><p>Before going any further, we need to make precise definition of terms. There are many articles discussing CAP, without clear dinifition and the readers may not have enough knowledge to understand them.</p>
+<h3 id="Serialization"><a href="#Serialization" class="headerlink" title="Serialization"></a>Serialization</h3><ul>
+<li>serialization is a transaction concept. Multiple transactions are processed in parallel, and each transaction contains one or more instructions. The database needs to <a href="https://en.wikipedia.org/wiki/Schedule_(computer_science" target="_blank" rel="noopener">schedule</a>) how the instructions are executed. Note that different execution orders may result in different result.<ul>
+<li>For example, start with the status a = 1, b = 3<ul>
+<li>t1<ul>
+<li>i1 : t1 = a</li>
+<li>i2 : b = t1 + 1</li>
+</ul>
 </li>
-<li><p>During Cluster initialization, use loaded ClientProtocalProvider list to create ClientProtocol until get one, ClientProtocal is the protocal for client and central jobtracker to communicate.</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.mapreduce.Cluster</span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">()</span> </span>&#123;</span><br><span class="line">         ...</span><br><span class="line">    <span class="keyword">for</span> (ClientProtocolProvider provider : providerList) &#123;</span><br><span class="line">        ClientProtocol clientProtocol = <span class="keyword">null</span>;</span><br><span class="line">        clientProtocol = provider.create(..., conf);</span><br><span class="line">        <span class="keyword">if</span> (clientProtocol != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<li>t2<ul>
+<li>i3 : t2 = b</li>
+<li>i4 : a = t2 + 1</li>
+</ul>
 </li>
-<li><p>There are two kinds of ClientProtocalProvider, one is LocalClientProtocolProvider for local, the other is YarnClientProtocolProvider for communicating with yarn.</p>
-<ul>
-<li><p>If <em>mapreduce.framework.name</em> is yarn, then create YarnRunner.</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.mapred.YarnClientProtocolProvider</span><br><span class="line">  <span class="function"><span class="keyword">public</span> ClientProtocol <span class="title">create</span><span class="params">(Configuration conf)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (MRConfig.YARN_FRAMEWORK_NAME.equals(conf.get(MRConfig.FRAMEWORK_NAME))) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> YARNRunner(conf);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>If <em>mapreduce.framework.name</em> is local, then create LocalJobRunner, and set map to be 1.</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.mapred.LocalClientProtocolProvider</span><br><span class="line">  <span class="function"><span class="keyword">public</span> ClientProtocol <span class="title">create</span><span class="params">(Configuration conf)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    String framework =</span><br><span class="line">        conf.get(MRConfig.FRAMEWORK_NAME, MRConfig.LOCAL_FRAMEWORK_NAME);</span><br><span class="line">    <span class="keyword">if</span> (!MRConfig.LOCAL_FRAMEWORK_NAME.equals(framework)) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    conf.setInt(JobContext.NUM_MAPS, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> LocalJobRunner(conf);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-</li>
+<li>Execution order of i1, i3, i2, i4 results in a = 4, b = 2. Execution order of i1, i2, i3, i4 results in a = 3, b = 2.</li>
 </ul>
 </li>
 </ul>
 </li>
-<li><p>Submit job through JobClient</p>
-<ul>
-<li><p>Get new JobId</p>
-<ul>
-<li><p>For local execution, generate local new jobId using LocalJobRunner</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.mapred.LocalJobRunner</span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">synchronized</span> org.apache.hadoop.mapreduce.<span class="function">JobID <span class="title">getNewJobID</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">new</span> org.apache.hadoop.mapreduce.JobID(<span class="string">"local"</span> + randid, ++jobid);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>For distributed execution, get new JobId from resource manager through YarnRunner</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.mapred.YARNRunner</span><br><span class="line">  <span class="function"><span class="keyword">public</span> JobID <span class="title">getNewJobID</span><span class="params">()</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> resMgrDelegate.getNewJobID();</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-</li>
+<li>A transaction schedule is <em>serializable</em> if the outcome is as if transactions are executed atomically and in some sequential order.</li>
+<li>Serializability is considered as the the highest level of isolation between transactions.</li>
+<li>Strict serializability : Serializability + transactions are processed in the “real-time” order. If transaction A finishes before transaction B starts, </li>
+</ul>
+<h3 id="How-to-garrantee-serialization"><a href="#How-to-garrantee-serialization" class="headerlink" title="How to garrantee serialization"></a>How to garrantee serialization</h3><ul>
+<li>Using concurrency control protocol  such as <a href="https://en.wikipedia.org/wiki/Two-phase_locking" target="_blank" rel="noopener">2PL</a><ul>
+<li>2PL : 2 phrase locking<ul>
+<li>acquire locks in first phrase, release locks in second phrase</li>
 </ul>
 </li>
-<li><p>Actual submit job</p>
-<ul>
-<li><p>For local execution</p>
-<ul>
-<li><p>Create a Job object. Job extends Thread, and can be run as a Thread.</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.mapred.LocalJobRunner</span><br><span class="line">   <span class="keyword">public</span> org.apache.hadoop.mapreduce.<span class="function">JobStatus <span class="title">submitJob</span><span class="params">(...)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">      Job job = <span class="keyword">new</span> Job(JobID.downgrade(jobid), jobSubmitDir);</span><br><span class="line">      ...</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>At the end of the constructor of Job, it starts itself as a Thread.</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.mapred.LocalJobRunner</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Job</span><span class="params">(JobID jobid, String jobSubmitDir)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">this</span>.start();</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-</li>
+<li>C2PL : Conservative two-phase locking<ul>
+<li>acquire all locks at the beginning of the transaction, release locks in the second phrase.</li>
 </ul>
 </li>
-<li><p>For distributed execution, submit the job to resource manager.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.mapred.YARNRunner</span><br><span class="line">    public JobStatus submitJob(JobID jobId, String jobSubmitDir, Credentials ts)&#123;</span><br><span class="line">        ...</span><br><span class="line">        ApplicationId applicationId =</span><br><span class="line">          resMgrDelegate.submitApplication(appContext);</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<li>S2PL : Strict two-phase locking<ul>
+<li>acquire locks in first phrase, release write locks at the end of the  transaction.</li>
+</ul>
 </li>
+<li>SS2PL : Strong strict two-phase locking<ul>
+<li>acquire locks in first phrase, release both read and write locks at the end of the transaction.</li>
+<li>SS2PL has been the concurrency control protocol of choice for most database systems and utilized since their early days in the 1970s.</li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
-<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>We can see that, whether a job runs in local mode or distributed mode is decided by <em>mapreduce.framework.name</em>. In local mode, the mapper and reducer will run locally in the same JVM with the client. In distributed mode, the job will be submitted to the resource manager.</p>
+<h3 id="Linearizability"><a href="#Linearizability" class="headerlink" title="Linearizability"></a>Linearizability</h3><ul>
+<li><a href="https://en.wikipedia.org/wiki/Linearizability" target="_blank" rel="noopener">Linearizability</a> is from concurrent programming.  Linearizability is originally talking about single objects and not transactions. Nowadays, many papers talk about linearilzability transactions the same as strict serializability, and each transaction contains only one operation. </li>
+<li>How Linearizability is related with CAP<ul>
+<li>Linearizability is what the CAP Theorem calls Consistency.</li>
+</ul>
+</li>
+</ul>
+<h3 id="Isolation"><a href="#Isolation" class="headerlink" title="Isolation"></a>Isolation</h3><ul>
+<li><a href="https://en.wikipedia.org/wiki/Isolation_(database_systems" target="_blank" rel="noopener">Phantom Read Phenomena</a>)<ul>
+<li>Dirty reads<ul>
+<li>A dirty read occurs when a transaction is allowed to read data from a row that has been modified by another running transaction and not yet committed.</li>
+</ul>
+</li>
+<li>Non-repeatable reads<ul>
+<li>A non-repeatable read occurs, when during the course of a transaction, a row is retrieved twice and the values within the row differ between reads.</li>
+</ul>
+</li>
+<li>Phantom reads<ul>
+<li>A phantom read occurs when, in the course of a transaction, new rows are added or removed by another transaction to the records being read.</li>
+</ul>
+</li>
+<li>Note that only these are insufficient and there are more situations.</li>
+</ul>
+</li>
+<li>Levels(stronger to lower)<ul>
+<li>Serializable<ul>
+<li>This is the highest isolation level.</li>
+<li>With a lock-based concurrency control DBMS implementation, serializability requires read and write locks (acquired on selected data) to be released at the end of the transaction. Also range-locks must be acquired when a SELECT query uses a ranged WHERE clause, especially to avoid the phantom reads phenomenon.</li>
+</ul>
+</li>
+<li>Repeatable reads<ul>
+<li>a lock-based concurrency control DBMS implementation keeps read and write locks (acquired on selected data) until the end of the transaction. However, range-locks are not managed, so phantom reads can occur.</li>
+</ul>
+</li>
+<li>Read committed<ul>
+<li>a lock-based concurrency control DBMS implementation keeps write locks (acquired on selected data) until the end of the transaction, but read locks are released as soon as the SELECT operation is performed (so the non-repeatable reads phenomenon can occur in this isolation level). As in the previous level, range-locks are not managed.</li>
+</ul>
+</li>
+<li>Read uncommitted<ul>
+<li>This is the lowest isolation level. In this level, dirty reads are allowed, so one transaction may see not-yet-committed changes made by other transactions.</li>
+</ul>
+</li>
+<li>There are also incufficient and there are many more.</li>
+</ul>
+</li>
+<li>How isolation is related in CAP<ul>
+<li>Since the C(consistency) in CAP refers to linearizability which is very strong, and per transaction contains one operation, all actions happen instantaneously. The C(consistency) actually ensures the strongest isolation : serializable isolution level.</li>
+</ul>
+</li>
+</ul>
+<h3 id="What-isolation-level-are-commercial-databases-providing"><a href="#What-isolation-level-are-commercial-databases-providing" class="headerlink" title="What isolation level are commercial databases providing"></a>What isolation level are commercial databases providing</h3><ul>
+<li>READ COMMITTED is defaulted isolation level on PostgreSQL, SQL Server, and Oracle.</li>
+<li>REPEATABLE READ is defaulted isolation level on Mysql Innodb.</li>
+<li>We can see that serializable isolation level is not used at lease by default. It is too heavy and required more locks(If use lock as concurrency control), less concurrency, and less throughput. It also infers that in CAP, even if we can only choose 2 of them at the same time, C(strong consistency, linearizability, highest isolation level) is mostly not chosen. Most databases choose weaker consistency, which has better performance.</li>
+</ul>
+<h2 id="Look-back-at-CAP-theorem"><a href="#Look-back-at-CAP-theorem" class="headerlink" title="Look back at CAP theorem"></a>Look back at CAP theorem</h2><ul>
+<li>C<ul>
+<li>definition<ul>
+<li>A guarantee that every node in a distributed cluster returns the same, most recent, successful write. Consistency refers to every client having the same view of the data. There are various types of consistency models. Consistency in CAP (used to prove the theorem) refers to linearizability or sequential consistency, a very strong form of consistency.</li>
+</ul>
+</li>
+<li>meaning<ul>
+<li>Apparently, this is very strong consistency and there are no dirty reads, non-repeatable reads, or phantom reads. </li>
+</ul>
+</li>
+</ul>
+</li>
+<li>A<ul>
+<li>definition<ul>
+<li>Every non-failing node returns a response for all read and write requests in a reasonable amount of time. The key word here is every. To be available, every node on (either side of a network partition) must be able to respond in a reasonable amount of time.</li>
+</ul>
+</li>
+<li>meaning<ul>
+<li>If some operation finishes exceeding an acceptable time(e.g. 30 seconds), it just means not available.</li>
+<li>This definition of availability is also strong. Note that during network partition, even if you say the partition which contains the majority of nodes responses the client, it is not seen as achieve availability in CAP. It is called availability if the less node partition nodes also responses write/read to the client without error.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>P<ul>
+<li>The system continues to function and upholds its consistency guarantees in spite of network partitions. Network partitions are a fact of life. Distributed systems guaranteeing partition tolerance can gracefully recover from partitions once the partition heals.</li>
+</ul>
+</li>
+<li>others<ul>
+<li>In a network partition, even if it is only a choice to choose avaialbility or consistency. Many databases are not choosing any of them, since the consistency (linearizability) is so expensive. Actually, there leave a space for the database designers/users to choose a level of balanced consistency and availability according to the use case. Whenever looking into a database, it will be a nice point to check what level of A and C among does it provides during P happens, even it is not perfect A or C according to the CAP definition.</li>
+</ul>
+</li>
+</ul>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="https://martin.kleppmann.com/2015/05/11/please-stop-calling-databases-cp-or-ap.html" target="_blank" rel="noopener">please-stop-calling-databases-cp-or-ap</a></li>
+<li><a href="https://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed" target="_blank" rel="noopener">cap-twelve-years-later-how-the-rules-have-changed</a></li>
+<li><a href="https://begriffs.com/posts/2017-08-01-practical-guide-sql-isolation.html" target="_blank" rel="noopener">practical-guide-sql-isolation</a></li>
+<li><a href="https://irenezhang.net/blog/2015/02/01/consistency.html" target="_blank" rel="noopener">consistency</a></li>
+<li><a href="https://project.inria.fr/epfl-Inria/files/2017/02/JadHamza-talk.pdf" target="_blank" rel="noopener">What is the strongest consistency that could be achieved<br>in a large scale distributed system?</a></li>
+<li><a href="http://www.bailis.org/blog/linearizability-versus-serializability/" target="_blank" rel="noopener">linearizability-versus-serializability/</a></li>
+<li><a href="https://dddpaul.github.io/blog/2016/03/17/linearizability-and-serializability/" target="_blank" rel="noopener">linearizability-and-serializability/</a></li>
+<li><a href="https://cs.stackexchange.com/questions/41698/linearizability-and-serializability-in-context-of-software-transactional-memory" target="_blank" rel="noopener">linearizability-and-serializability-in-context-of-software-transactional-memory</a></li>
+<li><a href="https://dzone.com/articles/understanding-the-cap-theorem" target="_blank" rel="noopener">understanding-the-cap-theorem</a></li>
+</ul>
 
       
     </div>
@@ -561,9 +638,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/hadoop/" rel="tag"># hadoop</a>
-          
-            <a href="/tags/hive/" rel="tag"># hive</a>
+            <a href="/tags/database/" rel="tag"># database</a>
           
         </div>
       
@@ -576,8 +651,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/11/19/hive-configuration-best-practise/" rel="next" title="hive configuration understanding">
-                <i class="fa fa-chevron-left"></i> hive configuration understanding
+              <a href="/2019/01/09/hive-DeferredJavaObject/" rel="next" title="hive GenericUDF and DeferredJavaObject analysis">
+                <i class="fa fa-chevron-left"></i> hive GenericUDF and DeferredJavaObject analysis
               </a>
             
           </div>
@@ -585,10 +660,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/12/15/create_git_hooks_in_mac/" rel="prev" title="create git hooks in mac">
-                create git hooks in mac <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -731,7 +802,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Flow-of-execution"><span class="nav-text">Flow of execution</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Conclusion"><span class="nav-text">Conclusion</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CAP-theorem"><span class="nav-text">CAP theorem</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Wiki-description"><span class="nav-text">Wiki description</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Simple-understanding"><span class="nav-text">Simple understanding</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Does-it-explain-well"><span class="nav-text">Does it explain well</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Definition-of-terms"><span class="nav-text">Definition of terms</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Serialization"><span class="nav-text">Serialization</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#How-to-garrantee-serialization"><span class="nav-text">How to garrantee serialization</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linearizability"><span class="nav-text">Linearizability</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Isolation"><span class="nav-text">Isolation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#What-isolation-level-are-commercial-databases-providing"><span class="nav-text">What isolation level are commercial databases providing</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Look-back-at-CAP-theorem"><span class="nav-text">Look back at CAP theorem</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-text">Reference</span></a></li></ol></li></ol></div>
             
 
           </div>
