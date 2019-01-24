@@ -117,7 +117,7 @@
 <meta property="og:site_name" content="Yan&#39;s Notes">
 <meta property="og:description" content="Wiki descriptionAccording to the wiki: CAP theorem explains that it is impossible for a distributed data store to simultaneously provide more than two out of the following three guarantees:  Consisten">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-01-24T13:58:58.600Z">
+<meta property="og:updated_time" content="2019-01-24T14:24:29.277Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Very basic understanding of CAP theorem">
 <meta name="twitter:description" content="Wiki descriptionAccording to the wiki: CAP theorem explains that it is impossible for a distributed data store to simultaneously provide more than two out of the following three guarantees:  Consisten">
@@ -424,7 +424,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-01-24 22:58:58" itemprop="dateModified" datetime="2019-01-24T22:58:58+09:00">2019-01-24</time>
+                <time title="Modified: 2019-01-24 23:24:29" itemprop="dateModified" datetime="2019-01-24T23:24:29+09:00">2019-01-24</time>
               
             
           </span>
@@ -479,7 +479,7 @@
 <h1 id="Does-it-explain-well"><a href="#Does-it-explain-well" class="headerlink" title="Does it explain well"></a>Does it explain well</h1><p>The above understanding of CAP is not sufficient. CAP is always criticized for being too simplistic and often misleading. Actually, many distributed data systems are not even CP, AP or AC, considering the strict definition. It is difficult for people to understand what is CAP by the above simple description which is explained in a lot of places on the Internet. The following of this article aims at <strong>adding a little more about the missing part of the above CAP theorem description and make it understandable</strong>.</p>
 <h1 id="Definition-of-terms"><a href="#Definition-of-terms" class="headerlink" title="Definition of terms"></a>Definition of terms</h1><p>Before going any further, we need to make precise definition of terms. There are many articles discussing CAP, without clear definition and the readers may not have enough knowledge to understand them.</p>
 <h2 id="Serialization"><a href="#Serialization" class="headerlink" title="Serialization"></a>Serialization</h2><ul>
-<li>serialization is a transaction concept. Multiple transactions are processed in parallel, and each transaction contains one or more instructions. The database needs to <a href="https://en.wikipedia.org/wiki/Schedule_(computer_science" target="_blank" rel="noopener">schedule</a> how the instructions are executed. Note that different execution orders may result in different result.<ul>
+<li>serialization is a transaction concept. Multiple transactions are processed in parallel, and each transaction contains one or more instructions. The database needs to <a href="https://en.wikipedia.org/wiki/Schedule_(computer_science)" title="[external] [title]" target="_blank" rel="noopener">schedule</a> how the instructions are executed. Note that different execution orders may result in different result.<ul>
 <li>For example, start with the status a = 1, b = 3<ul>
 <li>t1<ul>
 <li>i1 : t1 = a</li>
@@ -530,7 +530,8 @@
 </li>
 </ul>
 <h2 id="Isolation"><a href="#Isolation" class="headerlink" title="Isolation"></a>Isolation</h2><ul>
-<li><a href="https://en.wikipedia.org/wiki/Isolation_(database_systems" target="_blank" rel="noopener">Phantom Read Phenomena</a><ul>
+<li><a href="https://en.wikipedia.org/wiki/Isolation_(database_systems)" title="[external] [title]" target="_blank" rel="noopener">Phantom Read Phenomena</a>
+<ul>
 <li>Dirty reads<ul>
 <li>A dirty read occurs when a transaction is allowed to read data from a row that has been modified by another running transaction and not yet committed.</li>
 </ul>
