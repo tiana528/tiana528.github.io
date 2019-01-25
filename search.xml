@@ -3,6 +3,23 @@
   
     
     <entry>
+      <title>hadoop cluster incidents</title>
+      <link href="/2019/01/25/hadoop-cluster-incidents/"/>
+      <url>/2019/01/25/hadoop-cluster-incidents/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Purpose"><a href="#Purpose" class="headerlink" title="Purpose"></a>Purpose</h1><p>The operation of Hadoop cluster is not easy. There are many parameters and there is no perfect configuration that fit all situations. Monitoring and learn from each incidents is very important. This article aims at summarizing some incidents and they can be seen as valued knowledge to help investigate future incidents and discuss approaches to prevent. </p><h1 id="datanode-Xmx-configured-does-not-fit-the-instance"><a href="#datanode-Xmx-configured-does-not-fit-the-instance" class="headerlink" title="datanode Xmx configured does not fit the instance"></a>datanode Xmx configured does not fit the instance</h1><ul><li>situation<ul><li>The whole cluster performance degrades.</li><li>One node in the cluster has extremely higher CPU utilization than other nodes.</li><li>The datanode process on that node takes up more than 300% CPU by checking top command.</li><li>The accumulate GC time of the datanode processs on that node increases rapidly(know it through datadog jvm.gc.parnew.time metrics).</li></ul></li><li>analysis<ul><li>The cluster performance degrades because one datanode process behaves bad.</li><li>GC time increases rapidly indicates the memory is insufficient.</li></ul></li><li>root cause<ul><li>The Xmx parameter of the datanode process is configured too large. The slave instance type is aws c4.2xlarge which is 15GB, 8vCPU. Each core(map,reduce,application master) Xmx is configured as 2GB, node manager Xmx is also 2GB, but datanode JMX is configured as 10GB. Meaning that the datanode Xmx configured is much higher than the free memory on the node thus causing frequent memory swap and performance degradation, as well as longer GC time. This articles explains a little more about <a href="http://www.javaperformancetuning.com/news/qotm045.shtml" target="_blank" rel="noopener">the situation when a large heap(Xmx) is configured</a>.</li></ul></li><li>learn<ul><li>Monitoring GC time increasing speed helps find the situations that the JVM paramers are mis-configured. Free space on the node should be considered when deciding the Xmx value.</li></ul></li></ul><h1 id="to-be-continued"><a href="#to-be-continued" class="headerlink" title="to be continued"></a>to be continued</h1>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> hadoop </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
       <title>Very basic understanding of CAP theorem</title>
       <link href="/2019/01/19/hadoop-systems-and-CAP-theorem/"/>
       <url>/2019/01/19/hadoop-systems-and-CAP-theorem/</url>
