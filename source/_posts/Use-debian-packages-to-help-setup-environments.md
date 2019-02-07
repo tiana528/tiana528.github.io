@@ -28,5 +28,73 @@ It never becomes easy to setup/install/upgrade environments. This article aims a
 # Debian package operation
 
 ## Create debian packages
-There are 
+It is possible to use the official tool(dpkg-deb) to create debian packages. But here we use [fpm](https://github.com/jordansissel/fpm) to create debian packages. It is very simple to use.
+
+Refer [this](https://fpm.readthedocs.io/en/latest/installing.html) to install fpm.
+
+### Example1
+Create a debian package whose name is "hello_world", and what it do is installing a file "hello world" in the path of /tmp/hi.txt
+
+It is very easy, just execute 3 commands.
+
+```bash
+mkdir -p working_folder/tmp
+echo "hello world" > working_folder/tmp/hi.txt
+fpm \
+  --architecture=amd64 \
+  --chdir=working_folder \
+  --input-type=dir \
+  --output-type=deb \
+  --name=hello_world \
+  --version="0.0.1" \
+  --iteration="001" \
+  --description="This is an example" \
+  --deb-user="root" \
+  --deb-group="root" \
+  --deb-priority="extra" \
+  "."
+```
+Then a file of hello-world_0.0.1-001_amd64.deb will be created in the current folder.
+Use `sudo dpkg -i hello-world_0.0.1-001_amd64.deb` to install the deb file, and then you can see a file(/tmp/hi.txt) containing "hello world" is created.
+
+## Example2
+This is an example to create a symlink /etc/link which links to /tmp/hi.txt. This example shows the usage of `--after-install` to do something at the end of package installation.
+
+Create a file hook-AfterInstall.sh.
+```
+#!/usr/bin/env bash
+ln -s /tmp/hi.txt /etc/link
+```
+Then run 3 commands.
+```bash
+mkdir -p working_folder/tmp
+echo "hello world" > working_folder/tmp/hi.txt
+fpm \
+  --architecture=amd64 \
+  --chdir=working_folder \
+  --input-type=dir \
+  --output-type=deb \
+  --name=hello_world \
+  --version="0.0.1" \
+  --iteration="002" \
+  --description="This is an example" \
+  --deb-user="root" \
+  --deb-group="root" \
+  --deb-priority="extra" \
+  --after-install="hook-AfterInstall.sh" \
+  "."
+```
+Then hello-world_0.0.1-002_amd64.deb is created in the current folder. Installing it will create a symlink.
+
+## apt
+
+## dpkg
+dpkg plays with .deb file, following are several useful commands.
+sudo dpkg -L hadoop-node-common
+
+sudo dpkg --purge --force-depends hadoop-node-common
+
+## common questions
+- What are conffiles?
+    - [conffiles](https://www.debian.org/doc/manuals/maint-guide/dother.en.html#conffiles)
 
