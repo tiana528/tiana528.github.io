@@ -109,18 +109,18 @@
 
 
 
-  <meta name="description" content="backgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
+  <meta name="description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
 <meta name="keywords" content="debian package">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Use debian packaging to help setup environments">
 <meta property="og:url" content="https://tiana528.github.io/2019/02/07/Use-debian-packages-to-help-setup-environments/index.html">
 <meta property="og:site_name" content="Yan&#39;s Notes">
-<meta property="og:description" content="backgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
+<meta property="og:description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-07T14:41:13.489Z">
+<meta property="og:updated_time" content="2019-02-07T14:52:49.490Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Use debian packaging to help setup environments">
-<meta name="twitter:description" content="backgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
+<meta name="twitter:description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
 
 
 
@@ -407,7 +407,7 @@
                 
               
 
-              <time title="Created: 2019-02-07 20:25:32 / Modified: 23:41:13" itemprop="dateCreated datePublished" datetime="2019-02-07T20:25:32+09:00">2019-02-07</time>
+              <time title="Created: 2019-02-07 20:25:32 / Modified: 23:52:49" itemprop="dateCreated datePublished" datetime="2019-02-07T20:25:32+09:00">2019-02-07</time>
             
 
             
@@ -463,7 +463,7 @@
       
 
       
-        <h1 id="background"><a href="#background" class="headerlink" title="background"></a>background</h1><p>It never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments.</p>
+        <h1 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h1><p>It never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments.</p>
 <h2 id="What-is-a-debian-package"><a href="#What-is-a-debian-package" class="headerlink" title="What is a debian package"></a>What is a debian package</h2><ul>
 <li>Linux<ul>
 <li><a href="https://en.wikipedia.org/wiki/Linux" target="_blank" rel="noopener">Linux</a> is a family of free and open-source software operating systems based on the Linux kernel.</li>
@@ -502,7 +502,7 @@
 <p>Create a file hook-AfterInstall.sh.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env bash</span><br><span class="line">ln -s /tmp/hi.txt /etc/link</span><br></pre></td></tr></table></figure></p>
 <p>Then run 3 commands.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p working_folder/tmp</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"hello world"</span> &gt; working_folder/tmp/hi.txt</span><br><span class="line">fpm \</span><br><span class="line">  --architecture=amd64 \</span><br><span class="line">  --<span class="built_in">chdir</span>=working_folder \</span><br><span class="line">  --input-type=dir \</span><br><span class="line">  --output-type=deb \</span><br><span class="line">  --name=hello_world \</span><br><span class="line">  --version=<span class="string">"0.0.1"</span> \</span><br><span class="line">  --iteration=<span class="string">"002"</span> \</span><br><span class="line">  --description=<span class="string">"This is an example"</span> \</span><br><span class="line">  --deb-user=<span class="string">"root"</span> \</span><br><span class="line">  --deb-group=<span class="string">"root"</span> \</span><br><span class="line">  --deb-priority=<span class="string">"extra"</span> \</span><br><span class="line">  --after-install=<span class="string">"hook-AfterInstall.sh"</span> \</span><br><span class="line">  <span class="string">"."</span></span><br></pre></td></tr></table></figure></p>
 <p>Then hello-world_0.0.1-002_amd64.deb is created in the current folder. Installing it will create a symlink.</p>
-<h1 id="Debian-package-operation"><a href="#Debian-package-operation" class="headerlink" title="Debian package operation"></a>Debian package operation</h1><h2 id="dpkg"><a href="#dpkg" class="headerlink" title="dpkg"></a>dpkg</h2><ul>
+<h1 id="Debian-package-operation-tools"><a href="#Debian-package-operation-tools" class="headerlink" title="Debian package operation tools"></a>Debian package operation tools</h1><h2 id="dpkg"><a href="#dpkg" class="headerlink" title="dpkg"></a>dpkg</h2><ul>
 <li>See help<ul>
 <li>dpkg –help</li>
 <li>dpkg –force-help</li>
@@ -578,9 +578,11 @@
 </ul>
 <h2 id="dpkg-deb"><a href="#dpkg-deb" class="headerlink" title="dpkg-deb"></a>dpkg-deb</h2><ul>
 <li>Determine what files are contained in a Debian archive file<ul>
-<li>dpkg-deb –contents foo.deb<h2 id="common-questions"><a href="#common-questions" class="headerlink" title="common questions"></a>common questions</h2></li>
+<li>dpkg-deb –contents foo.deb</li>
 </ul>
 </li>
+</ul>
+<h1 id="common-questions"><a href="#common-questions" class="headerlink" title="common questions"></a>common questions</h1><ul>
 <li><p>What are <a href="https://www.debian.org/doc/manuals/maint-guide/dother.en.html#conffiles" target="_blank" rel="noopener">conffiles</a>?</p>
 <ul>
 <li>conffiles are just configuration files of a package. When you upgrade a package, you’ll be asked whether you want to keep your old configuration files or not.</li>
@@ -634,8 +636,9 @@
 </ul>
 </li>
 <li>How to downgrade the version of a package?</li>
-<li><p>How to dealwith conffiles during package version up?<br>  ls /var/lib/dpkg/info/. | grep conffiles</p>
-<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1></li>
+<li>How to dealwith conffiles during package version up?<br>  ls /var/lib/dpkg/info/. | grep conffiles</li>
+</ul>
+<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ul>
 <li><p><a href="https://www.debian.org/doc/manuals/debian-faq/ch-pkgtools.en.html" target="_blank" rel="noopener">FAQ</a> of dpkg tools</p>
 </li>
 <li><p>How to use <a href="https://help.ubuntu.com/community/AptGet/Howto" target="_blank" rel="noopener">apt-get</a>?</p>
@@ -837,7 +840,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#background"><span class="nav-text">background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#What-is-a-debian-package"><span class="nav-text">What is a debian package</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Create-debian-packages"><span class="nav-text">Create debian packages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example1"><span class="nav-text">Example1</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example2"><span class="nav-text">Example2</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#Debian-package-operation"><span class="nav-text">Debian package operation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg"><span class="nav-text">dpkg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aptitude"><span class="nav-text">aptitude</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg-deb"><span class="nav-text">dpkg-deb</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#common-questions"><span class="nav-text">common questions</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-text">References</span></a></li></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#What-is-a-debian-package"><span class="nav-text">What is a debian package</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Create-debian-packages"><span class="nav-text">Create debian packages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example1"><span class="nav-text">Example1</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example2"><span class="nav-text">Example2</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#Debian-package-operation-tools"><span class="nav-text">Debian package operation tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg"><span class="nav-text">dpkg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aptitude"><span class="nav-text">aptitude</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg-deb"><span class="nav-text">dpkg-deb</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#common-questions"><span class="nav-text">common questions</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-text">References</span></a></li></div>
             
 
           </div>
