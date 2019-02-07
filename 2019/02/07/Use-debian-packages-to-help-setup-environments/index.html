@@ -117,7 +117,7 @@
 <meta property="og:site_name" content="Yan&#39;s Notes">
 <meta property="og:description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-07T14:52:49.490Z">
+<meta property="og:updated_time" content="2019-02-07T15:03:50.412Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Use debian packaging to help setup environments">
 <meta name="twitter:description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
@@ -407,12 +407,24 @@
                 
               
 
-              <time title="Created: 2019-02-07 20:25:32 / Modified: 23:52:49" itemprop="dateCreated datePublished" datetime="2019-02-07T20:25:32+09:00">2019-02-07</time>
+              <time title="Created: 2019-02-07 20:25:32" itemprop="dateCreated datePublished" datetime="2019-02-07T20:25:32+09:00">2019-02-07</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-02-08 00:03:50" itemprop="dateModified" datetime="2019-02-08T00:03:50+09:00">2019-02-08</time>
               
             
           </span>
@@ -537,11 +549,11 @@
 </ul>
 </li>
 <li>Find packages by file name.<ul>
-<li>dpkg –search <pattern></pattern></li>
+<li>dpkg –search foo*</li>
 </ul>
 </li>
 <li>Find packages by package name.<ul>
-<li>dpkg –list <pattern></pattern></li>
+<li>dpkg –list foo*</li>
 </ul>
 </li>
 </ul>
@@ -582,9 +594,8 @@
 </ul>
 </li>
 </ul>
-<h1 id="common-questions"><a href="#common-questions" class="headerlink" title="common questions"></a>common questions</h1><ul>
-<li><p>What are <a href="https://www.debian.org/doc/manuals/maint-guide/dother.en.html#conffiles" target="_blank" rel="noopener">conffiles</a>?</p>
-<ul>
+<h1 id="Common-questions"><a href="#Common-questions" class="headerlink" title="Common questions"></a>Common questions</h1><ul>
+<li>What are <a href="https://www.debian.org/doc/manuals/maint-guide/dother.en.html#conffiles" target="_blank" rel="noopener">conffiles</a>?<ul>
 <li>conffiles are just configuration files of a package. When you upgrade a package, you’ll be asked whether you want to keep your old configuration files or not.</li>
 <li>Files under the /etc directory are marked as conffiles automatically.</li>
 <li>If your program uses configuration files but also rewrites them on its own, it’s best not to make them conffiles because dpkg will then prompt users to verify the changes all the time.</li>
@@ -595,14 +606,12 @@
 </li>
 </ul>
 </li>
-<li><p>What packages are already installed?</p>
-<ul>
+<li>What packages are already installed?<ul>
 <li>dpkg –list</li>
 <li>dpkg –list ‘foo*’</li>
 </ul>
 </li>
-<li><p>How to check detail of installed packages</p>
-<ul>
+<li>How to check detail of installed packages<ul>
 <li>dpkg –status foo</li>
 </ul>
 </li>
@@ -610,33 +619,31 @@
 <li>dpkg –listfiles foo</li>
 </ul>
 </li>
-<li><p>How can I find out what package produced a particular file?</p>
-<ul>
+<li>How can I find out what package produced a particular file?<ul>
 <li>dpkg –search foo<ul>
 <li>This will search all of the files having the file extension of .list in the directory /var/lib/dpkg/info/.</li>
 </ul>
 </li>
 </ul>
 </li>
-<li><p>Can multiple versions of the same package exist on the same system?</p>
-<ul>
+<li>Can multiple versions of the same package exist on the same system?<ul>
 <li>No.</li>
 </ul>
 </li>
-<li><p>What happens when upgrade a binary debian package?</p>
-<ul>
+<li>What happens when upgrade a binary debian package?<ul>
 <li>It will first delete all files created by the old version except conffiles, then install the new version. So there might be a small period that there will be no available/executable package.</li>
 </ul>
 </li>
-<li><p>What are conffiles of an installed packages?</p>
-</li>
-<li><p>How to install packages in place without breaking existing running service?</p>
-<ul>
+<li>What are conffiles of an installed packages?</li>
+<li>How to install packages in place without breaking existing running service?<ul>
 <li>Put version in the package name </li>
 </ul>
 </li>
 <li>How to downgrade the version of a package?</li>
-<li>How to dealwith conffiles during package version up?<br>  ls /var/lib/dpkg/info/. | grep conffiles</li>
+<li>How to dealwith conffiles during package version up?<ul>
+<li>ls /var/lib/dpkg/info/. | grep conffiles</li>
+</ul>
+</li>
 </ul>
 <h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ul>
 <li><p><a href="https://www.debian.org/doc/manuals/debian-faq/ch-pkgtools.en.html" target="_blank" rel="noopener">FAQ</a> of dpkg tools</p>
@@ -840,7 +847,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#What-is-a-debian-package"><span class="nav-text">What is a debian package</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Create-debian-packages"><span class="nav-text">Create debian packages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example1"><span class="nav-text">Example1</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example2"><span class="nav-text">Example2</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#Debian-package-operation-tools"><span class="nav-text">Debian package operation tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg"><span class="nav-text">dpkg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aptitude"><span class="nav-text">aptitude</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg-deb"><span class="nav-text">dpkg-deb</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#common-questions"><span class="nav-text">common questions</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-text">References</span></a></li></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#What-is-a-debian-package"><span class="nav-text">What is a debian package</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Create-debian-packages"><span class="nav-text">Create debian packages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example1"><span class="nav-text">Example1</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example2"><span class="nav-text">Example2</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#Debian-package-operation-tools"><span class="nav-text">Debian package operation tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg"><span class="nav-text">dpkg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aptitude"><span class="nav-text">aptitude</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg-deb"><span class="nav-text">dpkg-deb</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Common-questions"><span class="nav-text">Common questions</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-text">References</span></a></li></div>
             
 
           </div>
