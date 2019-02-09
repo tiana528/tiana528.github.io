@@ -112,14 +112,14 @@
   <meta name="description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
 <meta name="keywords" content="debian package">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Use debian packaging to help setup environments">
-<meta property="og:url" content="https://tiana528.github.io/2019/02/07/Use-debian-packages-to-help-setup-environments/index.html">
+<meta property="og:title" content="Basic understanding of debian packaging">
+<meta property="og:url" content="https://tiana528.github.io/2019/02/07/Basic_understanding_of_debian_packaging/index.html">
 <meta property="og:site_name" content="Yan&#39;s Notes">
 <meta property="og:description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-07T15:03:50.412Z">
+<meta property="og:updated_time" content="2019-02-09T13:59:37.673Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Use debian packaging to help setup environments">
+<meta name="twitter:title" content="Basic understanding of debian packaging">
 <meta name="twitter:description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
 
 
@@ -127,7 +127,7 @@
 
 
 
-  <link rel="canonical" href="https://tiana528.github.io/2019/02/07/Use-debian-packages-to-help-setup-environments/">
+  <link rel="canonical" href="https://tiana528.github.io/2019/02/07/Basic_understanding_of_debian_packaging/">
 
 
 
@@ -137,7 +137,7 @@
   };
 </script>
 
-  <title>Use debian packaging to help setup environments | Yan's Notes</title>
+  <title>Basic understanding of debian packaging | Yan's Notes</title>
   
 
 
@@ -365,7 +365,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2019/02/07/Use-debian-packages-to-help-setup-environments/">
+    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2019/02/07/Basic_understanding_of_debian_packaging/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Wang Yan">
@@ -382,7 +382,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Use debian packaging to help setup environments
+          <h1 class="post-title" itemprop="name headline">Basic understanding of debian packaging
               
             
           </h1>
@@ -424,7 +424,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-02-08 00:03:50" itemprop="dateModified" datetime="2019-02-08T00:03:50+09:00">2019-02-08</time>
+                <time title="Modified: 2019-02-09 22:59:37" itemprop="dateModified" datetime="2019-02-09T22:59:37+09:00">2019-02-09</time>
               
             
           </span>
@@ -438,9 +438,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2019/02/07/Use-debian-packages-to-help-setup-environments/#comments" itemprop="discussionUrl">
+                <a href="/2019/02/07/Basic_understanding_of_debian_packaging/#comments" itemprop="discussionUrl">
                 
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/02/07/Use-debian-packages-to-help-setup-environments/" itemprop="commentCount"></span>
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/02/07/Basic_understanding_of_debian_packaging/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -514,7 +514,7 @@
 <p>Create a file hook-AfterInstall.sh.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env bash</span><br><span class="line">ln -s /tmp/hi.txt /etc/link</span><br></pre></td></tr></table></figure></p>
 <p>Then run 3 commands.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p working_folder/tmp</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"hello world"</span> &gt; working_folder/tmp/hi.txt</span><br><span class="line">fpm \</span><br><span class="line">  --architecture=amd64 \</span><br><span class="line">  --<span class="built_in">chdir</span>=working_folder \</span><br><span class="line">  --input-type=dir \</span><br><span class="line">  --output-type=deb \</span><br><span class="line">  --name=hello_world \</span><br><span class="line">  --version=<span class="string">"0.0.1"</span> \</span><br><span class="line">  --iteration=<span class="string">"002"</span> \</span><br><span class="line">  --description=<span class="string">"This is an example"</span> \</span><br><span class="line">  --deb-user=<span class="string">"root"</span> \</span><br><span class="line">  --deb-group=<span class="string">"root"</span> \</span><br><span class="line">  --deb-priority=<span class="string">"extra"</span> \</span><br><span class="line">  --after-install=<span class="string">"hook-AfterInstall.sh"</span> \</span><br><span class="line">  <span class="string">"."</span></span><br></pre></td></tr></table></figure></p>
 <p>Then hello-world_0.0.1-002_amd64.deb is created in the current folder. Installing it will create a symlink.</p>
-<h1 id="Debian-package-operation-tools"><a href="#Debian-package-operation-tools" class="headerlink" title="Debian package operation tools"></a>Debian package operation tools</h1><h2 id="dpkg"><a href="#dpkg" class="headerlink" title="dpkg"></a>dpkg</h2><ul>
+<h1 id="Debian-package-management-tools"><a href="#Debian-package-management-tools" class="headerlink" title="Debian package management tools"></a>Debian package management tools</h1><h2 id="dpkg"><a href="#dpkg" class="headerlink" title="dpkg"></a>dpkg</h2><ul>
 <li>See help<ul>
 <li>dpkg –help</li>
 <li>dpkg –force-help</li>
@@ -634,22 +634,27 @@
 <li>It will first delete all files created by the old version except conffiles, then install the new version. So there might be a small period that there will be no available/executable package.</li>
 </ul>
 </li>
-<li>What are conffiles of an installed packages?</li>
-<li>How to install packages in place without breaking existing running service?<ul>
-<li>Put version in the package name </li>
+<li>What are conffiles of an installed packages?<ul>
+<li>ls /var/lib/dpkg/info/. | grep conffiles</li>
 </ul>
 </li>
-<li>How to downgrade the version of a package?</li>
+<li>How to install packages in place without breaking existing running service?<ul>
+<li>As we discribed before, updating a package will first delete all files owned by the current installed version, then install the new version. There is a small time window during the package versionup that there is no available/executable package. This should be considered when performing environment update. One solution is rolling update, never let a service in the middle of update provides actual service. The other is always installing new packages and do not update existing packages.</li>
+</ul>
+</li>
+<li>How to downgrade the version of a package?<ul>
+<li>apt get install foo=1.2 –allow-downgrades</li>
+</ul>
+</li>
 <li>How to dealwith conffiles during package version up?<ul>
-<li>ls /var/lib/dpkg/info/. | grep conffiles</li>
+<li><a href="https://raphaelhertzog.com/2010/09/21/debian-conffile-configuration-file-managed-by-dpkg/" target="_blank" rel="noopener">Everything you need to know about conffiles: configuration files managed by dpkg
+</a></li>
 </ul>
 </li>
 </ul>
 <h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ul>
-<li><p><a href="https://www.debian.org/doc/manuals/debian-faq/ch-pkgtools.en.html" target="_blank" rel="noopener">FAQ</a> of dpkg tools</p>
-</li>
-<li><p>How to use <a href="https://help.ubuntu.com/community/AptGet/Howto" target="_blank" rel="noopener">apt-get</a>?</p>
-</li>
+<li><a href="https://www.debian.org/doc/manuals/debian-faq/ch-pkgtools.en.html" target="_blank" rel="noopener">FAQ</a> of dpkg tools</li>
+<li>How to use <a href="https://help.ubuntu.com/community/AptGet/Howto" target="_blank" rel="noopener">apt-get</a>?</li>
 </ul>
 
       
@@ -847,7 +852,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#What-is-a-debian-package"><span class="nav-text">What is a debian package</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Create-debian-packages"><span class="nav-text">Create debian packages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example1"><span class="nav-text">Example1</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example2"><span class="nav-text">Example2</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#Debian-package-operation-tools"><span class="nav-text">Debian package operation tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg"><span class="nav-text">dpkg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aptitude"><span class="nav-text">aptitude</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg-deb"><span class="nav-text">dpkg-deb</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Common-questions"><span class="nav-text">Common questions</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-text">References</span></a></li></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#What-is-a-debian-package"><span class="nav-text">What is a debian package</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Create-debian-packages"><span class="nav-text">Create debian packages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example1"><span class="nav-text">Example1</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example2"><span class="nav-text">Example2</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#Debian-package-management-tools"><span class="nav-text">Debian package management tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg"><span class="nav-text">dpkg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aptitude"><span class="nav-text">aptitude</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg-deb"><span class="nav-text">dpkg-deb</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Common-questions"><span class="nav-text">Common questions</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-text">References</span></a></li></div>
             
 
           </div>
@@ -1010,9 +1015,9 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'https://tiana528.github.io/2019/02/07/Use-debian-packages-to-help-setup-environments/';
-        this.page.identifier = '2019/02/07/Use-debian-packages-to-help-setup-environments/';
-        this.page.title = 'Use debian packaging to help setup environments';
+        this.page.url = 'https://tiana528.github.io/2019/02/07/Basic_understanding_of_debian_packaging/';
+        this.page.identifier = '2019/02/07/Basic_understanding_of_debian_packaging/';
+        this.page.title = 'Basic understanding of debian packaging';
         };
       function loadComments () {
         var d = document, s = d.createElement('script');
