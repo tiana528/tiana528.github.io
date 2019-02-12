@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://tiana528.github.io/2019/02/11/YARN-UI-detailed-explanation/</loc>
+    <lastmod>2019-02-12T15:33:15.469Z</lastmod>
+  </url>  <url>
     <loc>https://tiana528.github.io/2019/02/09/HDFS_UI_detailed_description/</loc>
-    <lastmod>2019-02-11T03:03:26.596Z</lastmod>
+    <lastmod>2019-02-11T03:10:26.773Z</lastmod>
   </url>  <url>
     <loc>https://tiana528.github.io/2019/02/07/Basic_understanding_of_debian_packaging/</loc>
     <lastmod>2019-02-09T14:01:39.723Z</lastmod>
