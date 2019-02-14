@@ -84,6 +84,21 @@ Rebooted Nodes : 0
         - Number of nodes that are unhealthy. Node manager sends heartbeat to the resource manager regularly and the heartbeat contains the healthy report of the node, then the resource manager can know which nodes are unhealthy.
     - Rebooted nodes
         - Number of nodes that are rebooted.
+- Scheduler Metrics
+```
+Scheduler Type : Fair Scheduler
+Scheduling Resource Type : [MEMORY, CPU]
+Minimum Allocation : <memory:256, vCores:1>	
+Maximum Allocation : <memory:61440, vCores:32>
+```
+    - Scheduler Type
+        - The scheduler used by the resource manager.
+    - Scheduling Resource Type
+        - Get all resource types information from known resource types.
+    - Minimum Allocation
+        - Get minimum allocatable resource.
+    - Maximum Allocation
+        - Get maximum allocatable resource at the cluster level.
 
 ## About
 ```
@@ -96,30 +111,84 @@ ResourceManager started on:	Tue Feb 12 08:40:21 +0000 2019
 ResourceManager version:	2.7.3-...
 Hadoop version:	2.7.3-...
 ```
-
-## Nodes
+- Cluster ID
+    - This is the start timestamp of the resource manager.
+- ResourceManager state
+    - The state of the resource manager, which might be one of NOTINITED, INITED, STARTED, STOPPED.
+- ResourceManager HA state
+    - HA state of resource manager
+- ResourceManager HA zookeeper connection state
+- ResourceManager RMStateStore
+    - RMStateStore is storage of ResourceManager state. Takes care of asynchronous notifications and interfacing with YARN objects. Real store implementations need to derive from it and implement blocking store and load methods to actually store and load the state.
+- ResourceManager started on
+    - The start timestamp of resource manager
+- ResourceManager version
+    - The version of resource manager
+- Hadoop version
+    - The version of hadoop
 
 ## Applications
+This shows a table of applications. One example row is as follows.
+```
+ID : application_1549960821363_10810
+User : 1
+Name : job1...
+Application Type: MAPREDUCE
+Queue : root.q1
+Starttime : Thu Feb 14 22:00:21 +0900 2019
+Finishtime : Thu Feb 14 22:00:34 +0900 2019
+State : FINISHED
+FinalStatus : SUCCEEDED
+Running Containers : N/A
+Tracking UI : History
+Blacklisted Nodes : N/A
+```
+- source code
+    - [AppsBlock](https://github.com/apache/hadoop/blob/88625f5cd90766136a9ebd76a8d84b45a37e6c99/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-common/src/main/java/org/apache/hadoop/yarn/server/webapp/AppsBlock.java#L150)
+- ID
+    - ApplicationId represents the globally unique identifier for an application. The globally unique nature of the identifier is achieved by using the cluster timestamp i.e. start-time of the ResourceManager along with a monotonically increasing counter
+ for the application.
+- User
+    - The user who submitted the application.
+- Name
+    - Get the user-defined name of the application.
+- State
+    - Enumeration of various [states of an ApplicationMaster](https://github.com/apache/hadoop/blob/a55d6bba71c81c1c4e9d8cd11f55c78f10a548b0/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/src/main/java/org/apache/hadoop/yarn/api/records/YarnApplicationState.java).
+- Running Containers
+    - The number of containers.
+- Tracking UI
+    - The tracking url for the application.
+- Blacklisted Nodes
+    - A blacklisted node to indicate that a node is unhealthy and hadoop should not assign any tasks to it anymore.
 
 ## Scheduler
+This is a graph showing the current usage status of queues. 
+
+Take fair scheduler as a example. This graph tells us what are the queues, how much resource can a queue use up on fair, how much resource of a queue has been used up, is a queue used more than fair/less than fair, which queue is busy/idle, and so on.
+
 
 # Tools
 
 ## configuration
+This is actually redirects to http://{hadoop-master-ip}:8088/conf
+
+This shows all configurations from the source of hdfs-default.xml, yarn-default.xml, mapred-default.xml, core-default.xml, hdfs-site.xml, yarn-site.xml, mapred-site.xml, core-site.xml,
+
 
 ## Local logs
+yarn logs
 
-## Server
+## Server stacks
+Stack trace of the resource manager.
 
-## stacks
-
-## Server
-
-## metrivs
+## metrics
+JMX metrics of the resource manager.
 
 # Check job detailed information
+This is a complex part, it is not as straightforward as other parts because there are many logs and UIs involved.
 
 ## running jobs
+job tracking url
 
 ## finished jobs
 
