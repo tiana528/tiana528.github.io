@@ -117,7 +117,7 @@
 <meta property="og:site_name" content="Yan&#39;s Notes">
 <meta property="og:description" content="DescriptionYARN UI url is {hadoop_master_ip:8088}. There is a lot of information in this UI as follows which is very helpful for analyzing issues. This article aims at explaning everything in detail.1">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-16T04:17:44.408Z">
+<meta property="og:updated_time" content="2019-02-16T04:28:17.994Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="YARN UI detailed explanation">
 <meta name="twitter:description" content="DescriptionYARN UI url is {hadoop_master_ip:8088}. There is a lot of information in this UI as follows which is very helpful for analyzing issues. This article aims at explaning everything in detail.1">
@@ -424,7 +424,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-02-16 13:17:44" itemprop="dateModified" datetime="2019-02-16T13:17:44+09:00">2019-02-16</time>
+                <time title="Modified: 2019-02-16 13:28:17" itemprop="dateModified" datetime="2019-02-16T13:28:17+09:00">2019-02-16</time>
               
             
           </span>
@@ -664,14 +664,18 @@
 </li>
 </ul>
 <h2 id="Check-task-attempt-detailed-information"><a href="#Check-task-attempt-detailed-information" class="headerlink" title="Check task attempt detailed information"></a>Check task attempt detailed information</h2><p>Click the links in the jobs UI, then it will redirect to a list of tasks, and click task_id(e.g. task_1549418419376_657056_r_000732), the detailed info UI of a task attempt will open.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Attempt : attempt_1549418419376_657056_r_000732_0</span><br><span class="line">Progress : 76.90</span><br><span class="line">State: Running</span><br><span class="line">Status : reduce &gt; reduce</span><br><span class="line">Node : 172.1.1.2:8042</span><br><span class="line">Logs : logs</span><br><span class="line">Started : Sat Feb 16 11:57:37 +0900 2019	</span><br><span class="line">Finished : N/A</span><br><span class="line">Elapsed : 42sec</span><br><span class="line">Note : </span><br><span class="line">Actions : kill</span><br></pre></td></tr></table></figure></p>
-<pre><code>- Attempt : attempt id
-- Progress : the progress of the current task attempt
-- State : the state of the current task attempt
-- Status : what is the status of the current task attempt
-    - If it is a map task attempt, it will show `SCHEDULED`, `...&gt; map`, `... &gt; sort`. They are different phrases of the map process.
-    - If it is a reducer task attempt, it will show `SCHEDULED`, `35 / 35 copied.`, `reduce &gt; sort    `, `reduce &gt; reduce`. They are different phrases of the reduce process.
-- Logs : 
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">stderr : Total file length is 243 bytes.</span><br><span class="line">stdout : Total file length is 0 bytes.</span><br><span class="line">syslog : Total file length is 79129 bytes.</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Attempt : attempt id</li>
+<li>Progress : the progress of the current task attempt</li>
+<li>State : the state of the current task attempt</li>
+<li>Status : what is the status of the current task attempt<ul>
+<li>If it is a map task attempt, it will show <code>SCHEDULED</code>, <code>...&gt; map</code>, <code>... &gt; sort</code>. They are different phrases of the map process.</li>
+<li>If it is a reducer task attempt, it will show <code>SCHEDULED</code>, <code>35 / 35 copied.</code>, <code>reduce &gt; sort</code>, <code>reduce &gt; reduce</code>. They are different phrases of the reduce process.</li>
+</ul>
+</li>
+<li>Logs : <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">stderr : Total file length is 243 bytes.</span><br><span class="line">stdout : Total file length is 0 bytes.</span><br><span class="line">syslog : Total file length is 79129 bytes.</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
 
       
     </div>
