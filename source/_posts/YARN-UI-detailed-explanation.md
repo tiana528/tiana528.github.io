@@ -169,7 +169,7 @@ Take fair scheduler as a example. This graph tells us what are the queues, how m
 
 # Tools
 
-## configuration
+## Configuration
 This is actually redirects to http://{hadoop-master-ip}:8088/conf
 
 This shows all configurations from the source of hdfs-default.xml, yarn-default.xml, mapred-default.xml, core-default.xml, hdfs-site.xml, yarn-site.xml, mapred-site.xml, core-site.xml,
@@ -181,15 +181,84 @@ yarn logs
 ## Server stacks
 Stack trace of the resource manager.
 
-## metrics
+## Metrics
 JMX metrics of the resource manager.
 
 # Check job detailed information
 This is a complex part, it is not as straightforward as other parts because there are many logs and UIs involved.
+Yarn log aggregation needs to be enabled for checking the logs. ([Enable yarn log aggregation](https://tiana528.github.io/2018/11/19/hive-configuration-best-practise/))
 
-## running jobs
-job tracking url
 
-## finished jobs
+## Check application detailed info
+Click application id such as `application_1542608710651_1268349`, then the application UI will open. URL is : {master_ip:8088}/cluster/app/application_1549418419376_658006
+
+The bottom part shows the application attempts if there are any. If an application attemp fails, another application attempt will be triggered until the attempt number meets the configured maximum value. We can know how many times of the application attempts have been tried/trying from this UI.
+
+It is able to check the logs of the corresponding application master by clicking the `logs` in each row.
+
+
+## Check application attempt detailed info
+Click `Tracking URL: ApplicationMaster`
+- If the application master hasn't been started, the UI will be redirected to the application detailed info UI.
+- If the application master is running, the URL is like : {master_ip}:8088/proxy/application_1549418419376_657056/mapreduce/job/job_1549418419376_657056
+```
+Task Type :  Map, Reduce
+Progress: ...
+Total  : 2434, 999
+Pending : 0, 871
+Running : 0, 63
+Complete : 2434, 65
+
+Attempt Type : Maps, Reduces
+New : 0, 871
+Running : 0, 63
+Failed : 0, 0
+Killed : 0, 0
+Successful : 2434, 65
+```
+    - The above part(Task type) shows the total number of map/reduce tasks and how many are running/pending/completed.
+    - The blow part(Attempt type) shows the info of attempts. How many attemps are new/running/failed/killed/successful. 
+- If the application master has finished, the UI will be redirected to jobhistory. The URL is like : {job_history_server_ip}:19888/jobhistory/job/job_1549418419376_658293. 
+```
+Task Type :  Map, Reduce
+Total  : 12328, 0
+Complete : 0, 0
+
+Attempt Type : Maps, Reduces
+Failed : 597, 0
+Killed : 209, 0
+Successful : 0, 0
+```
+    - The above part(Task type) shows the total number of map/reduce tasks and how many have been finished.
+    - The blow part(Attempt type) shows the info of attempts. How many attemps are failed/killed/successful. 
+
+## Check task attempt detailed information
+Click the links in the jobs UI, then it will redirect to a list of tasks, and click task_id(e.g. task_1549418419376_657056_r_000732), the detailed info UI of a task attempt will open.
+```
+Attempt : attempt_1549418419376_657056_r_000732_0
+Progress : 76.90
+State: Running
+Status : reduce > reduce
+Node : 172.1.1.2:8042
+Logs : logs
+Started : Sat Feb 16 11:57:37 +0900 2019	
+Finished : N/A
+Elapsed : 42sec
+Note : 
+Actions : kill
+```
+    - Attempt : attempt id
+    - Progress : the progress of the current task attempt
+    - State : the state of the current task attempt
+    - Status : what is the status of the current task attempt
+        - If it is a map task attempt, it will show `SCHEDULED`, `...> map`, `... > sort`. They are different phrases of the map process.
+        - If it is a reducer task attempt, it will show `SCHEDULED`, `35 / 35 copied.`, `reduce > sort	`, `reduce > reduce`. They are different phrases of the reduce process.
+    - Logs : 
+```
+stderr : Total file length is 243 bytes.
+stdout : Total file length is 0 bytes.
+syslog : Total file length is 79129 bytes.
+```
+
 
 
