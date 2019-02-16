@@ -247,13 +247,13 @@ Elapsed : 42sec
 Note : 
 Actions : kill
 ```
-    - Attempt : attempt id
-    - Progress : the progress of the current task attempt
-    - State : the state of the current task attempt
-    - Status : what is the status of the current task attempt
-        - If it is a map task attempt, it will show `SCHEDULED`, `...> map`, `... > sort`. They are different phrases of the map process.
-        - If it is a reducer task attempt, it will show `SCHEDULED`, `35 / 35 copied.`, `reduce > sort	`, `reduce > reduce`. They are different phrases of the reduce process.
-    - Logs : 
+   - Attempt : attempt id
+   - Progress : the progress of the current task attempt
+   - State : the state of the current task attempt
+   - Status : what is the status of the current task attempt
+       - If it is a map task attempt, it will show `SCHEDULED`, `...> map`, `... > sort`. They are different phrases of the map process.
+       - If it is a reducer task attempt, it will show `SCHEDULED`, `35 / 35 copied.`, `reduce > sort	`, `reduce > reduce`. They are different phrases of the reduce process.
+   - Logs : 
 ```
 stderr : Total file length is 243 bytes.
 stdout : Total file length is 0 bytes.
