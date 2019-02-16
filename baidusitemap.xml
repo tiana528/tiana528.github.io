@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://tiana528.github.io/2019/02/11/YARN-UI-detailed-explanation/</loc>
-    <lastmod>2019-02-14T15:04:02.291Z</lastmod>
+    <lastmod>2019-02-16T04:17:44.408Z</lastmod>
   </url>  <url>
     <loc>https://tiana528.github.io/2019/02/09/HDFS_UI_detailed_description/</loc>
     <lastmod>2019-02-11T03:10:26.773Z</lastmod>
@@ -25,7 +25,7 @@
     <loc>https://tiana528.github.io/2018/12/09/hadoop-local-and-distributed-mode/</loc>
     <lastmod>2018-12-11T14:36:27.277Z</lastmod>
   </url>  <url>
-    <loc>https://tiana528.github.io/2018/11/19/hive-configuration-best-practise/</loc>
+    <loc>https://tiana528.github.io/2018/11/19/hive-configuration-understanding/</loc>
     <lastmod>2018-12-08T03:21:01.684Z</lastmod>
   </url>  <url>
     <loc>https://tiana528.github.io/2018/11/17/hive-scratch-working-directory/</loc>
