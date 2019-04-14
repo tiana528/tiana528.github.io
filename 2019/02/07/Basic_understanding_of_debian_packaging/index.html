@@ -117,7 +117,7 @@
 <meta property="og:site_name" content="Yan&#39;s Notes">
 <meta property="og:description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-09T14:01:39.723Z">
+<meta property="og:updated_time" content="2019-04-14T10:37:27.382Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Basic understanding of debian packaging">
 <meta name="twitter:description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
@@ -424,7 +424,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-02-09 23:01:39" itemprop="dateModified" datetime="2019-02-09T23:01:39+09:00">2019-02-09</time>
+                <time title="Modified: 2019-04-14 19:37:27" itemprop="dateModified" datetime="2019-04-14T19:37:27+09:00">2019-04-14</time>
               
             
           </span>
@@ -652,6 +652,53 @@
 </ul>
 </li>
 </ul>
+<h1 id="Scenarios"><a href="#Scenarios" class="headerlink" title="Scenarios"></a>Scenarios</h1><p>Here we discuss some scenarios.</p>
+<ul>
+<li><p>version up packages and revert the version up</p>
+<ul>
+<li>Use <code>--allow-downgrades</code> option to downgrade a version(revert a release) without prompting.<ul>
+<li>e.g. current version of package p1 is 1.2, then run <code>sudo apt-get install p1=1.1 --allow-downgrades</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>check broken installed packages</p>
+<ul>
+<li>Run <code>sudo apt-get update</code></li>
+</ul>
+</li>
+<li><p>override a file installed by another debian packages</p>
+<ul>
+<li>Never do this. It is not maintainable. However, sometimes, we want to move some files(responsibilities) from one package to another package, and in such case, we need to release two packages together in the specific order.<ul>
+<li>e.g. Package p1 install file f1, we want to let package p2 install the file, then implement it and release new version of p1 and p2. During deployment, we first install new version of p1, which will delete the file f1 installed by the previous version, then install new version of p2 to avoid confliction.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>installation of some packages fail in the middle</p>
+<ul>
+<li>This leaves a <code>held package</code>, detect a held package by <code>sudo dpkg --get-selections | grep held</code>.</li>
+<li>If the broken package is caused by ramdomly issue, a retry might help fix the issue, run <code>sudo dpkg --configure -a</code>.</li>
+<li>If the broken package is caused by package script issue, and needs to be fixed by installing a new version, then perform cleanup and install new version. <code>sudo apt-get remove p1</code> and <code>sudo apt-get install p1=...</code></li>
+</ul>
+</li>
+<li><p>list up local installed debian packages</p>
+<ul>
+<li>sudo dpkg -l</li>
+</ul>
+</li>
+<li><p>search remote installable debian packages</p>
+<ul>
+<li>sudo apt-cache search foo</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>install cron job<ul>
+<li>It is very common to create a crob job in a debian package, just create a file under /etc/cron.d instead of using the crontab command. Note that it is not good to use crontab command because if multiple packages use the crontab command to install cron jobs, they will all edit the same file and is hard to maintenance. Instead, copying a file under /etc/cron.d enables each package manages its cron jobs independently and isolately.</li>
+</ul>
+</li>
+</ul>
 <h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ul>
 <li><a href="https://www.debian.org/doc/manuals/debian-faq/ch-pkgtools.en.html" target="_blank" rel="noopener">FAQ</a> of dpkg tools</li>
 <li>How to use <a href="https://help.ubuntu.com/community/AptGet/Howto" target="_blank" rel="noopener">apt-get</a>?</li>
@@ -856,7 +903,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#What-is-a-debian-package"><span class="nav-text">What is a debian package</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Create-debian-packages"><span class="nav-text">Create debian packages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example1"><span class="nav-text">Example1</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example2"><span class="nav-text">Example2</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#Debian-package-management-tools"><span class="nav-text">Debian package management tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg"><span class="nav-text">dpkg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aptitude"><span class="nav-text">aptitude</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg-deb"><span class="nav-text">dpkg-deb</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Common-questions"><span class="nav-text">Common questions</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-text">References</span></a></li></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#What-is-a-debian-package"><span class="nav-text">What is a debian package</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Create-debian-packages"><span class="nav-text">Create debian packages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example1"><span class="nav-text">Example1</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example2"><span class="nav-text">Example2</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#Debian-package-management-tools"><span class="nav-text">Debian package management tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg"><span class="nav-text">dpkg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aptitude"><span class="nav-text">aptitude</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg-deb"><span class="nav-text">dpkg-deb</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Common-questions"><span class="nav-text">Common questions</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Scenarios"><span class="nav-text">Scenarios</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-text">References</span></a></li></div>
             
 
           </div>
