@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://tiana528.github.io/2019/04/14/resilient-architecture-should-also-consider-hard-shutdown/</loc>
+    <lastmod>2019-09-22T09:11:20.833Z</lastmod>
+  </url>  <url>
     <loc>https://tiana528.github.io/2019/02/07/Basic_understanding_of_debian_packaging/</loc>
     <lastmod>2019-04-14T10:37:27.382Z</lastmod>
   </url>  <url>

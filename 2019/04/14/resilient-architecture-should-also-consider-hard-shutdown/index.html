@@ -109,25 +109,24 @@
 
 
 
-  <meta name="description" content="This article aims at introducing what are the manually configured settings that override the default during using hive. environmentThis article is based on hive 2.3, hadoop 2.7, running hive on mapred">
-<meta name="keywords" content="hadoop,hive">
+  <meta name="description" content="Graceful shutdown and hard shutdownWhen a program/service is shutdown unexpectedly, it may be graceful shutdown or hard shutdown.When a service is killed with signal 15, if the service catches the sig">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hive configuration understanding">
-<meta property="og:url" content="https://tiana528.github.io/2018/11/19/hive-configuration-understanding/index.html">
+<meta property="og:title" content="resilient architecture should also consider hard shutdown">
+<meta property="og:url" content="https://tiana528.github.io/2019/04/14/resilient-architecture-should-also-consider-hard-shutdown/index.html">
 <meta property="og:site_name" content="Yan&#39;s Notes">
-<meta property="og:description" content="This article aims at introducing what are the manually configured settings that override the default during using hive. environmentThis article is based on hive 2.3, hadoop 2.7, running hive on mapred">
+<meta property="og:description" content="Graceful shutdown and hard shutdownWhen a program/service is shutdown unexpectedly, it may be graceful shutdown or hard shutdown.When a service is killed with signal 15, if the service catches the sig">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-12-08T03:21:01.684Z">
+<meta property="og:updated_time" content="2019-09-22T09:11:20.833Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="hive configuration understanding">
-<meta name="twitter:description" content="This article aims at introducing what are the manually configured settings that override the default during using hive. environmentThis article is based on hive 2.3, hadoop 2.7, running hive on mapred">
+<meta name="twitter:title" content="resilient architecture should also consider hard shutdown">
+<meta name="twitter:description" content="Graceful shutdown and hard shutdownWhen a program/service is shutdown unexpectedly, it may be graceful shutdown or hard shutdown.When a service is killed with signal 15, if the service catches the sig">
 
 
 
 
 
 
-  <link rel="canonical" href="https://tiana528.github.io/2018/11/19/hive-configuration-understanding/">
+  <link rel="canonical" href="https://tiana528.github.io/2019/04/14/resilient-architecture-should-also-consider-hard-shutdown/">
 
 
 
@@ -137,7 +136,7 @@
   };
 </script>
 
-  <title>hive configuration understanding | Yan's Notes</title>
+  <title>resilient architecture should also consider hard shutdown | Yan's Notes</title>
   
 
 
@@ -365,7 +364,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2018/11/19/hive-configuration-understanding/">
+    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2019/04/14/resilient-architecture-should-also-consider-hard-shutdown/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Wang Yan">
@@ -382,7 +381,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">hive configuration understanding
+          <h1 class="post-title" itemprop="name headline">resilient architecture should also consider hard shutdown
               
             
           </h1>
@@ -407,7 +406,7 @@
                 
               
 
-              <time title="Created: 2018-11-19 21:24:42" itemprop="dateCreated datePublished" datetime="2018-11-19T21:24:42+09:00">2018-11-19</time>
+              <time title="Created: 2019-04-14 19:39:06" itemprop="dateCreated datePublished" datetime="2019-04-14T19:39:06+09:00">2019-04-14</time>
             
 
             
@@ -424,29 +423,11 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-12-08 12:21:01" itemprop="dateModified" datetime="2018-12-08T12:21:01+09:00">2018-12-08</time>
+                <time title="Modified: 2019-09-22 18:11:20" itemprop="dateModified" datetime="2019-09-22T18:11:20+09:00">2019-09-22</time>
               
             
           </span>
 
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/big-data/" itemprop="url" rel="index"><span itemprop="name">big data</span></a></span>
-
-                
-                
-              
-            </span>
           
 
           
@@ -456,9 +437,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/11/19/hive-configuration-understanding/#comments" itemprop="discussionUrl">
+                <a href="/2019/04/14/resilient-architecture-should-also-consider-hard-shutdown/#comments" itemprop="discussionUrl">
                 
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/11/19/hive-configuration-understanding/" itemprop="commentCount"></span>
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/04/14/resilient-architecture-should-also-consider-hard-shutdown/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -493,298 +474,11 @@
       
 
       
-        <p>This article aims at introducing what are the manually configured settings that override the default during using hive.</p>
-<h2 id="environment"><a href="#environment" class="headerlink" title="environment"></a>environment</h2><p>This article is based on hive 2.3, hadoop 2.7, running hive on mapreduce.</p>
-<h2 id="background"><a href="#background" class="headerlink" title="background"></a>background</h2><p>Hive and hadoop have many configurations and it is not striaightforward to know what configurations need to be override manually. This article aims at listing up all such configurations that we can special take care of.</p>
-<h2 id="configuration-reference"><a href="#configuration-reference" class="headerlink" title="configuration reference"></a>configuration reference</h2><p>There are the links of the latest explanations of the configurations in the official wiki . </p>
-<ul>
-<li>hadoop<ul>
-<li><a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/core-default.xml" target="_blank" rel="noopener">core-default.xml</a></li>
-<li><a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml" target="_blank" rel="noopener">hdfs-default.xml</a></li>
-<li><a href="https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml" target="_blank" rel="noopener">mapred-default.xml</a></li>
-<li><a href="https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-common/yarn-default.xml" target="_blank" rel="noopener">yarn-default.xml</a></li>
-</ul>
-</li>
-<li>hive<ul>
-<li><a href="https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties#ConfigurationProperties" target="_blank" rel="noopener">hive-site.xml</a></li>
-</ul>
-</li>
-</ul>
-<h2 id="overridden-configurations"><a href="#overridden-configurations" class="headerlink" title="overridden configurations"></a>overridden configurations</h2><p>These are the configurations that need to take special care and be configured manually to override the default value.</p>
-<ul>
-<li><p>Basic settings</p>
-<ul>
-<li>purpose<ul>
-<li>There are some basic settings.</li>
-</ul>
-</li>
-<li>configuration<ul>
-<li>fs.defaultFS<ul>
-<li>default : file:///</li>
-<li>configured :  hdfs://&lt;namenode_ip&gt;:8020</li>
-<li>explain : This configures the default file system. By default, it is local file system, change it to use distributed file system.</li>
-</ul>
-</li>
-<li>mapreduce.framework.name<ul>
-<li>default : local</li>
-<li>configured : yarn</li>
-<li>explain : The runtime framework for executing MapReduce jobs. Can be one of local, classic or yarn.</li>
-</ul>
-</li>
-<li>yarn.resourcemanager.hostname <ul>
-<li>default:  0.0.0.0</li>
-<li>configured: <the real="" ip=""></the></li>
-<li>explain: The hostname of the RM.</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>Enable yarn log aggregation</p>
-<ul>
-<li>purpose <ul>
-<li>By default, yanr log aggregation is disabled, and yarn logs(container logs) are saved in the local of the instances where the containers run. In order to check the log, it is needed to first check the instance ip of a container, then login the instance and open the corresponding log file. When yarn log aggregation is enabled, the container’s log will be aggregated to some configured place(HDFS, s3, etc.), and it is able to check the yarn log through the yarn UI, which becomes much simpler.</li>
-</ul>
-</li>
-<li>configuration <ul>
-<li>yarn.log-aggregation-enable<ul>
-<li>default : false</li>
-<li>configured : true</li>
-<li>explain : This enables the yarn log aggregation.</li>
-</ul>
-</li>
-<li>yarn.nodemanager.remote-app-log-dir<ul>
-<li>default : /tmp/logs for hdfs</li>
-<li>configured : e.g. s3a://… for s3</li>
-<li>explain : This specifies the prefix of the actual path of the aggregated logs. You may want to include the cluster name in the path.</li>
-</ul>
-</li>
-<li>yarn.log-aggregation.retain-seconds<ul>
-<li>default : -1</li>
-<li>explain : This specifies how long the aggregated logs will be kept. The default value -1 indicates keeping the logs forever. Too big value may cause a waste of disk resource, too small may make you cannot find logs when investigate recent issues. 2 weeks or so may be helpful.</li>
-</ul>
-</li>
-<li>yarn.nodemanager.log-aggregation.compression-type<ul>
-<li>default: none</li>
-<li>configured: gz</li>
-<li>explain: If, and how, aggregated logs should be compressed.</li>
-</ul>
-</li>
-<li>mapreduce.job.userlog.retain.hours<ul>
-<li>default : 24</li>
-<li>explain : This specifies the maximum time in hours that the local yarn logs will be retained after job completion. You may want to adjust this setting together.</li>
-</ul>
-</li>
-<li>mapreduce.jobhistory.max-age-ms<ul>
-<li>default : 604800000</li>
-<li>explain : Job history files older than this many milliseconds will be deleted when the history cleaner runs. Defaults to 604800000 (1 week). We can make it 2 weeks.</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="https://renenyffenegger.ch/notes/development/Apache/Hadoop/Ycccc-=ARN/log-aggregation" target="_blank" rel="noopener">helpful links</a></li>
-</ul>
-</li>
-<li>Clean HDFS trash regularly<ul>
-<li>purpose<ul>
-<li>By default, the trash folder is not cleaned up automatically. We can configure to make it be cleaned up regularly to reduce disk cost.</li>
-</ul>
-</li>
-<li>configuration<ul>
-<li>fs.trash.interval    <ul>
-<li>default : 0</li>
-<li>configured : 360</li>
-<li>explain : will be deleted after 6 hours</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Enable hive client authorization<ul>
-<li>purpose<ul>
-<li>By default, hive client authorization is disabled. Enabling hive client authorization can help prevent users from doing operations they are not supposed to do.</li>
-</ul>
-</li>
-<li>configuration<ul>
-<li>hive.security.authorization.enabled<ul>
-<li>default : false</li>
-<li>configured : true</li>
-<li>explain : Enables the hive client authorization.</li>
-</ul>
-</li>
-<li>There are also other settings as needed. I will leave it as TODO.</li>
-</ul>
-</li>
-<li>helpful links<ul>
-<li><a href="https://cwiki.apache.org/confluence/display/Hive/SQL+Standard+Based+Hive+Authorization" target="_blank" rel="noopener">SQL Standard Based Hive Authorization</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Enable HDFS compression<ul>
-<li>configuration<ul>
-<li>io.compression.codecs<ul>
-<li>default : </li>
-<li>configured :  org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.BZip2Codec,org.apache.hadoop.io.compress.DeflateCodec,org.apache.hadoop.io.compress.SnappyCodec</li>
-<li>explain : A comma-separated list of the compression codec classes that can be used for compression/decompression which precedence of others loaded by from the classpath.</li>
-</ul>
-</li>
-<li>mapreduce.map.output.compress<ul>
-<li>default : false</li>
-<li>configured : true</li>
-<li>explain : Compress the output of map before sending accross the network.</li>
-</ul>
-</li>
-<li>mapreduce.map.output.compress.codec<ul>
-<li>default : org.apache.hadoop.io.compress.DefaultCodec</li>
-<li>configured : org.apache.hadoop.io.compress.SnappyCodec or org.apache.hadoop.io.compress.GzipCodec</li>
-<li>explain : If the map outputs are compressed, how should they be compressed?</li>
-</ul>
-</li>
-<li>mapreduce.output.fileoutputformat.compress.type<ul>
-<li>default : RECORD</li>
-<li>configured : BLOCK</li>
-<li>explain : If the job outputs are to compressed as SequenceFiles, how should they be compressed?</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Fail jobs when exceed disk usage<ul>
-<li>configuration<ul>
-<li>mapreduce.job.dfs.storage.capacity.kill-limit-exceed<ul>
-<li>default : true</li>
-<li>configured : false</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>dfs related<ul>
-<li>configuration<ul>
-<li>dfs.namenode.avoid.read.stale.datanode<ul>
-<li>default : false</li>
-<li>configured : true</li>
-</ul>
-</li>
-<li>dfs.namenode.avoid.write.stale.datanode<ul>
-<li>default : false</li>
-<li>configured : true</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>save job result in s3(option)<ul>
-<li>configuration<ul>
-<li>mapreduce.jobhistory.done-dir <ul>
-<li>default: ${yarn.app.mapreduce.am.staging-dir}/history/done </li>
-<li>configured: s3 path</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>speculative configs<ul>
-<li>configuration<ul>
-<li>mapreduce.map.speculative <ul>
-<li>default: true</li>
-<li>configured: false</li>
-</ul>
-</li>
-<li>mapreduce.reduce.speculative<ul>
-<li>default: true</li>
-<li>configured: false</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>enable namenode restart<ul>
-<li>configuration<ul>
-<li>yarn.nodemanager.recovery.enabled<ul>
-<li>default: false</li>
-<li>configured: true</li>
-</ul>
-</li>
-<li>yarn.nodemanager.address<ul>
-<li>default:  ${yarn.nodemanager.hostname}:0</li>
-<li>configured: 0.0.0.0:45454</li>
-<li>explain: Default value makes namenode use different port before and after a restart, and the running clients will be broken after the restart, explicitly setting the port can solve the issue.</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="https://hadoop.apache.org/docs/r2.8.0/hadoop-yarn/hadoop-yarn-site/NodeManager.html" target="_blank" rel="noopener">helpful links</a></li>
-</ul>
-</li>
-<li>enable resource manager restart<ul>
-<li>configuration<ul>
-<li>yarn.resourcemanager.recovery.enabled<ul>
-<li>default: false</li>
-<li>configured: true</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="https://hadoop.apache.org/docs/r2.7.5/hadoop-yarn/hadoop-yarn-site/ResourceManagerRestart.html" target="_blank" rel="noopener">helpful link</a></li>
-</ul>
-</li>
-<li>hive configs<ul>
-<li>configuration<ul>
-<li>hive.auto.convert.join<ul>
-<li>configured: false</li>
-</ul>
-</li>
-<li>hive.auto.convert.join.noconditionaltask<ul>
-<li>configured: false</li>
-</ul>
-</li>
-<li>hive.exec.compress.intermediate<ul>
-<li>configured: true</li>
-</ul>
-</li>
-<li>hive.exec.parallel<ul>
-<li>configured: true</li>
-</ul>
-</li>
-<li>hive.fetch.task.conversion<ul>
-<li>default: more</li>
-<li>configured: none</li>
-</ul>
-</li>
-<li>hive.groupby.orderby.position.alias<ul>
-<li>configured: true</li>
-</ul>
-</li>
-<li>hive.log.explain.output<ul>
-<li>configured: true</li>
-</ul>
-</li>
-<li>hive.mapred.reduce.tasks.speculative.execution<ul>
-<li>configured: false</li>
-</ul>
-</li>
-<li>hive.optimize.reducededuplication<ul>
-<li>configured: false</li>
-</ul>
-</li>
-<li>hive.resultset.use.unique.column.names<ul>
-<li>configured: false</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+        <h1 id="Graceful-shutdown-and-hard-shutdown"><a href="#Graceful-shutdown-and-hard-shutdown" class="headerlink" title="Graceful shutdown and hard shutdown"></a>Graceful shutdown and hard shutdown</h1><p>When a program/service is shutdown unexpectedly, it may be graceful shutdown or hard shutdown.<br>When a service is killed with signal 15, if the service catches the signal and perform some cleanup before exit, it is graceful shutdown.<br>When a service is killed with 9, the service cannot catch the signal and will be termidated immediately, this is hard shutdown.</p>
+<h1 id="hard-shutdown-is-unavoided"><a href="#hard-shutdown-is-unavoided" class="headerlink" title="hard shutdown is unavoided"></a>hard shutdown is unavoided</h1><p>You cannot prevent your service from hard shutdown, it may happen due to out of memory, disk full, operating system kernal crash, or even instance power off.</p>
+<p>Many systems have graceful shutdown hooks to do some clean up logic during unexpected shutting down, but it is not enough.</p>
+<h1 id="how-to-create-resilient-architecture"><a href="#how-to-create-resilient-architecture" class="headerlink" title="how to create resilient architecture"></a>how to create resilient architecture</h1><p>Your service should be strong enough(still keep consistency, be able to recover) no matter the service is killed by 9 or by 15.<br>It means that you need to make the service handle graceful shutdown, which is quite straightforward, just adding a shutdown hook to do some cleanups.<br>It is not easy to make the service support the case of hard shutdown, many application side logic is needed here and there to support it.</p>
+<h1 id="some-examples-of-high-resilient-architecture-which-supports-hard-shutdown"><a href="#some-examples-of-high-resilient-architecture-which-supports-hard-shutdown" class="headerlink" title="some examples of high resilient architecture which supports hard shutdown"></a>some examples of high resilient architecture which supports hard shutdown</h1><p>One good example is mysql, it writes operation logs, and if the mysql process hard shutdown happens, it can still recover from the failure, and won’t have any inconsistency.<br>Another example is hadoop, a hadoop cluster may have thousands of nodes, and it can still work properly even if any one node is lost, the data is already duplicated on other nodes, the failed tasks will be retried on other nodes.</p>
 
       
     </div>
@@ -806,14 +500,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/hadoop/" rel="tag"># hadoop</a>
-          
-            <a href="/tags/hive/" rel="tag"># hive</a>
-          
-        </div>
-      
 
       
       
@@ -823,8 +509,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/11/17/hive-scratch-working-directory/" rel="next" title="hive scratch directory">
-                <i class="fa fa-chevron-left"></i> hive scratch directory
+              <a href="/2019/02/11/YARN-UI-detailed-explanation/" rel="next" title="YARN UI detailed explanation">
+                <i class="fa fa-chevron-left"></i> YARN UI detailed explanation
               </a>
             
           </div>
@@ -832,10 +518,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/12/09/hadoop-local-and-distributed-mode/" rel="prev" title="hadoop local mode and distributed mode">
-                hadoop local mode and distributed mode <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -987,7 +669,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#environment"><span class="nav-text">environment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#background"><span class="nav-text">background</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#configuration-reference"><span class="nav-text">configuration reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#overridden-configurations"><span class="nav-text">overridden configurations</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Graceful-shutdown-and-hard-shutdown"><span class="nav-text">Graceful shutdown and hard shutdown</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hard-shutdown-is-unavoided"><span class="nav-text">hard shutdown is unavoided</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#how-to-create-resilient-architecture"><span class="nav-text">how to create resilient architecture</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#some-examples-of-high-resilient-architecture-which-supports-hard-shutdown"><span class="nav-text">some examples of high resilient architecture which supports hard shutdown</span></a></li></ol></div>
             
 
           </div>
@@ -1150,9 +832,9 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'https://tiana528.github.io/2018/11/19/hive-configuration-understanding/';
-        this.page.identifier = '2018/11/19/hive-configuration-understanding/';
-        this.page.title = 'hive configuration understanding';
+        this.page.url = 'https://tiana528.github.io/2019/04/14/resilient-architecture-should-also-consider-hard-shutdown/';
+        this.page.identifier = '2019/04/14/resilient-architecture-should-also-consider-hard-shutdown/';
+        this.page.title = 'resilient architecture should also consider hard shutdown';
         };
       function loadComments () {
         var d = document, s = d.createElement('script');
