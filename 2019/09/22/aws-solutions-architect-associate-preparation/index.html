@@ -109,24 +109,24 @@
 
 
 
-  <meta name="description" content="BackgroundThis article aims at discussing how hive generic User-defined function(GenericUDF) works. In the java doc, it says GenericUDF can do short-circuit evaluations using DeferedObject. But what i">
+  <meta name="description" content="BackgroundI passed the AWS solutions architect assciate exam today, and I would like to share some knowledge for people who want to prepare for the examination.I will summarize what I think is importa">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hive GenericUDF and DeferredJavaObject analysis">
-<meta property="og:url" content="https://tiana528.github.io/2019/01/09/hive-DeferredJavaObject/index.html">
+<meta property="og:title" content="aws solutions architect associate preparation">
+<meta property="og:url" content="https://tiana528.github.io/2019/09/22/aws-solutions-architect-associate-preparation/index.html">
 <meta property="og:site_name" content="Yan&#39;s Notes">
-<meta property="og:description" content="BackgroundThis article aims at discussing how hive generic User-defined function(GenericUDF) works. In the java doc, it says GenericUDF can do short-circuit evaluations using DeferedObject. But what i">
+<meta property="og:description" content="BackgroundI passed the AWS solutions architect assciate exam today, and I would like to share some knowledge for people who want to prepare for the examination.I will summarize what I think is importa">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-01-16T15:09:40.518Z">
+<meta property="og:updated_time" content="2019-09-22T12:43:47.082Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="hive GenericUDF and DeferredJavaObject analysis">
-<meta name="twitter:description" content="BackgroundThis article aims at discussing how hive generic User-defined function(GenericUDF) works. In the java doc, it says GenericUDF can do short-circuit evaluations using DeferedObject. But what i">
+<meta name="twitter:title" content="aws solutions architect associate preparation">
+<meta name="twitter:description" content="BackgroundI passed the AWS solutions architect assciate exam today, and I would like to share some knowledge for people who want to prepare for the examination.I will summarize what I think is importa">
 
 
 
 
 
 
-  <link rel="canonical" href="https://tiana528.github.io/2019/01/09/hive-DeferredJavaObject/">
+  <link rel="canonical" href="https://tiana528.github.io/2019/09/22/aws-solutions-architect-associate-preparation/">
 
 
 
@@ -136,7 +136,7 @@
   };
 </script>
 
-  <title>hive GenericUDF and DeferredJavaObject analysis | Yan's Notes</title>
+  <title>aws solutions architect associate preparation | Yan's Notes</title>
   
 
 
@@ -364,7 +364,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2019/01/09/hive-DeferredJavaObject/">
+    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2019/09/22/aws-solutions-architect-associate-preparation/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Wang Yan">
@@ -381,7 +381,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">hive GenericUDF and DeferredJavaObject analysis
+          <h1 class="post-title" itemprop="name headline">aws solutions architect associate preparation
               
             
           </h1>
@@ -406,24 +406,12 @@
                 
               
 
-              <time title="Created: 2019-01-09 22:06:25" itemprop="dateCreated datePublished" datetime="2019-01-09T22:06:25+09:00">2019-01-09</time>
+              <time title="Created: 2019-09-22 19:39:06 / Modified: 21:43:47" itemprop="dateCreated datePublished" datetime="2019-09-22T19:39:06+09:00">2019-09-22</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2019-01-17 00:09:40" itemprop="dateModified" datetime="2019-01-17T00:09:40+09:00">2019-01-17</time>
               
             
           </span>
@@ -437,9 +425,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2019/01/09/hive-DeferredJavaObject/#comments" itemprop="discussionUrl">
+                <a href="/2019/09/22/aws-solutions-architect-associate-preparation/#comments" itemprop="discussionUrl">
                 
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/01/09/hive-DeferredJavaObject/" itemprop="commentCount"></span>
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/09/22/aws-solutions-architect-associate-preparation/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -474,107 +462,40 @@
       
 
       
-        <h1 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h1><p>This article aims at discussing how hive generic User-defined function(GenericUDF) works. In the java doc, it says GenericUDF can do short-circuit evaluations using DeferedObject. But what is short-circuit evaluation and how DeferedObject works?</p>
-<h1 id="Description"><a href="#Description" class="headerlink" title="Description"></a>Description</h1><p>Basicly, use GenericUDF when the input or output is complex type, or input arguments have variable length.</p>
-<p>GenericUDF use DeferedObject to pass arguments and achieve lazy-evaluation and short-circuiting.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">interface</span> <span class="title">DeferredObject</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">prepare</span><span class="params">(<span class="keyword">int</span> version)</span> <span class="keyword">throws</span> HiveException</span>;</span><br><span class="line">  <span class="function">Object <span class="title">get</span><span class="params">()</span> <span class="keyword">throws</span> HiveException</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<h1 id="Source-code-analysis"><a href="#Source-code-analysis" class="headerlink" title="Source code analysis"></a>Source code analysis</h1><p>We run a sql <code>select abs(c1) from t1</code> and try to analysis how UDF is initialized and processed.</p>
-<ul>
-<li>Class structure and relationship<ul>
-<li>SelectOperator<ul>
-<li>ExprNodeEvaluator[] eval<ul>
-<li>(actually it is ExprNodeGenericFuncEvaluator)</li>
+        <h1 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h1><p>I passed the AWS solutions architect assciate exam today, and I would like to share some knowledge for people who want to prepare for the examination.<br>I will summarize what I think is important and useful for passing it.<br>There are already a lot of other blogs talking about how to prepare for the exmaination. Actually there are too much information, and it is difficult to know <code>what is important</code> and <code>what is not important</code>.<br>Most blogs are only concentrating what are the important parts, and I will also tell you <strong>what is not important, so that you can save a lot of time</strong>.</p>
+<p>This article is mainly for people who don’t have much experience with AWS(for example, you have no idea what is Cloudfront…), and want to know how to prepare for the exam efficiently.</p>
+<h1 id="Description-of-the-examination"><a href="#Description-of-the-examination" class="headerlink" title="Description of the examination"></a>Description of the examination</h1><p>65 questions.<br>130 minutes.<br>I finished the exam within 50 minutes, I think you don’t need to worry about time.</p>
+<h1 id="what-is-important-and-what-is-not-important"><a href="#what-is-important-and-what-is-not-important" class="headerlink" title="what is important and what is not important"></a>what is important and what is not important</h1><ul>
+<li>Each question is very short, most questions are only 2 or 3 lines. Meaning basicly, you don’t need to do a lot of exercises which are very long.</li>
+<li>Nearly no question requires you remember the actual number(except for the very very basic one). So you don’t need to remember things such as the limitation of the number of subnets in one vpc is 200.</li>
+<li>I have seen more than half of the questions from the exercises I have done. So I think doing exercises is very important for passing the exam.</li>
+<li>There are many questions of AWS solutions associate you can find in the Internet, but most of them contain wrong results. I think it is important to choose the places where people can discuss, so even if the answer is wrong, some people will discuss what is the correct answer.</li>
+<li>The service I meet in the questions are all very common service, EC2, cloudfront, api gateway, vpc, elb, s3, rds, sts, storage gateway, sqs, beanstalk, route53, swf, dynamodb, CloudFormation, Snowball, kinesis, opswork, iam, lambda, redshift, ecs, redis, codedeploy, Cognito, elasticache, Aurora, CloudTrail, sns, directory service. These are important topics.</li>
+<li>I haven’t seen any questions about devpay, FPS, budget, AppSync, Step Functions, X-Ray, Glue, Systems Manager, Workspace, organizations. So these are not important topics.</li>
+</ul>
+<h1 id="how-I-prepared-for-the-exam"><a href="#how-I-prepared-for-the-exam" class="headerlink" title="how I prepared for the exam"></a>how I prepared for the exam</h1><ul>
+<li>read a book(500+ pages) : AWS Certified Solutions Architect Official Study Guide: Associate Exam<ul>
+<li><a href="https://www.pdfdrive.com/aws-certified-solutions-architect-official-study-guide-associate-exam-d38558089.html" target="_blank" rel="noopener">https://www.pdfdrive.com/aws-certified-solutions-architect-official-study-guide-associate-exam-d38558089.html</a></li>
+</ul>
+</li>
+<li>exam practise<ul>
+<li>Udemy(not free)<ul>
+<li>AWS Certified Solutions Architect Associate Practice Exams</li>
+</ul>
+</li>
+<li>examtopics<ul>
+<li>314 questions, people can leave comments</li>
+</ul>
+</li>
+<li>briefmenow<ul>
+<li><a href="https://www.briefmenow.org/amazon/what-additional-step-is-required-to-allow-access-from-t/" target="_blank" rel="noopener">https://www.briefmenow.org/amazon/what-additional-step-is-required-to-allow-access-from-t/</a></li>
+<li>403 questions, people can leave comments</li>
+</ul>
+</li>
+<li>also some other questions that I can find on the Internet, but the above ones are the most useful ones</li>
 </ul>
 </li>
 </ul>
-</li>
-<li>ExprNodeGenericFuncEvaluator<ul>
-<li>ExprNodeEvaluator[] children; <ul>
-<li>(actually it is [ExprNodeColumnEvaluator[Column[c1]]])</li>
-</ul>
-</li>
-<li>GenericUDF.DeferredObject[] deferredChildren;<ul>
-<li>(actually it is org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator$DeferredExprObject and contains the ExprNodeEvaluator)</li>
-</ul>
-</li>
-<li>GenericUDF.DeferredObject[] childrenNeedingPrepare;<ul>
-<li>(actually it contains the same object as deferredChildren in this example)</li>
-</ul>
-</li>
-<li>GenericUDF genericUDF;<ul>
-<li>(actually it is GenericUDFAbs)</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li><p>During initialization</p>
-<ul>
-<li>Generate query plan tree<ul>
-<li>SemanticAnalyzer.genPlan</li>
-</ul>
-</li>
-<li><p>Create ExprNodeGenericFuncDesc based on genericUDFClass</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc</span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExprNodeGenericFuncDesc <span class="title">newInstance</span><span class="params">(GenericUDF genericUDF,</span></span></span><br><span class="line"><span class="function"><span class="params">      String funcText,</span></span></span><br><span class="line"><span class="function"><span class="params">      List&lt;ExprNodeDesc&gt; children)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    ObjectInspector oi = genericUDF.initializeAndFoldConstants(childrenOIs);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Initialize GenericUDF</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.udf.generic.GenericUDF</span><br><span class="line"><span class="function"><span class="keyword">public</span> ObjectInspector <span class="title">initializeAndFoldConstants</span><span class="params">(ObjectInspector[] arguments)</span></span></span><br><span class="line"><span class="function">      <span class="keyword">throws</span> UDFArgumentException </span>&#123;</span><br><span class="line"></span><br><span class="line">    ObjectInspector oi = initialize(arguments);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.udf.generic.GenericUDFAbs</span><br><span class="line">  <span class="function"><span class="keyword">public</span> ObjectInspector <span class="title">initialize</span><span class="params">(ObjectInspector[] arguments)</span> <span class="keyword">throws</span> UDFArgumentException </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Initial select operator</p>
-<ul>
-<li><p>Create ExprNodeGenericFuncEvaluator</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.SelectOperator</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initializeOp</span><span class="params">(Configuration hconf)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  eval[i] = ExprNodeEvaluatorFactory.get(colList.get(i), hconf);</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ExprNodeGenericFuncEvaluator</span><span class="params">(ExprNodeGenericFuncDesc expr, Configuration conf)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    children = <span class="keyword">new</span> ExprNodeEvaluator[expr.getChildren().size()];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; children.length; i++) &#123;</span><br><span class="line">      ExprNodeDesc child = expr.getChildren().get(i);</span><br><span class="line">      ExprNodeEvaluator nodeEvaluator = ExprNodeEvaluatorFactory.get(child, conf);</span><br><span class="line">      children[i] = nodeEvaluator;</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Init ExprNodeGenericFuncEvaluator and create DeferredExprObject</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> ObjectInspector <span class="title">initialize</span><span class="params">(ObjectInspector rowInspector)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">     deferredChildren = <span class="keyword">new</span> GenericUDF.DeferredObject[children.length];</span><br><span class="line">     </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ExprNodeGenericFuncEvaluator.DeferredExprObject</span><br><span class="line"> DeferredExprObject(ExprNodeEvaluator eval, <span class="keyword">boolean</span> eager) &#123;</span><br><span class="line">      <span class="keyword">this</span>.eval = eval; <span class="comment">//(ExprNodeEvaluator[Column[c1]])</span></span><br><span class="line">      <span class="keyword">this</span>.eager = eager; (<span class="keyword">false</span>)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>During processing data</p>
-<ul>
-<li><p>select operator process one row</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.SelectOperator</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(Object row, <span class="keyword">int</span> tag)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    output[i] = eval[i].evaluate(row); <span class="comment">//(eval[i] is actually ExprNodeGenericFuncEvaluator)</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>Note that <code>row</code> is an LazyStruct object which holds data in binary format</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> Object <span class="title">_evaluate</span><span class="params">(Object row, <span class="keyword">int</span> version)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> genericUDF.evaluate(deferredChildren);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.udf.generic.GenericUDFAbs</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Object <span class="title">evaluate</span><span class="params">(DeferredObject[] arguments)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    Object valObject = arguments[<span class="number">0</span>].get();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>Note that arguments[0] is ExprNodeGenericFuncEvaluator&amp;DeferredExprObject</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator</span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">get</span><span class="params">()</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">     ...</span><br><span class="line">     obj = eval.evaluate(rowObject, version); <span class="comment">//(eval is ExprNodeColumnEvaluator)</span></span><br><span class="line">     ...</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeColumnEvaluator</span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> Object <span class="title">_evaluate</span><span class="params">(Object row, <span class="keyword">int</span> version)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">   ...</span><br><span class="line">   <span class="keyword">return</span> inspector.getStructFieldData(row, field); <span class="comment">//(inspector is LazySimpleStructObjectInspector)</span></span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-<h1 id="Summarize"><a href="#Summarize" class="headerlink" title="Summarize"></a>Summarize</h1><ul>
-<li>Processing<ul>
-<li>During intilization<ul>
-<li>hive creates SelectOperator, SelectOperator contains ExprNodeGenericFuncEvaluator, ExprNodeGenericFuncEvaluator contains GenericUDFAbs and DeferredExprObject (DeferredObject), DeferredExprObject contains ExprNodeColumnEvaluator (column[c1]).</li>
-</ul>
-</li>
-<li>During executing<ul>
-<li>SelectOperator processes row which is LazyStruct, and at last passed to LazySimpleStructObjectInspector (getStructFieldData) to get the actual data from binary data.</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>lazy-evaluation and short-circuiting<ul>
-<li>We can notice that the value of the attribute which is involved in the UDF calculation is only evaluated just before use. The value is analyzed from binary format. This is very efficient.</li>
-</ul>
-</li>
-</ul>
-<h1 id="Cache-approach-in-GenericUDF"><a href="#Cache-approach-in-GenericUDF" class="headerlink" title="Cache approach in GenericUDF"></a>Cache approach in GenericUDF</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Object <span class="title">evaluate</span><span class="params">(DeferredObject[] arguments)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    Object obj = arguments[<span class="number">0</span>].get();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>The obj got DeferredObject in GenericUDF evaluate function is  an LazyInteger object, it is always the same object even if evaluate function is invoked for processing a different row.</p>
-<p>We should be careful when making use of cache to speedup GenericUDF calculation. Buffer the input and output, and returns buffered output if historical input comes. Since we always get the same object from the DeferredObject, if we use <code>equals</code> function to compare, it will always be true. We need to deep copy the inputs for further comparison. </p>
 
       
     </div>
@@ -605,8 +526,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/12/15/create_git_hooks_in_mac/" rel="next" title="create git hooks in mac">
-                <i class="fa fa-chevron-left"></i> create git hooks in mac
+              <a href="/2019/04/14/resilient-architecture-should-also-consider-hard-shutdown/" rel="next" title="resilient architecture should also consider hard shutdown">
+                <i class="fa fa-chevron-left"></i> resilient architecture should also consider hard shutdown
               </a>
             
           </div>
@@ -614,10 +535,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/01/19/basic-understanding-of-cap-theorem/" rel="prev" title="Very basic understanding of CAP theorem">
-                Very basic understanding of CAP theorem <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -769,7 +686,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Description"><span class="nav-text">Description</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Source-code-analysis"><span class="nav-text">Source code analysis</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Summarize"><span class="nav-text">Summarize</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Cache-approach-in-GenericUDF"><span class="nav-text">Cache approach in GenericUDF</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Description-of-the-examination"><span class="nav-text">Description of the examination</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#what-is-important-and-what-is-not-important"><span class="nav-text">what is important and what is not important</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#how-I-prepared-for-the-exam"><span class="nav-text">how I prepared for the exam</span></a></li></ol></div>
             
 
           </div>
@@ -932,9 +849,9 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'https://tiana528.github.io/2019/01/09/hive-DeferredJavaObject/';
-        this.page.identifier = '2019/01/09/hive-DeferredJavaObject/';
-        this.page.title = 'hive GenericUDF and DeferredJavaObject analysis';
+        this.page.url = 'https://tiana528.github.io/2019/09/22/aws-solutions-architect-associate-preparation/';
+        this.page.identifier = '2019/09/22/aws-solutions-architect-associate-preparation/';
+        this.page.title = 'aws solutions architect associate preparation';
         };
       function loadComments () {
         var d = document, s = d.createElement('script');
