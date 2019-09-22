@@ -167,6 +167,37 @@ aptitude provides the functionality of apt-get
     - [Everything you need to know about conffiles: configuration files managed by dpkg
 ](https://raphaelhertzog.com/2010/09/21/debian-conffile-configuration-file-managed-by-dpkg/)
 
+
+# Scenarios
+Here we discuss some scenarios.
+
+
+- version up packages and revert the version up
+    - Use `--allow-downgrades` option to downgrade a version(revert a release) without prompting.
+        - e.g. current version of package p1 is 1.2, then run `sudo apt-get install p1=1.1 --allow-downgrades`
+
+- check broken installed packages
+    - Run `sudo apt-get update`
+
+- override a file installed by another debian packages
+    - Never do this. It is not maintainable. However, sometimes, we want to move some files(responsibilities) from one package to another package, and in such case, we need to release two packages together in the specific order.
+        - e.g. Package p1 install file f1, we want to let package p2 install the file, then implement it and release new version of p1 and p2. During deployment, we first install new version of p1, which will delete the file f1 installed by the previous version, then install new version of p2 to avoid confliction.
+
+- installation of some packages fail in the middle
+    - This leaves a `held package`, detect a held package by `sudo dpkg --get-selections | grep held`.
+    - If the broken package is caused by ramdomly issue, a retry might help fix the issue, run `sudo dpkg --configure -a`.
+    - If the broken package is caused by package script issue, and needs to be fixed by installing a new version, then perform cleanup and install new version. `sudo apt-get remove p1` and `sudo apt-get install p1=...`
+
+- list up local installed debian packages
+    - sudo dpkg -l
+
+- search remote installable debian packages
+    - sudo apt-cache search foo
+
+
+- install cron job
+    - It is very common to create a crob job in a debian package, just create a file under /etc/cron.d instead of using the crontab command. Note that it is not good to use crontab command because if multiple packages use the crontab command to install cron jobs, they will all edit the same file and is hard to maintenance. Instead, copying a file under /etc/cron.d enables each package manages its cron jobs independently and isolately.
+
 # References
 
 - [FAQ](https://www.debian.org/doc/manuals/debian-faq/ch-pkgtools.en.html) of dpkg tools
