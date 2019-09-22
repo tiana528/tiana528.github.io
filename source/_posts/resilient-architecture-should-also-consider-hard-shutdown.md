@@ -19,7 +19,7 @@ It is not easy to make the service support the case of hard shutdown, many appli
 **But it is very important to handle the case of hard shutdown to achieve high resilient architecture. If your data/service will be inconsistent and there is no way to recover whenever hard shutdown happens, it might just be unacceptable.**
 
 # some examples of high resilient architecture which support hard shutdown
-One good example is mysql, it writes operation logs, and if the mysql process hard shutdown happens, it can still recover from the failure, and won't have any inconsistency.
-Another example is hadoop, a hadoop cluster may have thousands of nodes, and it can still work properly even if any one node is lost, the data is already duplicated on other nodes, the failed tasks will be retried on other nodes.
-
+- One good example is mysql, it writes operation logs, and if the mysql process hard shutdown happens, it can still recover from the failure, and won't have any inconsistency.
+- Another example is hadoop, a hadoop cluster may have thousands of nodes, and it can still work properly even if any one node is lost, the data is already duplicated on other nodes, the failed tasks will be retried on other nodes.
+- Windows is also a good example, if you shutdown the power of your windows PC, your windows can still work properly after you restart it.
 
