@@ -5,6 +5,4 @@ db.json
 node_modules/
 .deploy*/
 
-!public/
-public/*
-!public/CNAME
+public/
