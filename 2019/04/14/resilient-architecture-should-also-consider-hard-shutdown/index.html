@@ -109,17 +109,17 @@
 
 
 
-  <meta name="description" content="Graceful shutdown and hard shutdownWhen a program/service is shutdown unexpectedly, it may be graceful shutdown or hard shutdown.When a service is killed with signal 15, if the service catches the sig">
+  <meta name="description" content="graceful shutdown and hard shutdownWhen a program/service is shutdown unexpectedly, it may be graceful shutdown or hard shutdown.When a service is killed with signal 15, if the service catches the sig">
 <meta property="og:type" content="article">
 <meta property="og:title" content="resilient architecture should also consider hard shutdown">
 <meta property="og:url" content="https://tiana528.github.io/2019/04/14/resilient-architecture-should-also-consider-hard-shutdown/index.html">
 <meta property="og:site_name" content="Yan&#39;s Notes">
-<meta property="og:description" content="Graceful shutdown and hard shutdownWhen a program/service is shutdown unexpectedly, it may be graceful shutdown or hard shutdown.When a service is killed with signal 15, if the service catches the sig">
+<meta property="og:description" content="graceful shutdown and hard shutdownWhen a program/service is shutdown unexpectedly, it may be graceful shutdown or hard shutdown.When a service is killed with signal 15, if the service catches the sig">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-09-22T09:11:20.833Z">
+<meta property="og:updated_time" content="2019-09-22T09:33:26.390Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="resilient architecture should also consider hard shutdown">
-<meta name="twitter:description" content="Graceful shutdown and hard shutdownWhen a program/service is shutdown unexpectedly, it may be graceful shutdown or hard shutdown.When a service is killed with signal 15, if the service catches the sig">
+<meta name="twitter:description" content="graceful shutdown and hard shutdownWhen a program/service is shutdown unexpectedly, it may be graceful shutdown or hard shutdown.When a service is killed with signal 15, if the service catches the sig">
 
 
 
@@ -423,7 +423,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-09-22 18:11:20" itemprop="dateModified" datetime="2019-09-22T18:11:20+09:00">2019-09-22</time>
+                <time title="Modified: 2019-09-22 18:33:26" itemprop="dateModified" datetime="2019-09-22T18:33:26+09:00">2019-09-22</time>
               
             
           </span>
@@ -474,11 +474,10 @@
       
 
       
-        <h1 id="Graceful-shutdown-and-hard-shutdown"><a href="#Graceful-shutdown-and-hard-shutdown" class="headerlink" title="Graceful shutdown and hard shutdown"></a>Graceful shutdown and hard shutdown</h1><p>When a program/service is shutdown unexpectedly, it may be graceful shutdown or hard shutdown.<br>When a service is killed with signal 15, if the service catches the signal and perform some cleanup before exit, it is graceful shutdown.<br>When a service is killed with 9, the service cannot catch the signal and will be termidated immediately, this is hard shutdown.</p>
+        <h1 id="graceful-shutdown-and-hard-shutdown"><a href="#graceful-shutdown-and-hard-shutdown" class="headerlink" title="graceful shutdown and hard shutdown"></a>graceful shutdown and hard shutdown</h1><p>When a program/service is shutdown unexpectedly, it may be graceful shutdown or hard shutdown.<br>When a service is killed with signal 15, if the service catches the signal and perform some cleanup before exit, it is graceful shutdown. If the service does not catch the signal and exits intermediately, it is hard shutdown.<br>When a service is killed with 9, the service cannot catch the signal and will be termidated immediately, this is also hard shutdown.</p>
 <h1 id="hard-shutdown-is-unavoided"><a href="#hard-shutdown-is-unavoided" class="headerlink" title="hard shutdown is unavoided"></a>hard shutdown is unavoided</h1><p>You cannot prevent your service from hard shutdown, it may happen due to out of memory, disk full, operating system kernal crash, or even instance power off.</p>
-<p>Many systems have graceful shutdown hooks to do some clean up logic during unexpected shutting down, but it is not enough.</p>
-<h1 id="how-to-create-resilient-architecture"><a href="#how-to-create-resilient-architecture" class="headerlink" title="how to create resilient architecture"></a>how to create resilient architecture</h1><p>Your service should be strong enough(still keep consistency, be able to recover) no matter the service is killed by 9 or by 15.<br>It means that you need to make the service handle graceful shutdown, which is quite straightforward, just adding a shutdown hook to do some cleanups.<br>It is not easy to make the service support the case of hard shutdown, many application side logic is needed here and there to support it.</p>
-<h1 id="some-examples-of-high-resilient-architecture-which-supports-hard-shutdown"><a href="#some-examples-of-high-resilient-architecture-which-supports-hard-shutdown" class="headerlink" title="some examples of high resilient architecture which supports hard shutdown"></a>some examples of high resilient architecture which supports hard shutdown</h1><p>One good example is mysql, it writes operation logs, and if the mysql process hard shutdown happens, it can still recover from the failure, and won’t have any inconsistency.<br>Another example is hadoop, a hadoop cluster may have thousands of nodes, and it can still work properly even if any one node is lost, the data is already duplicated on other nodes, the failed tasks will be retried on other nodes.</p>
+<h1 id="how-to-create-resilient-architecture"><a href="#how-to-create-resilient-architecture" class="headerlink" title="how to create resilient architecture"></a>how to create resilient architecture</h1><p>Your service should be strong enough(still keep consistency, be able to recover) no matter the service is killed by 9 or by 15.<br>It means that you need to make the service handle graceful shutdown, which is quite straightforward, just adding a shutdown hook to do some cleanups.<br>It is not easy to make the service support the case of hard shutdown, many application side logic is needed here and there to support it.<br><strong>But it is very important to handle the case of hard shutdown to achieve high resilient architecture. If your data/service will be inconsistent and no way to recover whenever hard shutdown happens, it might just be unacceptable.</strong></p>
+<h1 id="some-examples-of-high-resilient-architecture-which-support-hard-shutdown"><a href="#some-examples-of-high-resilient-architecture-which-support-hard-shutdown" class="headerlink" title="some examples of high resilient architecture which support hard shutdown"></a>some examples of high resilient architecture which support hard shutdown</h1><p>One good example is mysql, it writes operation logs, and if the mysql process hard shutdown happens, it can still recover from the failure, and won’t have any inconsistency.<br>Another example is hadoop, a hadoop cluster may have thousands of nodes, and it can still work properly even if any one node is lost, the data is already duplicated on other nodes, the failed tasks will be retried on other nodes.</p>
 
       
     </div>
@@ -669,7 +668,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Graceful-shutdown-and-hard-shutdown"><span class="nav-text">Graceful shutdown and hard shutdown</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hard-shutdown-is-unavoided"><span class="nav-text">hard shutdown is unavoided</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#how-to-create-resilient-architecture"><span class="nav-text">how to create resilient architecture</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#some-examples-of-high-resilient-architecture-which-supports-hard-shutdown"><span class="nav-text">some examples of high resilient architecture which supports hard shutdown</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#graceful-shutdown-and-hard-shutdown"><span class="nav-text">graceful shutdown and hard shutdown</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hard-shutdown-is-unavoided"><span class="nav-text">hard shutdown is unavoided</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#how-to-create-resilient-architecture"><span class="nav-text">how to create resilient architecture</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#some-examples-of-high-resilient-architecture-which-support-hard-shutdown"><span class="nav-text">some examples of high resilient architecture which support hard shutdown</span></a></li></ol></div>
             
 
           </div>
