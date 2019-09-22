@@ -16,7 +16,7 @@ You cannot prevent your service from hard shutdown, it may happen due to out of 
 Your service should be strong enough(still keep consistency, be able to recover) no matter the service is killed by 9 or by 15.
 It means that you need to make the service handle graceful shutdown, which is quite straightforward, just adding a shutdown hook to do some cleanups.
 It is not easy to make the service support the case of hard shutdown, many application side logic is needed here and there to support it.
-**But it is very important to handle the case of hard shutdown to achieve high resilient architecture. If your data/service will be inconsistent and no way to recover whenever hard shutdown happens, it might just be unacceptable.**
+**But it is very important to handle the case of hard shutdown to achieve high resilient architecture. If your data/service will be inconsistent and there is no way to recover whenever hard shutdown happens, it might just be unacceptable.**
 
 # some examples of high resilient architecture which support hard shutdown
 One good example is mysql, it writes operation logs, and if the mysql process hard shutdown happens, it can still recover from the failure, and won't have any inconsistency.
