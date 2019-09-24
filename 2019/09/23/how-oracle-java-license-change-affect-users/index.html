@@ -116,7 +116,7 @@
 <meta property="og:site_name" content="Yan&#39;s Notes">
 <meta property="og:description" content="Oracle javaplatformsoracle java has 3 platforms, Java SE for standard usage, Java EE for enterprise usage, and Java ME for micro usage.They are all specifications and are not implementations. Some spe">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-09-24T16:02:22.318Z">
+<meta property="og:updated_time" content="2019-09-24T16:44:35.715Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="how oracle java license change affect users">
 <meta name="twitter:description" content="Oracle javaplatformsoracle java has 3 platforms, Java SE for standard usage, Java EE for enterprise usage, and Java ME for micro usage.They are all specifications and are not implementations. Some spe">
@@ -423,7 +423,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-09-25 01:02:22" itemprop="dateModified" datetime="2019-09-25T01:02:22+09:00">2019-09-25</time>
+                <time title="Modified: 2019-09-25 01:44:35" itemprop="dateModified" datetime="2019-09-25T01:44:35+09:00">2019-09-25</time>
               
             
           </span>
@@ -492,7 +492,6 @@
 </li>
 <li>api <ul>
 <li><a href="https://docs.oracle.com/javase/8/docs/api/" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/api/</a></li>
-<li><a href="https://docs.oracle.com/javase/8/docs/api/" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/api/</a></li>
 <li>java.applet, java.io, java.lang, java.sql, java.util…</li>
 </ul>
 </li>
@@ -512,7 +511,7 @@
 <h2 id="relationship-between-jdk-jre-and-Java-SE"><a href="#relationship-between-jdk-jre-and-Java-SE" class="headerlink" title="relationship between jdk, jre and Java SE"></a>relationship between jdk, jre and Java SE</h2><ul>
 <li>Refer to <a href="https://docs.oracle.com/javase/8/docs/" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/</a>, Java SE defines the specification. JDK and JRE are implementations of the Java SE.</li>
 <li>JDK is a superset of JRE. Meaning when you download JDK, the JRE is always included.</li>
-<li>JDK is for development programs, JRE is for running programs.</li>
+<li>JDK is for developing programs, JRE is for running programs.</li>
 </ul>
 <h2 id="oracle-jdk-user-types"><a href="#oracle-jdk-user-types" class="headerlink" title="oracle jdk user types"></a>oracle jdk user types</h2><p>According to <a href="https://www.oracle.com/technetwork/java/javase/overview/oracle-jdk-faqs.html" target="_blank" rel="noopener">https://www.oracle.com/technetwork/java/javase/overview/oracle-jdk-faqs.html</a>, there are at least three kinds of users.</p>
 <ul>
@@ -523,26 +522,7 @@
 <li>commercial users</li>
 <li>Oracle Product users</li>
 </ul>
-<h2 id="oracle-jdk-license"><a href="#oracle-jdk-license" class="headerlink" title="oracle jdk license"></a>oracle jdk license</h2><p>Two distinct Java releases since JAVA8 after April 16, 2019. (<a href="https://www.oracle.com/technetwork/java/javase/overview/oracle-jdk-faqs.html" target="_blank" rel="noopener">https://www.oracle.com/technetwork/java/javase/overview/oracle-jdk-faqs.html</a>)</p>
-<ul>
-<li>Oracle OpenJDK releases<ul>
-<li>license : under the open source GNU General Public License v2, with the Classpath Exception (GPLv2+CPE)</li>
-</ul>
-</li>
-<li>Oracle Java SE product releases<ul>
-<li>license : under the OTN License Agreement for Java SE</li>
-<li>includes Oracle JDK8 and later, and Oracle JRE for Java8 and so on.</li>
-<li>This license permits personal use, development, testing, prototyping, demonstrating and some other uses at no cost.</li>
-</ul>
-</li>
-</ul>
-<p>Java releases before April 16, 2019</p>
-<ul>
-<li>Oracle JAVA SE product releases<ul>
-<li>license : BCL license</li>
-</ul>
-</li>
-</ul>
+<h2 id="oracle-jdk-license-changes-at-April-16-2019"><a href="#oracle-jdk-license-changes-at-April-16-2019" class="headerlink" title="oracle jdk license changes at April 16, 2019"></a>oracle jdk license changes at April 16, 2019</h2><p>Oracle JAVA SE product releases(include Oracle JDK/JRE) before April 16 2019 are BCL license, and are OTN license after April 16, 2019.<br>Oracle OpenJDK releases are still GPL license.</p>
 <p>(According to the release note, <a href="https://www.java.com/en/download/faq/release_dates.xml" target="_blank" rel="noopener">https://www.java.com/en/download/faq/release_dates.xml</a>, Oracle JDK8 until jdk1.8-201 belong to BCL license, Oracle JDK8 later than it belong to OTN license.)<br>(Commercial users can use BCL license at no cost for most of the features, but commercial users cannot use OTN license at no cost.)</p>
 <h2 id="do-you-need-to-pay-to-use-Oracle-JAVA"><a href="#do-you-need-to-pay-to-use-Oracle-JAVA" class="headerlink" title="do you need to pay to use Oracle JAVA?"></a>do you need to pay to use Oracle JAVA?</h2><ul>
 <li>no cost<ul>
@@ -555,8 +535,8 @@
 </ul>
 </li>
 </ul>
-<p>It means that if you use Oracle JDK8 in the commercial environments at no cost, the latest Oracle JDK8 version you can use is jdk1.8-201, if you want to use newer versions(you would need to do it, for security patches), you need to either use Oracle OpenJDK or pay for the Oracle JDK.<br>If you want to pay for Oracle JDK, oracle says the price is <code>as low as $2.50/desktop user/month</code>, but I think this price is no low…</p>
-<h2 id="suggestion-for-commercial-users-to-choose-which-JDK-to-use"><a href="#suggestion-for-commercial-users-to-choose-which-JDK-to-use" class="headerlink" title="suggestion for commercial users to choose which JDK to use"></a>suggestion for commercial users to choose which JDK to use</h2><p>Use Oracle OpenJDK for most of the cases.<br>Use and pay for Oracle JDK if you really need strong support from Oracle(like financial companies?), which I think is not the case for most of the companies.<br>There are also other free JDKs that are not provided by Oracle, such as Zulu, AdoptOpenJDK, Corretto(from Amazon) and so on. They can also be alternative choices.</p>
+<p>It means that if you use Oracle JDK8 in the commercial environments at no cost, the latest Oracle JDK8 version you can use is jdk1.8-201.<br>If you want to use newer versions(you would need to do it, for security patches), you need to either use Oracle OpenJDK or pay for the Oracle JDK.<br>If you want to pay for Oracle JDK, oracle says the price is <code>as low as $2.50/desktop user/month</code>, but I think this price is not low…</p>
+<h2 id="suggestion-for-commercial-users-to-choose-which-JDK-to-use"><a href="#suggestion-for-commercial-users-to-choose-which-JDK-to-use" class="headerlink" title="suggestion for commercial users to choose which JDK to use"></a>suggestion for commercial users to choose which JDK to use</h2><p>Use Oracle OpenJDK for most of the cases.<br>Use and pay for Oracle JDK if you really need strong support from Oracle(like financial companies?), which I think is not the case for most of the companies.<br>There are also free JDKs that are not provided by Oracle, such as Zulu, AdoptOpenJDK, Corretto(from Amazon) and so on. They can also be alternative choices.</p>
 
       
     </div>
@@ -747,7 +727,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Oracle-java"><span class="nav-text">Oracle java</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#platforms"><span class="nav-text">platforms</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#relationship-between-jdk-jre-and-Java-SE"><span class="nav-text">relationship between jdk, jre and Java SE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#oracle-jdk-user-types"><span class="nav-text">oracle jdk user types</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#oracle-jdk-license"><span class="nav-text">oracle jdk license</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#do-you-need-to-pay-to-use-Oracle-JAVA"><span class="nav-text">do you need to pay to use Oracle JAVA?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#suggestion-for-commercial-users-to-choose-which-JDK-to-use"><span class="nav-text">suggestion for commercial users to choose which JDK to use</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Oracle-java"><span class="nav-text">Oracle java</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#platforms"><span class="nav-text">platforms</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#relationship-between-jdk-jre-and-Java-SE"><span class="nav-text">relationship between jdk, jre and Java SE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#oracle-jdk-user-types"><span class="nav-text">oracle jdk user types</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#oracle-jdk-license-changes-at-April-16-2019"><span class="nav-text">oracle jdk license changes at April 16, 2019</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#do-you-need-to-pay-to-use-Oracle-JAVA"><span class="nav-text">do you need to pay to use Oracle JAVA?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#suggestion-for-commercial-users-to-choose-which-JDK-to-use"><span class="nav-text">suggestion for commercial users to choose which JDK to use</span></a></li></ol></li></ol></div>
             
 
           </div>
