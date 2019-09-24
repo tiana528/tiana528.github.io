@@ -109,25 +109,24 @@
 
 
 
-  <meta name="description" content="PurposeThe operation of Hadoop cluster is not easy. There are many parameters and there is no perfect configuration that fit all situations. Monitoring and learn from each incidents is very important.">
-<meta name="keywords" content="hadoop">
+  <meta name="description" content="oracle javaplatformsoracle java has 3 platforms, Java SE for standard usage, Java EE for enterprise usage, and Java ME for micro usage.They are all specifications and are not implementations. Some spe">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hadoop cluster incidents">
-<meta property="og:url" content="https://tiana528.github.io/2019/01/25/hadoop-cluster-incidents/index.html">
+<meta property="og:title" content="how oracle java license change affect users">
+<meta property="og:url" content="https://tiana528.github.io/2019/09/23/how-oracle-java-license-change-affect-users/index.html">
 <meta property="og:site_name" content="Yan&#39;s Notes">
-<meta property="og:description" content="PurposeThe operation of Hadoop cluster is not easy. There are many parameters and there is no perfect configuration that fit all situations. Monitoring and learn from each incidents is very important.">
+<meta property="og:description" content="oracle javaplatformsoracle java has 3 platforms, Java SE for standard usage, Java EE for enterprise usage, and Java ME for micro usage.They are all specifications and are not implementations. Some spe">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-01-25T13:49:58.705Z">
+<meta property="og:updated_time" content="2019-09-24T15:57:21.238Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="hadoop cluster incidents">
-<meta name="twitter:description" content="PurposeThe operation of Hadoop cluster is not easy. There are many parameters and there is no perfect configuration that fit all situations. Monitoring and learn from each incidents is very important.">
+<meta name="twitter:title" content="how oracle java license change affect users">
+<meta name="twitter:description" content="oracle javaplatformsoracle java has 3 platforms, Java SE for standard usage, Java EE for enterprise usage, and Java ME for micro usage.They are all specifications and are not implementations. Some spe">
 
 
 
 
 
 
-  <link rel="canonical" href="https://tiana528.github.io/2019/01/25/hadoop-cluster-incidents/">
+  <link rel="canonical" href="https://tiana528.github.io/2019/09/23/how-oracle-java-license-change-affect-users/">
 
 
 
@@ -137,7 +136,7 @@
   };
 </script>
 
-  <title>hadoop cluster incidents | Yan's Notes</title>
+  <title>how oracle java license change affect users | Yan's Notes</title>
   
 
 
@@ -365,7 +364,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2019/01/25/hadoop-cluster-incidents/">
+    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2019/09/23/how-oracle-java-license-change-affect-users/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Wang Yan">
@@ -382,7 +381,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">hadoop cluster incidents
+          <h1 class="post-title" itemprop="name headline">how oracle java license change affect users
               
             
           </h1>
@@ -407,12 +406,24 @@
                 
               
 
-              <time title="Created: 2019-01-25 20:03:09 / Modified: 22:49:58" itemprop="dateCreated datePublished" datetime="2019-01-25T20:03:09+09:00">2019-01-25</time>
+              <time title="Created: 2019-09-23 17:58:21" itemprop="dateCreated datePublished" datetime="2019-09-23T17:58:21+09:00">2019-09-23</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-09-25 00:57:21" itemprop="dateModified" datetime="2019-09-25T00:57:21+09:00">2019-09-25</time>
               
             
           </span>
@@ -426,9 +437,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2019/01/25/hadoop-cluster-incidents/#comments" itemprop="discussionUrl">
+                <a href="/2019/09/23/how-oracle-java-license-change-affect-users/#comments" itemprop="discussionUrl">
                 
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/01/25/hadoop-cluster-incidents/" itemprop="commentCount"></span>
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/09/23/how-oracle-java-license-change-affect-users/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -463,30 +474,89 @@
       
 
       
-        <h1 id="Purpose"><a href="#Purpose" class="headerlink" title="Purpose"></a>Purpose</h1><p>The operation of Hadoop cluster is not easy. There are many parameters and there is no perfect configuration that fit all situations. Monitoring and learn from each incidents is very important. This article aims at summarizing some incidents and they can be seen as valued knowledge to help investigate future incidents and discuss approaches to prevent. </p>
-<h1 id="datanode-Xmx-configured-does-not-fit-the-instance"><a href="#datanode-Xmx-configured-does-not-fit-the-instance" class="headerlink" title="datanode Xmx configured does not fit the instance"></a>datanode Xmx configured does not fit the instance</h1><ul>
-<li>situation<ul>
-<li>The whole cluster performance degrades.</li>
-<li>One node in the cluster has extremely higher CPU utilization than other nodes.</li>
-<li>The datanode process on that node takes up more than 300% CPU by checking top command.</li>
-<li>The accumulate GC time of the datanode processs on that node increases rapidly(know it through datadog jvm.gc.parnew.time metrics).</li>
+        <h1 id="oracle-java"><a href="#oracle-java" class="headerlink" title="oracle java"></a>oracle java</h1><h2 id="platforms"><a href="#platforms" class="headerlink" title="platforms"></a>platforms</h2><p>oracle java has 3 platforms, Java SE for standard usage, Java EE for enterprise usage, and Java ME for micro usage.<br>They are all specifications and are not implementations.</p>
+<p>Some specification examples:</p>
+<ul>
+<li>Java SE<ul>
+<li>specification<ul>
+<li><a href="https://docs.oracle.com/javase/specs/" target="_blank" rel="noopener">https://docs.oracle.com/javase/specs/</a></li>
+<li>Java Language Specification and Java Virtual Machine Specification<ul>
+<li>Grammars, Lexical Structure, Conversions, Classes, Interfaces, Arrays, Threads…</li>
 </ul>
 </li>
-<li>analysis<ul>
-<li>The cluster performance degrades because one datanode process behaves bad.</li>
-<li>GC time increases rapidly indicates the memory is insufficient.</li>
-</ul>
-</li>
-<li>root cause<ul>
-<li>The Xmx parameter of the datanode process is configured too large. The slave instance type is aws c4.2xlarge which is 15GB, 8vCPU. Each core(map,reduce,application master) Xmx is configured as 2GB, node manager Xmx is also 2GB, but datanode JMX is configured as 10GB. Meaning that the datanode Xmx configured is much higher than the free memory on the node thus causing frequent memory swap and performance degradation, as well as longer GC time. This articles explains a little more about <a href="http://www.javaperformancetuning.com/news/qotm045.shtml" target="_blank" rel="noopener">the situation when a large heap(Xmx) is configured</a>.</li>
-</ul>
-</li>
-<li>learn<ul>
-<li>Monitoring GC time increasing speed helps find the situations that the JVM paramers are mis-configured. Free space on the node should be considered when deciding the Xmx value.</li>
+<li>Java Virtual Machine Specification<ul>
+<li>Compiler, loading, linking, instruction set…</li>
 </ul>
 </li>
 </ul>
-<h1 id="to-be-continued"><a href="#to-be-continued" class="headerlink" title="to be continued"></a>to be continued</h1>
+</li>
+<li>api <ul>
+<li><a href="https://docs.oracle.com/javase/8/docs/api/" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/api/</a></li>
+<li><a href="https://docs.oracle.com/javase/8/docs/api/" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/api/</a></li>
+<li>java.applet, java.io, java.lang, java.sql, java.util…</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Java EE<ul>
+<li><a href="https://javaee.github.io/javaee-spec/javadocs/" target="_blank" rel="noopener">https://javaee.github.io/javaee-spec/javadocs/</a></li>
+<li>javax.annotation, javax.xml.rpc.handler…</li>
+</ul>
+</li>
+<li>Java ME<ul>
+<li><a href="https://www.oracle.com/java/technologies/javameoverview.html" target="_blank" rel="noopener">https://www.oracle.com/java/technologies/javameoverview.html</a></li>
+<li>IOT…<h2 id="relationship-between-jdk-jre-and-Java-SE"><a href="#relationship-between-jdk-jre-and-Java-SE" class="headerlink" title="relationship between jdk, jre and Java SE"></a>relationship between jdk, jre and Java SE</h2></li>
+</ul>
+</li>
+<li>Refer to <a href="https://docs.oracle.com/javase/8/docs/" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/</a>, Java SE defines the specification. JDK and JRE are implementations of the Java SE.</li>
+<li>JDK is a superset of JRE. Meaning when you download JDK, the JRE is always included.</li>
+<li>JDK is for development programs, JRE is for running programs.</li>
+</ul>
+<h2 id="oracle-jdk-user-types"><a href="#oracle-jdk-user-types" class="headerlink" title="oracle jdk user types"></a>oracle jdk user types</h2><p>According to <a href="https://www.oracle.com/technetwork/java/javase/overview/oracle-jdk-faqs.html" target="_blank" rel="noopener">https://www.oracle.com/technetwork/java/javase/overview/oracle-jdk-faqs.html</a>, there are at least three kinds of users.</p>
+<ul>
+<li>personal users<ul>
+<li>Personal use is using Java on a desktop or laptop computer to do things such as to play games or run other personal applications. If you are using Java on a desktop or laptop computer as part of any business operations, that is not personal use.</li>
+</ul>
+</li>
+<li>commercial users</li>
+<li>Oracle Product users</li>
+</ul>
+<h2 id="oracle-jdk-license"><a href="#oracle-jdk-license" class="headerlink" title="oracle jdk license"></a>oracle jdk license</h2><p>Two distinct Java releases since JAVA8 after April 16, 2019(<a href="https://www.oracle.com/technetwork/java/javase/overview/oracle-jdk-faqs.html" target="_blank" rel="noopener">https://www.oracle.com/technetwork/java/javase/overview/oracle-jdk-faqs.html</a>)</p>
+<ul>
+<li>Oracle OpenJDK releases<ul>
+<li>license : under the open source GNU General Public License v2, with the Classpath Exception (GPLv2+CPE)</li>
+</ul>
+</li>
+<li>Oracle Java SE product releases<ul>
+<li>license : under the OTN License Agreement for Java SE</li>
+<li>includes Oracle JDK8 and later, and Oracle JRE for Java8 and so on.</li>
+<li>This license permits personal use, development, testing, prototyping, demonstrating and some other uses at no cost.</li>
+</ul>
+</li>
+</ul>
+<p>Java releases before April 16, 2019</p>
+<ul>
+<li>Oracle JAVA SE product releases<ul>
+<li>license : BCL license</li>
+</ul>
+</li>
+</ul>
+<p>(According to the release note, <a href="https://www.java.com/en/download/faq/release_dates.xml" target="_blank" rel="noopener">https://www.java.com/en/download/faq/release_dates.xml</a>, Oracle JDK8 until jdk1.8-201 belong to BCL license, Oracle JDK8 later than it belong to OTN license.)<br>(Commercial users can use BCL license at no cost for most of the features, but commercial users cannot use OTN license at no cost.)</p>
+<h2 id="do-you-need-to-pay-to-use-JAVA"><a href="#do-you-need-to-pay-to-use-JAVA" class="headerlink" title="do you need to pay to use JAVA?"></a>do you need to pay to use JAVA?</h2><ul>
+<li>no cost<ul>
+<li>All types of users can use <code>Oracle OpenJDK</code> at no cost.</li>
+<li>Personal user and Oracle Product users can use <code>Oracle Java SE product</code>(Oracle JDK version before April 16, 2019) at no cost.</li>
+</ul>
+</li>
+<li>need to pay<ul>
+<li>Commercial users who use <code>Oracle Java SE product</code>(Oracle JDK version after April 16, 2019) will require a Java SE Subscription, meaning need to pay money to Oracle.</li>
+</ul>
+</li>
+</ul>
+<p>It means that if you use Oracle JDK8 in the commercial environments at no cost, the latest Oracle JDK8 version you can use is jdk1.8-201, if you want to use newer versions(you would need to do it, for security patches), you need to either use Oracle OpenJDK or pay for the Oracle JDK.<br>If you want to pay for Oracle JDK, oracle says the price is <code>as low as $2.50/desktop user/month</code>, but I think this price is no low…</p>
+<h2 id="suggestion-for-commercial-users"><a href="#suggestion-for-commercial-users" class="headerlink" title="suggestion for commercial users"></a>suggestion for commercial users</h2><p>Use Oracle OpenJDK for most of the cases.<br>Use and pay for Oracle JDK if you really need strong support from Oracle(like financial companies?), which I think is not the case for most of the companies.</p>
+<h1 id="Other-JAVAs"><a href="#Other-JAVAs" class="headerlink" title="Other JAVAs"></a>Other JAVAs</h1><p>Zulu, AdoptOpenJDK, Corretto(from Amazon) and so on.</p>
+
       
     </div>
 
@@ -507,12 +577,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/hadoop/" rel="tag"># hadoop</a>
-          
-        </div>
-      
 
       
       
@@ -522,8 +586,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/01/19/basic-understanding-of-cap-theorem/" rel="next" title="Very basic understanding of CAP theorem">
-                <i class="fa fa-chevron-left"></i> Very basic understanding of CAP theorem
+              <a href="/2019/09/22/how-to-pass-AWS-Solutions-Architect-Associate-Exam/" rel="next" title="how to pass AWS Solutions Architect Associate Exam">
+                <i class="fa fa-chevron-left"></i> how to pass AWS Solutions Architect Associate Exam
               </a>
             
           </div>
@@ -531,10 +595,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/02/07/Basic_understanding_of_debian_packaging/" rel="prev" title="Basic understanding of debian packaging">
-                Basic understanding of debian packaging <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -686,7 +746,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Purpose"><span class="nav-text">Purpose</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#datanode-Xmx-configured-does-not-fit-the-instance"><span class="nav-text">datanode Xmx configured does not fit the instance</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#to-be-continued"><span class="nav-text">to be continued</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#oracle-java"><span class="nav-text">oracle java</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#platforms"><span class="nav-text">platforms</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#relationship-between-jdk-jre-and-Java-SE"><span class="nav-text">relationship between jdk, jre and Java SE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#oracle-jdk-user-types"><span class="nav-text">oracle jdk user types</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#oracle-jdk-license"><span class="nav-text">oracle jdk license</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#do-you-need-to-pay-to-use-JAVA"><span class="nav-text">do you need to pay to use JAVA?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#suggestion-for-commercial-users"><span class="nav-text">suggestion for commercial users</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Other-JAVAs"><span class="nav-text">Other JAVAs</span></a></li></ol></div>
             
 
           </div>
@@ -849,9 +909,9 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'https://tiana528.github.io/2019/01/25/hadoop-cluster-incidents/';
-        this.page.identifier = '2019/01/25/hadoop-cluster-incidents/';
-        this.page.title = 'hadoop cluster incidents';
+        this.page.url = 'https://tiana528.github.io/2019/09/23/how-oracle-java-license-change-affect-users/';
+        this.page.identifier = '2019/09/23/how-oracle-java-license-change-affect-users/';
+        this.page.title = 'how oracle java license change affect users';
         };
       function loadComments () {
         var d = document, s = d.createElement('script');
