@@ -5,7 +5,7 @@ tags:
 ---
 
 
-# oracle java
+# Oracle java
 
 ## platforms
 oracle java has 3 platforms, Java SE for standard usage, Java EE for enterprise usage, and Java ME for micro usage.
@@ -21,7 +21,6 @@ Some specification examples:
             - Compiler, loading, linking, instruction set...
     - api 
         - https://docs.oracle.com/javase/8/docs/api/
-        - https://docs.oracle.com/javase/8/docs/api/
         - java.applet, java.io, java.lang, java.sql, java.util...
 - Java EE
     - https://javaee.github.io/javaee-spec/javadocs/
@@ -29,12 +28,14 @@ Some specification examples:
 - Java ME
     - https://www.oracle.com/java/technologies/javameoverview.html
     - IOT...
+
 ## relationship between jdk, jre and Java SE
 - Refer to https://docs.oracle.com/javase/8/docs/, Java SE defines the specification. JDK and JRE are implementations of the Java SE.
 - JDK is a superset of JRE. Meaning when you download JDK, the JRE is always included.
-- JDK is for development programs, JRE is for running programs.
+- JDK is for developing programs, JRE is for running programs.
 
 ## oracle jdk user types
+
 According to https://www.oracle.com/technetwork/java/javase/overview/oracle-jdk-faqs.html, there are at least three kinds of users.
 - personal users
     - Personal use is using Java on a desktop or laptop computer to do things such as to play games or run other personal applications. If you are using Java on a desktop or laptop computer as part of any business operations, that is not personal use.
@@ -42,24 +43,16 @@ According to https://www.oracle.com/technetwork/java/javase/overview/oracle-jdk-
 - Oracle Product users
 
 
-## oracle jdk license
-Two distinct Java releases since JAVA8 after April 16, 2019(https://www.oracle.com/technetwork/java/javase/overview/oracle-jdk-faqs.html)
-- Oracle OpenJDK releases
-    - license : under the open source GNU General Public License v2, with the Classpath Exception (GPLv2+CPE)
-- Oracle Java SE product releases
-    - license : under the OTN License Agreement for Java SE
-    - includes Oracle JDK8 and later, and Oracle JRE for Java8 and so on.
-    - This license permits personal use, development, testing, prototyping, demonstrating and some other uses at no cost.
+## oracle jdk license changes at April 16, 2019
 
-Java releases before April 16, 2019
-- Oracle JAVA SE product releases
-    - license : BCL license
+Oracle JAVA SE product releases(include Oracle JDK/JRE) before April 16 2019 are BCL license, and are OTN license after April 16, 2019.
+Oracle OpenJDK releases are still GPL license.
 
 
 (According to the release note, https://www.java.com/en/download/faq/release_dates.xml, Oracle JDK8 until jdk1.8-201 belong to BCL license, Oracle JDK8 later than it belong to OTN license.)
 (Commercial users can use BCL license at no cost for most of the features, but commercial users cannot use OTN license at no cost.)
 
-## do you need to pay to use JAVA?
+## do you need to pay to use Oracle JAVA?
 
 - no cost
     - All types of users can use `Oracle OpenJDK` at no cost.
@@ -67,15 +60,14 @@ Java releases before April 16, 2019
 - need to pay
     - Commercial users who use `Oracle Java SE product`(Oracle JDK version after April 16, 2019) will require a Java SE Subscription, meaning need to pay money to Oracle.
 
-It means that if you use Oracle JDK8 in the commercial environments at no cost, the latest Oracle JDK8 version you can use is jdk1.8-201, if you want to use newer versions(you would need to do it, for security patches), you need to either use Oracle OpenJDK or pay for the Oracle JDK.
-If you want to pay for Oracle JDK, oracle says the price is `as low as $2.50/desktop user/month`, but I think this price is no low...
+It means that if you use Oracle JDK8 in the commercial environments at no cost, the latest Oracle JDK8 version you can use is jdk1.8-201.
+If you want to use newer versions(you would need to do it, for security patches), you need to either use Oracle OpenJDK or pay for the Oracle JDK.
+If you want to pay for Oracle JDK, oracle says the price is `as low as $2.50/desktop user/month`, but I think this price is not low...
 
-## suggestion for commercial users
+## suggestion for commercial users to choose which JDK to use
+
 Use Oracle OpenJDK for most of the cases.
 Use and pay for Oracle JDK if you really need strong support from Oracle(like financial companies?), which I think is not the case for most of the companies.
-
-
-# Other JAVAs
-Zulu, AdoptOpenJDK, Corretto(from Amazon) and so on.
+There are also free JDKs that are not provided by Oracle, such as Zulu, AdoptOpenJDK, Corretto(from Amazon) and so on. They can also be alternative choices.
 
 
