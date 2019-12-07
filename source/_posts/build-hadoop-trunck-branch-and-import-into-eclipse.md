@@ -1,12 +1,12 @@
 ---
-title: build hadoop trunck branch and import into eclipse in mac
+title: build hadoop 3 trunck branch and import into eclipse in mac
 date: 2019-12-03 18:50:30
 tags:
 ---
 
 # Description
 I tried to build the trunck branch of hadoop git repository and imported it into eclipse then resolved the issues.
-The date I did it is 2019/11/03, the latest commit is : 6b2d6d4aafb110bef1b77d4ccbba4350e624b57d.
+The date I did it is 2019/11/03, the latest commit is : 6b2d6d4aafb110bef1b77d4ccbba4350e624b57d, version is 3.3.0-SNAPSHOT.
 
 For some necessary tools which are needed, we can refer to this to know what and which version to install :  [Building on macOS (without Docker)](https://github.com/apache/hadoop/blob/18059acb6ae16e72a6cdd08795f6281cda122bff/BUILDING.txt#L377-L410).
 Alternatively, we can use `./start-build-env.sh` command to simply build the environment, I am not using it because the build time using it is much longer than build without docker.
