@@ -8,7 +8,9 @@ tags:
 I tried to build the trunck branch of hadoop git repository and imported it into eclipse then resolved the issues.
 The date I did it is 2019/11/03, the latest commit is : 6b2d6d4aafb110bef1b77d4ccbba4350e624b57d.
 
-Basicly, refer to this for the build on mac [Building on macOS (without Docker)](https://github.com/apache/hadoop/blob/18059acb6ae16e72a6cdd08795f6281cda122bff/BUILDING.txt#L377-L410).
+For some necessary tools which are needed, we can refer to this to know what and which version to install :  [Building on macOS (without Docker)](https://github.com/apache/hadoop/blob/18059acb6ae16e72a6cdd08795f6281cda122bff/BUILDING.txt#L377-L410).
+Alternatively, we can use `./start-build-env.sh` command to simply build the environment, I am not using it because the build time using it is much longer than build without docker.
+
 # Steps
 
 ## download hadoop repository
@@ -33,7 +35,7 @@ I am installing it under `/usr/local/protoc`, you can install wherever you want,
 
 ## compile hadoop
 - cd hadoop
-- mvn clean install -DskipTests=true
+- mvn clean install -Pdist -DskipTests -Dtar
 - mvn eclipse:clean eclipse:eclipse -DskipTests
 
 ## import hadoop into eclipse and solve issues
