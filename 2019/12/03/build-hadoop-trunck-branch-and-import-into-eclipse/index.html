@@ -116,7 +116,7 @@
 <meta property="og:site_name" content="Yan&#39;s Notes">
 <meta property="og:description" content="DescriptionI tried to build the trunck branch of hadoop git repository and imported it into eclipse then resolved the issues.The date I did it is 2019/11/03, the latest commit is : 6b2d6d4aafb110bef1b">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-12-07T04:52:53.128Z">
+<meta property="og:updated_time" content="2019-12-07T04:55:18.516Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="build hadoop trunck branch and import into eclipse in mac">
 <meta name="twitter:description" content="DescriptionI tried to build the trunck branch of hadoop git repository and imported it into eclipse then resolved the issues.The date I did it is 2019/11/03, the latest commit is : 6b2d6d4aafb110bef1b">
@@ -423,7 +423,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-12-07 13:52:53" itemprop="dateModified" datetime="2019-12-07T13:52:53+09:00">2019-12-07</time>
+                <time title="Modified: 2019-12-07 13:55:18" itemprop="dateModified" datetime="2019-12-07T13:55:18+09:00">2019-12-07</time>
               
             
           </span>
@@ -499,7 +499,7 @@
 </ul>
 <h2 id="compile-hadoop"><a href="#compile-hadoop" class="headerlink" title="compile hadoop"></a>compile hadoop</h2><ul>
 <li>cd hadoop</li>
-<li>mvn clean package install -DskipTests=true</li>
+<li>mvn clean install -Pdist -DskipTests -Dtar</li>
 <li>mvn eclipse:clean eclipse:eclipse -DskipTests</li>
 </ul>
 <h2 id="import-hadoop-into-eclipse-and-solve-issues"><a href="#import-hadoop-into-eclipse-and-solve-issues" class="headerlink" title="import hadoop into eclipse and solve issues"></a>import hadoop into eclipse and solve issues</h2><p>After importing all hadoop projects into eclipse, there are 400 build errors shown in the error console. I will show how to solve them manually.<br>Note that my way of fixing them is only aiming at resolving eclipse issues quickly, and not an ideal way, ideally everything should be resolved just after running the maven command.</p>
