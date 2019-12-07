@@ -116,7 +116,7 @@
 <meta property="og:site_name" content="Yan&#39;s Notes">
 <meta property="og:description" content="DescriptionI tried to build the trunck branch of hadoop git repository and imported it into eclipse then resolved the issues.The date I did it is 2019/11/03, the latest commit is : 6b2d6d4aafb110bef1b">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-12-03T10:19:52.890Z">
+<meta property="og:updated_time" content="2019-12-07T03:30:07.184Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="build hadoop trunck branch and import into eclipse in mac">
 <meta name="twitter:description" content="DescriptionI tried to build the trunck branch of hadoop git repository and imported it into eclipse then resolved the issues.The date I did it is 2019/11/03, the latest commit is : 6b2d6d4aafb110bef1b">
@@ -406,12 +406,24 @@
                 
               
 
-              <time title="Created: 2019-12-03 18:50:30 / Modified: 19:19:52" itemprop="dateCreated datePublished" datetime="2019-12-03T18:50:30+09:00">2019-12-03</time>
+              <time title="Created: 2019-12-03 18:50:30" itemprop="dateCreated datePublished" datetime="2019-12-03T18:50:30+09:00">2019-12-03</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-12-07 12:30:07" itemprop="dateModified" datetime="2019-12-07T12:30:07+09:00">2019-12-07</time>
               
             
           </span>
@@ -463,6 +475,7 @@
 
       
         <h1 id="Description"><a href="#Description" class="headerlink" title="Description"></a>Description</h1><p>I tried to build the trunck branch of hadoop git repository and imported it into eclipse then resolved the issues.<br>The date I did it is 2019/11/03, the latest commit is : 6b2d6d4aafb110bef1b77d4ccbba4350e624b57d.</p>
+<p>Basicly, refer to this for the build on mac <a href="https://github.com/apache/hadoop/blob/18059acb6ae16e72a6cdd08795f6281cda122bff/BUILDING.txt#L377-L410" target="_blank" rel="noopener">Building on macOS (without Docker)</a>.</p>
 <h1 id="Steps"><a href="#Steps" class="headerlink" title="Steps"></a>Steps</h1><h2 id="download-hadoop-repository"><a href="#download-hadoop-repository" class="headerlink" title="download hadoop repository"></a>download hadoop repository</h2><ul>
 <li>git clone <a href="https://github.com/apache/hadoop" target="_blank" rel="noopener">https://github.com/apache/hadoop</a></li>
 <li>cd hadoop</li>
@@ -472,7 +485,7 @@
 </li>
 </ul>
 <h2 id="compile-and-build-proto"><a href="#compile-and-build-proto" class="headerlink" title="compile and build proto"></a>compile and build proto</h2><p>Note that the same version is recommended to be used as the one we checked in the previous step.</p>
-<p>I am installing it under <code>/usr/local/protoc</code>, you can install whereever you want, and even someplace in your home folder.</p>
+<p>I am installing it under <code>/usr/local/protoc</code>, you can install wherever you want, and even someplace in your home folder.</p>
 <ul>
 <li>git clone <a href="https://github.com/protocolbuffers/protobuf.git" target="_blank" rel="noopener">https://github.com/protocolbuffers/protobuf.git</a></li>
 <li>cd protobuf</li>
@@ -489,7 +502,7 @@
 <li>mvn clean install -DskipTests=true</li>
 <li>mvn eclipse:clean eclipse:eclipse -DskipTests</li>
 </ul>
-<h2 id="import-hadoop-into-eclipse-and-solve-issues"><a href="#import-hadoop-into-eclipse-and-solve-issues" class="headerlink" title="import hadoop into eclipse and solve issues"></a>import hadoop into eclipse and solve issues</h2><p>After importing all hadoop projects into eclipse, there are 400 build errors shown in the error console. I will show how to solve them manually.</p>
+<h2 id="import-hadoop-into-eclipse-and-solve-issues"><a href="#import-hadoop-into-eclipse-and-solve-issues" class="headerlink" title="import hadoop into eclipse and solve issues"></a>import hadoop into eclipse and solve issues</h2><p>After importing all hadoop projects into eclipse, there are 400 build errors shown in the error console. I will show how to solve them manually.<br>Note that my way of fixing them is only aiming at resolving eclipse issues quickly, and not an ideal way, ideally everything should be resolved just after running the maven command.</p>
 <h3 id="about-cannot-nest-issue"><a href="#about-cannot-nest-issue" class="headerlink" title="about cannot nest issue"></a>about cannot nest issue</h3><p>(1) error message : hadoop-yarn-common project has build error, Cannot nest ‘hadoop-yarn-common/src/test/resources/resource-types’ inside ‘hadoop-yarn-common/src/test/resources’. To enable the nesting exclude ‘resource-types/‘ from ‘hadoop-yarn-common/src/test/resources’</p>
 <p>(2) solve approach : hadoop-yarn-common project -&gt; properties -&gt; build path -&gt; add <code>resource-types/</code> to the exclude path</p>
 <p>(3) remaining errors : 399</p>
@@ -517,21 +530,21 @@
 <p>(2) solve approach :</p>
 <ul>
 <li>cd hadoop-common-project\hadoop-common\src\test\proto</li>
-<li>protoc –java_out=../java *.proto</li>
+<li>protoc –javaout=../java *.proto</li>
 </ul>
 <p>(3) remaining errors : 137</p>
 <h3 id="more-about-proto"><a href="#more-about-proto" class="headerlink" title="more about proto"></a>more about proto</h3><p>Do the same as above</p>
 <ul>
 <li>cd ./hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/test/proto/</li>
-<li><p>protoc –java_out=../java *.proto –proto_path=.  –proto_path=/Users/wang.yan/hadoop_source/hadoop/./hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/src/main/proto/ –proto_path=/Users/wang.yan/hadoop_source/hadoop/hadoop-common-project/hadoop-common/src/main/proto</p>
+<li><p>protoc –javaout=../java *.proto –proto_pth=.  –proto_path=/Users/wang.yan/hadoop_source/hadoop/./hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/src/main/proto/ –proto_path=/Users/wang.yan/hadoop_source/hadoop/hadoop-common-project/hadoop-common/src/main/proto</p>
 </li>
 <li><p>cd ./hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-resourcemanager/src/test/proto/test_client_tokens.proto</p>
 </li>
-<li><p>protoc –java_out=../java *.proto –proto_path=.  –proto_path=/Users/wang.yan/hadoop_source/hadoop/./hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/src/main/proto/ –proto_path=/Users/wang.yan/hadoop_source/hadoop/hadoop-common-project/hadoop-common/src/main/proto</p>
+<li><p>protoc –javaout=../java *.proto –proto_path=.  –proto_path=/Users/wang.yan/hadoop_source/hadoop/./hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/src/main/proto/ –proto_path=/Users/wang.yan/hadoop_source/hadoop/hadoop-common-project/hadoop-common/src/main/proto</p>
 </li>
 <li><p>cd ./hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/src/test/proto/</p>
 </li>
-<li>protoc –java_out=../java *.proto –proto_path=.  –proto_path=/Users/wang.yan/hadoop_source/hadoop/./hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/src/main/proto/ –proto_path=/Users/wang.yan/hadoop_source/hadoop/hadoop-common-project/hadoop-common/src/main/proto</li>
+<li>protoc –javaout=../java *.proto –proto_path=.  –proto_path=/Users/wang.yan/hadoop_source/hadoop/./hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/src/main/proto/ –proto_path=/Users/wang.yan/hadoop_source/hadoop/hadoop-common-project/hadoop-common/src/main/proto</li>
 </ul>
 <p>Remaining errors : 0</p>
 
