@@ -5,13 +5,11 @@ tags:
 ---
 
 # description
-In the previous [blog](https://mingyue.me/2019/12/03/build-hadoop-trunck-branch-and-import-into-eclipse/), we discussed about how to compile hadoop 3 from source and import source code into Eclipse.
+In the previous [blog](https://mingyue.me/2019/12/03/build-hadoop-trunck-branch-and-import-into-eclipse/), we discussed about how to compile hadoop 3 from the source code and import source code into Eclipse.
 
-As one step of the build(mvn clean install -Pdist -DskipTests -Dtar), we generate the hadoop distribution of hadoop-dist/target/hadoop-3.3.0-SNAPSHOT.tar.gz.
+As one step of the build(mvn clean install -Pdist -DskipTests -Dtar), we generated the hadoop distribution of hadoop-dist/target/hadoop-3.3.0-SNAPSHOT.tar.gz.
 
-In this blog, we show how to use the generated hadoop distribution to run hadoop service in mac, and debug hadoop client as well as service by eclipse.
-
-We will run hadoop in one single node in the `Pseudo-Distributed` mode, based on [SingleCluster hadoop wiki](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html).
+In this blog, we will show how to use the generated hadoop distribution to run hadoop service in mac, and how to debug hadoop client as well as service by eclipse.
 
 hadoop version is 3.3.0-SNAPSHOT built from trunk branch.
 
@@ -25,7 +23,7 @@ hadoop version is 3.3.0-SNAPSHOT built from trunk branch.
 ## configure environment variable
 - add HADOOP_HOME to the ~/.profile
     ```
-export HADOOP_HOME="/Users/wang.yan/public_work/hadoop_distribute/hadoop-3.3.0-SNAPSHOT/"
+export HADOOP_HOME=/Users/wang.yan/public_work/hadoop_distribute/hadoop-3.3.0-SNAPSHOT/
 PATH=$PATH:$HADOOP_HOME/sbin:$HADOOP_HOME/bin
     ```
 - source ~/.profile
@@ -53,7 +51,7 @@ workers                          turn on worker mode
 - mkdir -p /Users/wang.yan/tmp/namenode/
 - mkdir -p /Users/wang.yan/tmp/datanode/
 
-## add hadoop properties
+## configure hadoop properties
 Change properties files under etc/hadoop/, for running hadoop in the `Pseudo-Distributed` mode.
 
 - core-site.xml
@@ -113,10 +111,10 @@ Change properties files under etc/hadoop/, for running hadoop in the `Pseudo-Dis
 </configuration>
     ```
 
-## Setup passphraseless ssh
+## setup passphraseless ssh
 Refer [hadoop wiki](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html#Setup_passphraseless_ssh) for this step.
 
-I tried but it does not work in my local, so I gave up this step.
+I tried but it does not work properly in my local, so I skipped this step.
 
 Because I skipped this step, I cannot use the commands of sbin/, I will use the commands of bin/ directly instead.
 
@@ -145,7 +143,7 @@ We are able to check the UIs.
 ## check logs
 The logs are under logs/
 
-# test to run word count in pseudo-distributed mode
+## test to run word count in pseudo-distributed mode
 - prepare data
 ```
    bin/hdfs dfs -rm -r /tmp/input
@@ -162,15 +160,15 @@ The logs are under logs/
     ```
    bin/hdfs dfs -cat /tmp/output/part-r-00000
     ```
-Part of the output is 
-```
-"AS	1
-"License");	1
-"log	1
-#	323
-##	12
-###	33
-```
+    - Part of the output is
+    ```
+    "AS	1
+    "License");	1
+    "log	1
+    #	323
+    ##	12
+    ###	33
+    ```
 
 # run word count in standalone node and debug by eclipse
 
