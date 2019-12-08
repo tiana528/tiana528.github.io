@@ -109,17 +109,17 @@
 
 
 
-  <meta name="description" content="descriptionIn the previous blog, we discussed about how to compile hadoop 3 from source and import source code into Eclipse. As one step of the build(mvn clean install -Pdist -DskipTests -Dtar), we ge">
+  <meta name="description" content="descriptionIn the previous blog, we discussed about how to compile hadoop 3 from the source code and import source code into Eclipse. As one step of the build(mvn clean install -Pdist -DskipTests -Dta">
 <meta property="og:type" content="article">
 <meta property="og:title" content="run work count by hadoop 3 and debug hadoop by eclipse in mac">
 <meta property="og:url" content="https://tiana528.github.io/2019/12/07/run-work-count-by-hadoop-3-and-debug-hadoop/index.html">
 <meta property="og:site_name" content="Yan&#39;s Notes">
-<meta property="og:description" content="descriptionIn the previous blog, we discussed about how to compile hadoop 3 from source and import source code into Eclipse. As one step of the build(mvn clean install -Pdist -DskipTests -Dtar), we ge">
+<meta property="og:description" content="descriptionIn the previous blog, we discussed about how to compile hadoop 3 from the source code and import source code into Eclipse. As one step of the build(mvn clean install -Pdist -DskipTests -Dta">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-12-08T10:33:32.590Z">
+<meta property="og:updated_time" content="2019-12-08T12:57:24.319Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="run work count by hadoop 3 and debug hadoop by eclipse in mac">
-<meta name="twitter:description" content="descriptionIn the previous blog, we discussed about how to compile hadoop 3 from source and import source code into Eclipse. As one step of the build(mvn clean install -Pdist -DskipTests -Dtar), we ge">
+<meta name="twitter:description" content="descriptionIn the previous blog, we discussed about how to compile hadoop 3 from the source code and import source code into Eclipse. As one step of the build(mvn clean install -Pdist -DskipTests -Dta">
 
 
 
@@ -423,7 +423,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-12-08 19:33:32" itemprop="dateModified" datetime="2019-12-08T19:33:32+09:00">2019-12-08</time>
+                <time title="Modified: 2019-12-08 21:57:24" itemprop="dateModified" datetime="2019-12-08T21:57:24+09:00">2019-12-08</time>
               
             
           </span>
@@ -474,10 +474,9 @@
       
 
       
-        <h1 id="description"><a href="#description" class="headerlink" title="description"></a>description</h1><p>In the previous <a href="https://mingyue.me/2019/12/03/build-hadoop-trunck-branch-and-import-into-eclipse/" target="_blank" rel="noopener">blog</a>, we discussed about how to compile hadoop 3 from source and import source code into Eclipse.</p>
-<p>As one step of the build(mvn clean install -Pdist -DskipTests -Dtar), we generate the hadoop distribution of hadoop-dist/target/hadoop-3.3.0-SNAPSHOT.tar.gz.</p>
-<p>In this blog, we show how to use the generated hadoop distribution to run hadoop service in mac, and debug hadoop client as well as service by eclipse.</p>
-<p>We will run hadoop in one single node in the <code>Pseudo-Distributed</code> mode, based on <a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html" target="_blank" rel="noopener">SingleCluster hadoop wiki</a>.</p>
+        <h1 id="description"><a href="#description" class="headerlink" title="description"></a>description</h1><p>In the previous <a href="https://mingyue.me/2019/12/03/build-hadoop-trunck-branch-and-import-into-eclipse/" target="_blank" rel="noopener">blog</a>, we discussed about how to compile hadoop 3 from the source code and import source code into Eclipse.</p>
+<p>As one step of the build(mvn clean install -Pdist -DskipTests -Dtar), we generated the hadoop distribution of hadoop-dist/target/hadoop-3.3.0-SNAPSHOT.tar.gz.</p>
+<p>In this blog, we will show how to use the generated hadoop distribution to run hadoop service in mac, and how to debug hadoop client as well as service by eclipse.</p>
 <p>hadoop version is 3.3.0-SNAPSHOT built from trunk branch.</p>
 <h1 id="environment-setup"><a href="#environment-setup" class="headerlink" title="environment setup"></a>environment setup</h1><h2 id="copy-and-extract"><a href="#copy-and-extract" class="headerlink" title="copy and extract"></a>copy and extract</h2><ul>
 <li>cp hadoop-dist/target/hadoop-3.3.0-SNAPSHOT.tar.gz /Users/wang.yan/public_work/hadoop_distribute</li>
@@ -486,7 +485,7 @@
 </ul>
 <h2 id="configure-environment-variable"><a href="#configure-environment-variable" class="headerlink" title="configure environment variable"></a>configure environment variable</h2><ul>
 <li><p>add HADOOP_HOME to the ~/.profile</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export HADOOP_HOME=&quot;/Users/wang.yan/public_work/hadoop_distribute/hadoop-3.3.0-SNAPSHOT/&quot;</span><br><span class="line">PATH=$PATH:$HADOOP_HOME/sbin:$HADOOP_HOME/bin</span><br></pre></td></tr></table></figure>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export HADOOP_HOME=/Users/wang.yan/public_work/hadoop_distribute/hadoop-3.3.0-SNAPSHOT/</span><br><span class="line">PATH=$PATH:$HADOOP_HOME/sbin:$HADOOP_HOME/bin</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>source ~/.profile</p>
 </li>
@@ -499,7 +498,7 @@
 <li>mkdir -p /Users/wang.yan/tmp/namenode/</li>
 <li>mkdir -p /Users/wang.yan/tmp/datanode/</li>
 </ul>
-<h2 id="add-hadoop-properties"><a href="#add-hadoop-properties" class="headerlink" title="add hadoop properties"></a>add hadoop properties</h2><p>Change properties files under etc/hadoop/, for running hadoop in the <code>Pseudo-Distributed</code> mode.</p>
+<h2 id="configure-hadoop-properties"><a href="#configure-hadoop-properties" class="headerlink" title="configure hadoop properties"></a>configure hadoop properties</h2><p>Change properties files under etc/hadoop/, for running hadoop in the <code>Pseudo-Distributed</code> mode.</p>
 <ul>
 <li><p>core-site.xml</p>
   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;hdfs://localhost:9000&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
@@ -514,8 +513,8 @@
   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">      &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">      &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<h2 id="Setup-passphraseless-ssh"><a href="#Setup-passphraseless-ssh" class="headerlink" title="Setup passphraseless ssh"></a>Setup passphraseless ssh</h2><p>Refer <a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html#Setup_passphraseless_ssh" target="_blank" rel="noopener">hadoop wiki</a> for this step.</p>
-<p>I tried but it does not work in my local, so I gave up this step.</p>
+<h2 id="setup-passphraseless-ssh"><a href="#setup-passphraseless-ssh" class="headerlink" title="setup passphraseless ssh"></a>setup passphraseless ssh</h2><p>Refer <a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html#Setup_passphraseless_ssh" target="_blank" rel="noopener">hadoop wiki</a> for this step.</p>
+<p>I tried but it does not work properly in my local, so I skipped this step.</p>
 <p>Because I skipped this step, I cannot use the commands of sbin/, I will use the commands of bin/ directly instead.</p>
 <h2 id="cleanup-before-start-all-service"><a href="#cleanup-before-start-all-service" class="headerlink" title="cleanup before start all service"></a>cleanup before start all service</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">./bin/hdfs --daemon stop namenode</span><br><span class="line">./bin/hdfs --daemon stop datanode</span><br><span class="line">./bin/yarn --daemon stop resourcemanager</span><br><span class="line">./bin/yarn --daemon stop nodemanager</span><br><span class="line">rm -rf /Users/wang.yan/tmp/datenode/*</span><br><span class="line">./bin/hdfs namenode -format</span><br></pre></td></tr></table></figure>
 <p>Note that whenever we shutdown namenode and start it, it is a new cluster, and we need to cleanup namenode and datanode data folder before start the namenode/datanode service.</p>
@@ -535,9 +534,12 @@
 </li>
 <li><p>check result</p>
   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/hdfs dfs -cat /tmp/output/part-r-00000</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Part of the output is<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&quot;AS	1</span><br><span class="line">&quot;License&quot;);	1</span><br><span class="line">&quot;log	1</span><br><span class="line">#	323</span><br><span class="line">##	12</span><br><span class="line">###	33</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<p>Part of the output is<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&quot;AS	1</span><br><span class="line">&quot;License&quot;);	1</span><br><span class="line">&quot;log	1</span><br><span class="line">#	323</span><br><span class="line">##	12</span><br><span class="line">###	33</span><br></pre></td></tr></table></figure></p>
+</li>
+</ul>
 <h1 id="run-word-count-in-standalone-node-and-debug-by-eclipse"><a href="#run-word-count-in-standalone-node-and-debug-by-eclipse" class="headerlink" title="run word count in standalone node and debug by eclipse"></a>run word count in standalone node and debug by eclipse</h1><ul>
 <li><p>clean up output folder and create data</p>
   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /tmp/input</span><br><span class="line">rm -rf /tmp/output</span><br><span class="line">cp etc/hadoop/hadoop-env.sh /tmp/input/</span><br></pre></td></tr></table></figure>
@@ -778,7 +780,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#description"><span class="nav-text">description</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#environment-setup"><span class="nav-text">environment setup</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#copy-and-extract"><span class="nav-text">copy and extract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#configure-environment-variable"><span class="nav-text">configure environment variable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#try-hadoop-command"><span class="nav-text">try hadoop command</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#create-local-paths-for-namenode-and-datanode-to-use"><span class="nav-text">create local paths for namenode and datanode to use</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#add-hadoop-properties"><span class="nav-text">add hadoop properties</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Setup-passphraseless-ssh"><span class="nav-text">Setup passphraseless ssh</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cleanup-before-start-all-service"><span class="nav-text">cleanup before start all service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#start-all-service"><span class="nav-text">start all service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#check-UIs"><span class="nav-text">check UIs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#check-logs"><span class="nav-text">check logs</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#test-to-run-word-count-in-pseudo-distributed-mode"><span class="nav-text">test to run word count in pseudo-distributed mode</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#run-word-count-in-standalone-node-and-debug-by-eclipse"><span class="nav-text">run word count in standalone node and debug by eclipse</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#run-word-count-in-pseudo-distributed-mode-and-debug-hadoop-client-by-eclipse"><span class="nav-text">run word count in pseudo-distributed mode and debug hadoop client by eclipse</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#run-word-count-in-pseudo-distributed-mode-and-debug-hadoop-service-by-eclipse"><span class="nav-text">run word count in pseudo-distributed mode and debug hadoop service by eclipse</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#run-word-count-in-pseudo-distributed-mode-and-debug-hadoop-child-process-bu-eclipse"><span class="nav-text">run word count in pseudo-distributed mode and debug hadoop child process bu eclipse</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#description"><span class="nav-text">description</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#environment-setup"><span class="nav-text">environment setup</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#copy-and-extract"><span class="nav-text">copy and extract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#configure-environment-variable"><span class="nav-text">configure environment variable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#try-hadoop-command"><span class="nav-text">try hadoop command</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#create-local-paths-for-namenode-and-datanode-to-use"><span class="nav-text">create local paths for namenode and datanode to use</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#configure-hadoop-properties"><span class="nav-text">configure hadoop properties</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#setup-passphraseless-ssh"><span class="nav-text">setup passphraseless ssh</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cleanup-before-start-all-service"><span class="nav-text">cleanup before start all service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#start-all-service"><span class="nav-text">start all service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#check-UIs"><span class="nav-text">check UIs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#check-logs"><span class="nav-text">check logs</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#test-to-run-word-count-in-pseudo-distributed-mode"><span class="nav-text">test to run word count in pseudo-distributed mode</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#run-word-count-in-standalone-node-and-debug-by-eclipse"><span class="nav-text">run word count in standalone node and debug by eclipse</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#run-word-count-in-pseudo-distributed-mode-and-debug-hadoop-client-by-eclipse"><span class="nav-text">run word count in pseudo-distributed mode and debug hadoop client by eclipse</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#run-word-count-in-pseudo-distributed-mode-and-debug-hadoop-service-by-eclipse"><span class="nav-text">run word count in pseudo-distributed mode and debug hadoop service by eclipse</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#run-word-count-in-pseudo-distributed-mode-and-debug-hadoop-child-process-bu-eclipse"><span class="nav-text">run word count in pseudo-distributed mode and debug hadoop child process bu eclipse</span></a></li></ol></div>
             
 
           </div>
