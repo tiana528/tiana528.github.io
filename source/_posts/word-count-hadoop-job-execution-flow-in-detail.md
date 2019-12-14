@@ -96,16 +96,45 @@ At the end of RMAppNewlySavingTransition, RMStateStore.storeNewApplication
 ### RMAppStore APP_NEW_SAVED -> SUBMITTED
 RMAppImpl.AddApplicationToSchedulerTransition handles the APP_NEW_SAVED type event
     => dispatch AppAddedSchedulerEvent event
+        => CapacityScheduler.handle (yarn.resourcemanager.scheduler.class)
+            => CapacityScheduler.addApplication
+                => CSQueue.submitApplication : Submit a new application to the queue
+                => Put the application into a field of : applications
+                => dispatch RMAppEventType.APP_ACCEPTED event
     => if timeline server is enabled (yarn.timeline-service.generic-application-history.enabled)
         => dispatch WritingApplicationStartEvent event, event type is WritingHistoryEventType.APP_START
             => RMApplicationHistoryWriter.handleWritingApplicationHistoryEvent
                 => ApplicationHistoryWriter.applicationStarted
                     => FileSystemApplicationHistoryStore.applicationStarted (yarn.timeline-service.generic-application-history.store-class)
+                        => working path : yarn.timeline-service.generic-application-history.fs-history-store.uri or "\${hadoop.tmp.dir"}/yarn/timeline/generic-history"
+                        => root dir : working path + ApplicationHistoryDataRoot
+                        => application history file : root dir + application id (This is the file in the local file system of resource manager for saving one application history. )
+                        => write ApplicationStartDataPBImpl to the application history file
         => if system publisher is enabled(yarn.system-metrics-publisher.enabled) and timeline server v1 is enabled
             => TimelineServiceV1Publisher.appCreated
                 => publish application name, application type, user, tags, priority, and so on to timelineserver.
                     ... => TimelineServiceV1Publisher.putEntity ...
                             => Go to the timelineserver world
+
+
+### RMAppStore SUBMITTED -> ACCEPTED
+RMAppImpl.StartAppAttemptTransition
+    => RMAppImpl.createAndStartNewAttempt
+        => create new application attempt = appId + attemptId(increase by 1 : 1, 2, 3...)
+        => create RMAppAttemptImpl, put to attempts field, update the currentAttempt
+        => trigger RMAppStartAttemptEvent event with the attempt id, event type : RMAppAttemptEventType.START
+            => RMAppAttemptImpl.AttemptStartedTransition handles AttemptStartedTransition START-> SUBMITTED
+                => appAttempt.masterService.registerAppAttempt : Register with the ApplicationMasterService
+                    => Note that ApplicationMasterService is created in the ResourceManager
+                    => ApplicationMasterService.registerAppAttempt 
+
+### RMAppStore ACCEPTED -> 
+
+
+
+
+
+
 
 
 
