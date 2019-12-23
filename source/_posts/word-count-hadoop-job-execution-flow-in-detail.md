@@ -123,12 +123,49 @@ RMAppImpl.StartAppAttemptTransition
         => create new application attempt = appId + attemptId(increase by 1 : 1, 2, 3...)
         => create RMAppAttemptImpl, put to attempts field, update the currentAttempt
         => trigger RMAppStartAttemptEvent event with the attempt id, event type : RMAppAttemptEventType.START
-            => RMAppAttemptImpl.AttemptStartedTransition handles AttemptStartedTransition START-> SUBMITTED
-                => appAttempt.masterService.registerAppAttempt : Register with the ApplicationMasterService
-                    => Note that ApplicationMasterService is created in the ResourceManager
-                    => ApplicationMasterService.registerAppAttempt 
 
-### RMAppStore ACCEPTED -> 
+### RMAppAttemptState NEW -> SUBMITTED
+RMAppAttemptImpl.AttemptStartedTransition handles RMAppAttemptEventType.START : RMAppAttemptState NEW -> SUBMITTED
+    => appAttempt.masterService.registerAppAttempt : Register with the ApplicationMasterService
+         => Note that ApplicationMasterService is created in the ResourceManager
+         => ApplicationMasterService.registerAppAttempt
+         => trigger AppAttemptAddedSchedulerEvent event(SchedulerEventType.APP_ATTEMPT_ADDED)
+             => CapacityScheduler.handle deal with the above event
+                 => CapacityScheduler.addApplicationAttempt
+                     => get SchedulerApplication from applications fields, create new FiCaSchedulerApp(for the attempt), set the attempt to the application as the current app attempt.
+                     => queue.submitApplicationAttempt
+                         => LeafQueue.submitApplicationAttempt, put into applicationAttemptMap
+                         => use yarn.scheduler.capacity.resource-calculator(or DefaultResourceCalculator) as calculator to calculate whether resource is enough
+                             => if resource is enough(lastClusterResource is larger than 0), activateApplications
+                                 => configure the queue(internal datastructure) for the resource of application master
+                             => if resource is not enough, do not activeApplication now
+                     => dispatch RMAppAttemptEventType.ATTEMPT_ADDED event
+
+### RMAppAttemptState SUBMITTED -> SCHEDULED
+ScheduleTransition handles the event
+    => allocate container for the application master
+        => CapacityScheduler.allocate
+            => create an Allocation object, with the request content inside
+
+CapacityScheduler
+
+
+
+When RMContainer(RMContainerImpl) is created? 
+    => AbstractYarnScheduler
+    => CapacityScheduler
+    => RegularContainerAllocator
+    => FiCaSchedulerApp
+    => FsAppAttempt
+When RMContainerEventType.START event is triggered?
+
+RMContainerEventType.START event : RMContainerState NEW -> ALLOCATED
+    => RMContainerImpl.ContainerStartedTransition
+        => RMAppAttemptEventType.CONTAINER_ALLOCATED event is triggered
+
+### RMAppAttemptState SCHEDULED -> ALLOCATED_SAVING
+
+
 
 
 
