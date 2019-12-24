@@ -144,65 +144,75 @@ RMAppAttemptImpl.AttemptStartedTransition handles RMAppAttemptEventType.START : 
 ### RMAppAttemptState SUBMITTED -> SCHEDULED
 ScheduleTransition handles the RMAppAttemptEventType.ATTEMPT_ADDED event
     => allocate container for the application master
-        => CapacityScheduler.allocate
+        => CapacityScheduler.allocate (A view of the resources that will be allocated from this application)
             => create an Allocation object, with the request content inside
 
-CapacityScheduler
-
-
-
-#When RMContainer(RMContainerImpl) is created? 
-#    => AbstractYarnScheduler
-#    => CapacityScheduler
-#    => RegularContainerAllocator
-#    => FiCaSchedulerApp
-#    => FsAppAttempt
-#When RMContainerEventType.START event is triggered?
-#
-#RMContainerEventType.START event : RMContainerState NEW -> ALLOCATED
-#    => RMContainerImpl.ContainerStartedTransition
-#        => RMAppAttemptEventType.CONTAINER_ALLOCATED event is triggered
 
 ### RMAppAttemptState SCHEDULED -> ALLOCATED_SAVING
+This is not very straightforward.
 
-In order to trigger this transition, it is needed to trigger RMAppAttemptEventType.CONTAINER_ALLOCATED event, what is the trigger condition of it?
--> The only condition is : ContainerStartedTransition
-When ContainerStartedTransition will be triggered?
--> RMContainerEventType.START event will trigger it.
-When RMContainerEventType.START event will be triggered? It will also change status : RMContainerState.NEW, RMContainerState.ALLOCATED
-When RMContainerState.NEW statue is created
--> When RMContainerImpl is created
-    -> Many places, I will check one by one
-        -> FiCaSchedulerApp.allocate
-            <- RegularContainerAllocator.handleNewContainerAllocation
-                <- RegularContainerAllocator.doAllocation
-                    <- RegularContainerAllocator.allocate, it invokes tryAllocateOnNode which actually allocate the resource on node
-                        <- RegularContainerAllocator.assignContainers
-                            <- ContainerAllocator.assignContainers
-                                <- FiCaSchedulerApp.assignContainers
-                                    <- LeafQueue.assignContainers
-                                        <- CapacityScheduler.allocateOrReserveNewContainers
-                                            <- CapacityScheduler.allocateContainersOnMultiNodes
-                                                <- CapacityScheduler.allocateContainersToNode
-                                                    <- CapacityScheduler.allocateContainersToNode
-                                                        <- CapacityScheduler.nodeUpdate
-                                                            <- handle SchedulerEventType.NODE_UPDATE event
-                                                                <- RMNodeImpl.StatusUpdateWhenHealthyTransition triggers NODE_UPDATE event.
-                                                                    <- RMNodeImpl created : when a node joins 
-                                                                    <- RMNodeImpl NODE_UPDATE : when heartbeat comes
+(NM) When NodeManager service starts, NodeManager create NodeStatusUpdater service
+(NM)     -> NodeStatusUpdater.registerWithRM
+(NM)          -> ResourceTracker.registerNodeManager, get node id, host, port, capacity
+(RM)                -> create RMNodeImpl(Node managers information on available resources)
+(...)                   -> Dispatch RMNodeEventType.STARTED event
+                            -> AddNodeTransition handles the event, NodeState changed from NEW to RUNNING
+                                -> dispatch SchedulerEventType.NODE_ADDED event and NodesListManagerEventType.NODE_USABLE event
+                                    -> CapacityScheduler handles SchedulerEventType.NODE_ADDED event, create FiCaSchedulerNode
 
-                                                        <- CapacityScheduler.schedule
-                                                            <- CapacityScheduler.run (By default this is false yarn.scheduler.capacity.schedule-asynchronously.enabled)
 
-When RMContainerEventType.START event is triggered
-<- FiCaSchedulerApp.apply
-    <- CapacityScheduler.tryCommit
-        <- CapacityScheduler.attemptAllocationOnNode
-            <- ApplicationMasterProtocol.allocate (invoked from client side)
-        <- ResourceCommitterService.run (Aynschronously execution, disabled by default)
-        <- CapacityScheduler.submitResourceCommitRequest
-            <- CapacityScheduler.allocateOrReserveNewContainers
-                <- ... following are the same as above
+(NN) NodeStatusUpdateImpl.StatusUpdaterRunnable send heartbeat to resourcemanager regularly
+(RM)    -> NodeManager.heartbeat
+            -> ResourceTrackerService.nodeHeartbeat
+                -> dispatch RMNodeEventType.STATUS_UPDATE event
+                    -> StatusUpdateWhenHealthyTransition handles the event
+                        -> dispatch SchedulerEventType.NODE_UPDATE event
+                            -> CapacityScheduler handles the event, invoke CapacityScheduler.nodeUpdate(), try to do scheduling
+                                -> CapacityScheduler.allocateContainersToNode
+                                    -> CapacityScheduler.allocateContainerOnSingleNode
+                                        -> CapacityScheduler.allocateOrReserveNewContainers
+                                            -> LeafQueue.assignContainers
+                                                -> FiCaSchedulerApp.assignContainerys
+                                                    -> ContainerAllocator.assignContainers
+                                                        -> RegularContainerAllocator.assignContainers
+                                                            -> RegularContainerAllocator.allocate, it invokes tryAllocateOnNode which actually allocate the resource on node
+                                                                -> RegularContainerAllocator.doAllocation
+                                                                    -> RegularContainerAllocator.handleNewContainerAllocation
+                                                                        -> FiCaSchedulerApp.allocate
+                                                                            -> creat RMContainerImpl(Represents the ResourceManager's view of an application container.)
+
+
+                                            -> CapacityScheduler.submitResourceCommitRequest
+                                                -> CapacityScheduler.tryCommit
+                                                    -> CapacityScheduler.submitResourceCommitRequest
+                                                        -> FiCaSchedulerApp.apply
+                                                            -> dispatch event RMContainerEventType.START
+                                                                -> ContainerStartedTransition handles the event, and RMContainerEventType NEW->ALLOCATED
+                                                                    -> dispatch RMAppAttemptEventType.CONTAINER_ALLOCATED event
+                                                                        -> RMAppAttemptImpl.AMContainerAllocatedTransition handles the event and RMAppAttemptState SCHEDULED->ALLOCATED_SAVING
+                                                                            -> set master container, RMContainerImpl.setAMContainer(true), trigger RMStateStoreEventType.STORE_APP_ATTEMPT event to store the state of RM
+                                                                                -> StoreAppAttemptTransition handles the event, saves the state to leveldb(for example), then dispatch event RMAppAttemptEventType.ATTEMPT_NEW_SAVED
+
+
+
+
+### RMAppAttemptState ALLOCATED_SAVING -> ALLOCATED
+AttemptStoredTransition handles the RMAppAttemptEventType.ATTEMPT_NEW_SAVED event
+    -> RMAppAttemptImpl.launchAttempt, trigger AMLauncherEventType.LAUNCH event
+        -> ApplicationMasterLauncher.launch
+            -> Use ContainerManagementProtocol protocal to interact with NodeManager, connect nodemanager
+            -> Create ContainerLaunchContext(represents all of the information needed by the {@code NodeManager} to launch a container.)
+            -> Send StartContainerRequest request to NodeManager and get response.
+                (NM) -> ContainerManagerImpl.startContainers
+                    (NM) -> get ContainerLaunchContext, create ContainerImpl, create ApplicationImpl, dispatch ApplicationInitEvent
+                        (NM) -> ...... -> DefaultContainerExecutor.launchContainer
+                                            -> exec /bin/bash -c "$JAVA_HOME/bin/java org.apache.hadoop.mapreduce.v2.app.MRAppMaster"
+            -> dispatch RMAppAttemptEventType.LAUNCHED event
+
+### RMAppAttemptState ALLOCATED -> LAUNCHED
+AMLaunchedTransition handles the RMAppAttemptEventType.LAUNCHED event
+
+
 
 
 
