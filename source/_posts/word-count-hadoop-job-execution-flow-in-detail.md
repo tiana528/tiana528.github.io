@@ -93,7 +93,7 @@ At the end of RMAppNewlySavingTransition, RMStateStore.storeNewApplication
             => trigger event RMAppEventType.APP_NEW_SAVED
 
 
-### RMAppStore APP_NEW_SAVED -> SUBMITTED
+### RMAppState APP_NEW_SAVED -> SUBMITTED
 RMAppImpl.AddApplicationToSchedulerTransition handles the APP_NEW_SAVED type event
     => dispatch AppAddedSchedulerEvent event
         => CapacityScheduler.handle (yarn.resourcemanager.scheduler.class)
@@ -117,7 +117,7 @@ RMAppImpl.AddApplicationToSchedulerTransition handles the APP_NEW_SAVED type eve
                             => Go to the timelineserver world
 
 
-### RMAppStore SUBMITTED -> ACCEPTED
+### RMAppState SUBMITTED -> ACCEPTED
 RMAppImpl.StartAppAttemptTransition
     => RMAppImpl.createAndStartNewAttempt
         => create new application attempt = appId + attemptId(increase by 1 : 1, 2, 3...)
@@ -206,19 +206,41 @@ AttemptStoredTransition handles the RMAppAttemptEventType.ATTEMPT_NEW_SAVED even
                 (NM) -> ContainerManagerImpl.startContainers
                     (NM) -> get ContainerLaunchContext, create ContainerImpl, create ApplicationImpl, dispatch ApplicationInitEvent
                         (NM) -> ...... -> DefaultContainerExecutor.launchContainer
-                                            -> exec /bin/bash -c "$JAVA_HOME/bin/java org.apache.hadoop.mapreduce.v2.app.MRAppMaster"
+                                            -> exec /bin/bash -c "JAVA_HOME/bin/java org.apache.hadoop.mapreduce.v2.app.MRAppMaster"
+                                            -> Then application master service process is created
             -> dispatch RMAppAttemptEventType.LAUNCHED event
 
 ### RMAppAttemptState ALLOCATED -> LAUNCHED
 AMLaunchedTransition handles the RMAppAttemptEventType.LAUNCHED event
+    -> register RMAppEventType.ATTEMPT_LAUNCHED event
 
+### RMAppState ACCEPTED -> ACCEPTED
+AttemptLaunchedTransition (update the launchTime and publish to ATS)
+    -> dispatch RMStateStoreEventType.UPDATE_APP event
+        -> UpdateAppTransition handles RMStateStoreEventType.UPDATE_APP event
+            -> store the state and dispatch APP_UPDATE_SAVED event
 
+### RMAppAttemptState LAUNCHED -> RUNNING, RMAppState ACCETPTED -> RUNNING
+(AM) Application master (MRAppMaster) start
+    -> (AM) ContainerAllocatorRouter service is created to handle container allocation
+        -> (AM) if uber mode, use LocalContainerAllocator
+        -> (AM) if not uber mode, use RMContainerAllocator, note that RMContainerAllocator is also RMCommunicator
+            -> (AM) RMCommunicator.serviceStart
+                -> (AM) RMCommunicator.register : registerApplicationMaster , this will communicate with the Resource Manager.
+                    -> (RM) DefaultAMSProcessor.registerApplicationMaster : resource manager side handles the request
+                        -> (RM) dispatch RMAppAttemptEventType.REGISTERED event
+                            -> (RM) AMRegisteredTransition handles the event, and RMAppAttemptState LAUNCHED -> RUNNING
+                                -> (RM) dispatch RMAppEventType.ATTEMPT_REGISTERED event, WritingHistoryEventType.APP_ATTEMPT_START event
 
-
-
-
-
-
+### Appliation allocate resource from resource manager, start container by communicating with node manager, run map reduce tasks in the container
+(AM)
+Inside RMCommunicator.serviceStart, it creates a thread (AllocatorRunnable) for allocating containers for every 1 second.
+    -> RMContainerAllocator.heartbeat
+        -> RMContainerAllocator.getResources
+            -> RMContainerAllocator.makeRemoteRequest
+                -> ... ApplicationMasterProtocolPBClientImpl.allocate()
+                    -> (RM) handle the request and send response, AllocateResponse
+                        -> 
 
 
 
