@@ -142,7 +142,7 @@ RMAppAttemptImpl.AttemptStartedTransition handles RMAppAttemptEventType.START : 
                      => dispatch RMAppAttemptEventType.ATTEMPT_ADDED event
 
 ### RMAppAttemptState SUBMITTED -> SCHEDULED
-ScheduleTransition handles the event
+ScheduleTransition handles the RMAppAttemptEventType.ATTEMPT_ADDED event
     => allocate container for the application master
         => CapacityScheduler.allocate
             => create an Allocation object, with the request content inside
@@ -151,21 +151,58 @@ CapacityScheduler
 
 
 
-When RMContainer(RMContainerImpl) is created? 
-    => AbstractYarnScheduler
-    => CapacityScheduler
-    => RegularContainerAllocator
-    => FiCaSchedulerApp
-    => FsAppAttempt
-When RMContainerEventType.START event is triggered?
-
-RMContainerEventType.START event : RMContainerState NEW -> ALLOCATED
-    => RMContainerImpl.ContainerStartedTransition
-        => RMAppAttemptEventType.CONTAINER_ALLOCATED event is triggered
+#When RMContainer(RMContainerImpl) is created? 
+#    => AbstractYarnScheduler
+#    => CapacityScheduler
+#    => RegularContainerAllocator
+#    => FiCaSchedulerApp
+#    => FsAppAttempt
+#When RMContainerEventType.START event is triggered?
+#
+#RMContainerEventType.START event : RMContainerState NEW -> ALLOCATED
+#    => RMContainerImpl.ContainerStartedTransition
+#        => RMAppAttemptEventType.CONTAINER_ALLOCATED event is triggered
 
 ### RMAppAttemptState SCHEDULED -> ALLOCATED_SAVING
 
+In order to trigger this transition, it is needed to trigger RMAppAttemptEventType.CONTAINER_ALLOCATED event, what is the trigger condition of it?
+-> The only condition is : ContainerStartedTransition
+When ContainerStartedTransition will be triggered?
+-> RMContainerEventType.START event will trigger it.
+When RMContainerEventType.START event will be triggered? It will also change status : RMContainerState.NEW, RMContainerState.ALLOCATED
+When RMContainerState.NEW statue is created
+-> When RMContainerImpl is created
+    -> Many places, I will check one by one
+        -> FiCaSchedulerApp.allocate
+            <- RegularContainerAllocator.handleNewContainerAllocation
+                <- RegularContainerAllocator.doAllocation
+                    <- RegularContainerAllocator.allocate, it invokes tryAllocateOnNode which actually allocate the resource on node
+                        <- RegularContainerAllocator.assignContainers
+                            <- ContainerAllocator.assignContainers
+                                <- FiCaSchedulerApp.assignContainers
+                                    <- LeafQueue.assignContainers
+                                        <- CapacityScheduler.allocateOrReserveNewContainers
+                                            <- CapacityScheduler.allocateContainersOnMultiNodes
+                                                <- CapacityScheduler.allocateContainersToNode
+                                                    <- CapacityScheduler.allocateContainersToNode
+                                                        <- CapacityScheduler.nodeUpdate
+                                                            <- handle SchedulerEventType.NODE_UPDATE event
+                                                                <- RMNodeImpl.StatusUpdateWhenHealthyTransition triggers NODE_UPDATE event.
+                                                                    <- RMNodeImpl created : when a node joins 
+                                                                    <- RMNodeImpl NODE_UPDATE : when heartbeat comes
 
+                                                        <- CapacityScheduler.schedule
+                                                            <- CapacityScheduler.run (By default this is false yarn.scheduler.capacity.schedule-asynchronously.enabled)
+
+When RMContainerEventType.START event is triggered
+<- FiCaSchedulerApp.apply
+    <- CapacityScheduler.tryCommit
+        <- CapacityScheduler.attemptAllocationOnNode
+            <- ApplicationMasterProtocol.allocate (invoked from client side)
+        <- ResourceCommitterService.run (Aynschronously execution, disabled by default)
+        <- CapacityScheduler.submitResourceCommitRequest
+            <- CapacityScheduler.allocateOrReserveNewContainers
+                <- ... following are the same as above
 
 
 
