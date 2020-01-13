@@ -232,15 +232,61 @@ AttemptLaunchedTransition (update the launchTime and publish to ATS)
                             -> (RM) AMRegisteredTransition handles the event, and RMAppAttemptState LAUNCHED -> RUNNING
                                 -> (RM) dispatch RMAppEventType.ATTEMPT_REGISTERED event, WritingHistoryEventType.APP_ATTEMPT_START event
 
-### Appliation allocate resource from resource manager, start container by communicating with node manager, run map reduce tasks in the container
+### Appliation master allocate resource from resource manager, start container by communicating with node manager, run map reduce tasks in the container
 (AM)
 Inside RMCommunicator.serviceStart, it creates a thread (AllocatorRunnable) for allocating containers for every 1 second.
     -> RMContainerAllocator.heartbeat
         -> RMContainerAllocator.getResources
             -> RMContainerAllocator.makeRemoteRequest
                 -> ... ApplicationMasterProtocolPBClientImpl.allocate()
-                    -> (RM) handle the request and send response, AllocateResponse
-                        -> 
+                    -> (RM) ApplicationMasterService.allocate and response
+        -> (AM) loop all assigned containers, check memory requirements, blacklists, and so on, then assign the container : RMContainerAllocator.assignContainers
+            -> dispatch TaskAttemptContainerAssignedEvent event (assign container X to task Y on node Z)
+                -> TaskAttemptImpl.ContainerAssignedTransition handles the event, state : TaskAttemptStateInternal.ASSIGNED => TaskAttemptEventType.TA_ASSIGNED
+                    -> create ContainerLaunchContext, setup commands for creating the container(MapReduceChildJVM.getVMCommand): /bin/java ... YarnChild
+                    -> dispatch ContainerRemoteLaunchEvent event
+                        -> ContainerLauncherImpl.launch, connect nodemanager, start actual container
+                           -> org.apache.hadoop.mapred.YarnChild#main, args : TaskUmbilicalProtocol's host and port for providing service, task attempt's TaskAttemptID, task attemp's JVMId
+                        -> dispatch TaskAttemptContainerLaunchedEvent event
+                            ->LaunchedContainerTransition handles the event, TaskAttemptStateInternal.ASSIGNED => TaskAttemptStateInternal.RUNNING
+                                -> dispatch TaskEventType.T_ATTEMPT_LAUNCHED event
+                                    -> LaunchTransition handles the event TaskStateInternal.SCHEDULED => TaskStateInternal.RUNNING
+
+### YarnChild works and perform map tasks
+YarnChild.main
+    -> read arguments : TaskUmbilicalProtocol's host and port(which is application master MRAppMaster) for providing service, task attempt's TaskAttemptID, task attemp's JVMId
+        -> get map task from application master through TaskUmbilicalProtocal and run it.
+            -> MapTask.run
+                -> create mapper, inputFormat, read split
+                -> mapper.run() : this is the actual word count mapper(WordCount.TokenizerMapper)
+                    -> Context is : org.apache.hadoop.mapreduce.lib.map.WrappedMapper, which is a wrapped of MapContextImpl
+                    -> write output data to NewDirectOutputCollector(reducer is 0) or NewOutputCollector(reducer is not 0)
+                        -> MapOutputBuffer.collect put the result in the memory buffer as intermediate storage
+                -> ... (There is a lot of logic here, we won't go into much details)
+
+### Similar progress as above and reducer task starts
+YarnChild.main
+    -> read arguments : TaskUmbilicalProtocol's host and port(which is application master MRAppMaster) for providing service, task attempt's TaskAttemptID, task attemp's JVMId
+        -> get reducer task from application master through TaskUmbilicalProtocal and run it.
+            -> ReduceTask.run
+                -> create reducer
+                -> reducer.run() : this is the actual word count mapper(WordCount.IntSumReducer)
+                -> ... (There is a lot of logic here, we won't go into much details)
+                -> umbilical.done
+                    -> (AM) TaskAttemptListenerImpl.done() : trigger TaskAttemptEventType.TA_DONE event
+                        -> (AM) TaskAttemptImpl.MoveContainerToSucceededFinishingTransition handles the event, TaskAttemptStateInternal RUNNING -> SUCCESS_FINISHING_CONTAINER
+                            -> (AM) triggers event TaskEventType.T_ATTEMPT_SUCCEEDED
+                                -> (AM) TaskImpl.AttemptSucceededTransition handle the event, TaskStateInternal.RUNNING => TaskStateInternal.SUCCEEDED
+                                    -> (AM) trigger JobEventType.JOB_TASK_ATTEMPT_COMPLETED event
+                                        -> (AM) JobImpl.TaskAttemptCompletedEventTransition handles the event, JobStateInternal.RUNNING => JobStateInternal.RUNNING
+
+
+
+
+
+
+
+
 
 
 
