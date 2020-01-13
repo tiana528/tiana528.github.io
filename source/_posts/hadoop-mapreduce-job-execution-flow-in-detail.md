@@ -1,11 +1,11 @@
 ---
-title: word count hadoop job execution flow in detail
+title: hadoop mapreduce job execution flow in detail
 date: 2019-12-14 09:11:29
 tags:
 ---
 
 # Description
-In this blog, we will look into the execution flow of hadoop word count job in detail.
+In this blog, we will look into the execution flow of hadoop mapreduce job (word count) in detail.
 
 Word count job is simple and straightforward, so it is an good example to show how hadoop is working internally.
 
@@ -32,12 +32,11 @@ All other classes(in client and server side), contains the functions provided by
 
 One an api call in invoked, data flow is : ClientNamenodeProtocalTranslatorPB(client side) -> ClientNamenodeProtocalServerSideTranslatorPB(server side) -> NamenodeRpcServer
 
-# Word count execution flow
--> client side logic
-=> server side logic
 
+# Job execution flow
 ## Job submission
 
+```
 WordCount(hadoop-mapreduce-examples)
 -> Job.waitForCompletion  (hadoop-mapreduce-client-core)
 	-> JobSubmitter.submitJobInternal (hadoop-mapreduce-client-core)
@@ -65,12 +64,14 @@ WordCount(hadoop-mapreduce-examples)
 				-> ResourceMgrDelegate.submitApplication
 				-> ResourceMgrDelegate.getApplicationReport
 					... =>ClientRMService.submitApplication (hadoop-yarn-server-resourcemanager)
-
-## Resource manager application lifecycle
+```
+## Resource manager application lifecycle : RMAppState NEW -> NEW_SAVING
+```
 State machine : RMAppImpl.StateMachineFactory(hadoop-yarn-server-resourcemanager)
 RMStateStore : handles RMStateStoreAppEvent event
 RMAppImpl : handles RMAppEventType event
-### RMAppState NEW -> NEW_SAVING
+
+
 ClientRMService.submitApplication (hadoop-yarn-server-resourcemanager)
 	=> rmContext getRMApps : all apps that have been put into rmContext
 	=> RMAppManager.submitApplication
@@ -84,7 +85,7 @@ ClientRMService.submitApplication (hadoop-yarn-server-resourcemanager)
 							=> the state machine factory(StateMachineFactory) is also initialized in the ResourceManager, the initial state is NEW.
 							=> We can see one registered transaction is : addTransition(RMAppState.NEW, RMAppState.NEW_SAVING,  RMAppEventType.START, new RMAppNewlySavingTransition()). It means if the current state is NEW, and RMAppEventType.START event happens, then invoke RMAppNewlySavingTransition and convert the state to NEW_SAVING.
 
-### RMAppState NEW_SAVING -> APP_NEW_SAVED
+## RMAppState NEW_SAVING -> APP_NEW_SAVED
 
 At the end of RMAppNewlySavingTransition, RMStateStore.storeNewApplication
     => stores application state, and triggers RMStateStoreAppEvent event, event type is RMStateStoreEventType.STORE_APP
@@ -93,7 +94,7 @@ At the end of RMAppNewlySavingTransition, RMStateStore.storeNewApplication
             => trigger event RMAppEventType.APP_NEW_SAVED
 
 
-### RMAppState APP_NEW_SAVED -> SUBMITTED
+## RMAppState APP_NEW_SAVED -> SUBMITTED
 RMAppImpl.AddApplicationToSchedulerTransition handles the APP_NEW_SAVED type event
     => dispatch AppAddedSchedulerEvent event
         => CapacityScheduler.handle (yarn.resourcemanager.scheduler.class)
@@ -116,15 +117,17 @@ RMAppImpl.AddApplicationToSchedulerTransition handles the APP_NEW_SAVED type eve
                     ... => TimelineServiceV1Publisher.putEntity ...
                             => Go to the timelineserver world
 
-
-### RMAppState SUBMITTED -> ACCEPTED
+```
+## RMAppState SUBMITTED -> ACCEPTED
+```
 RMAppImpl.StartAppAttemptTransition
     => RMAppImpl.createAndStartNewAttempt
         => create new application attempt = appId + attemptId(increase by 1 : 1, 2, 3...)
         => create RMAppAttemptImpl, put to attempts field, update the currentAttempt
         => trigger RMAppStartAttemptEvent event with the attempt id, event type : RMAppAttemptEventType.START
-
-### RMAppAttemptState NEW -> SUBMITTED
+```
+## RMAppAttemptState NEW -> SUBMITTED
+```
 RMAppAttemptImpl.AttemptStartedTransition handles RMAppAttemptEventType.START : RMAppAttemptState NEW -> SUBMITTED
     => appAttempt.masterService.registerAppAttempt : Register with the ApplicationMasterService
          => Note that ApplicationMasterService is created in the ResourceManager
@@ -140,15 +143,17 @@ RMAppAttemptImpl.AttemptStartedTransition handles RMAppAttemptEventType.START : 
                                  => configure the queue(internal datastructure) for the resource of application master
                              => if resource is not enough, do not activeApplication now
                      => dispatch RMAppAttemptEventType.ATTEMPT_ADDED event
-
-### RMAppAttemptState SUBMITTED -> SCHEDULED
+```
+## RMAppAttemptState SUBMITTED -> SCHEDULED
+```
 ScheduleTransition handles the RMAppAttemptEventType.ATTEMPT_ADDED event
     => allocate container for the application master
         => CapacityScheduler.allocate (A view of the resources that will be allocated from this application)
             => create an Allocation object, with the request content inside
+```
 
-
-### RMAppAttemptState SCHEDULED -> ALLOCATED_SAVING
+## RMAppAttemptState SCHEDULED -> ALLOCATED_SAVING
+```
 This is not very straightforward.
 
 (NM) When NodeManager service starts, NodeManager create NodeStatusUpdater service
@@ -181,7 +186,6 @@ This is not very straightforward.
                                                                         -> FiCaSchedulerApp.allocate
                                                                             -> creat RMContainerImpl(Represents the ResourceManager's view of an application container.)
 
-
                                             -> CapacityScheduler.submitResourceCommitRequest
                                                 -> CapacityScheduler.tryCommit
                                                     -> CapacityScheduler.submitResourceCommitRequest
@@ -193,10 +197,11 @@ This is not very straightforward.
                                                                             -> set master container, RMContainerImpl.setAMContainer(true), trigger RMStateStoreEventType.STORE_APP_ATTEMPT event to store the state of RM
                                                                                 -> StoreAppAttemptTransition handles the event, saves the state to leveldb(for example), then dispatch event RMAppAttemptEventType.ATTEMPT_NEW_SAVED
 
+```
 
 
-
-### RMAppAttemptState ALLOCATED_SAVING -> ALLOCATED
+## RMAppAttemptState ALLOCATED_SAVING -> ALLOCATED
+```
 AttemptStoredTransition handles the RMAppAttemptEventType.ATTEMPT_NEW_SAVED event
     -> RMAppAttemptImpl.launchAttempt, trigger AMLauncherEventType.LAUNCH event
         -> ApplicationMasterLauncher.launch
@@ -209,18 +214,21 @@ AttemptStoredTransition handles the RMAppAttemptEventType.ATTEMPT_NEW_SAVED even
                                             -> exec /bin/bash -c "JAVA_HOME/bin/java org.apache.hadoop.mapreduce.v2.app.MRAppMaster"
                                             -> Then application master service process is created
             -> dispatch RMAppAttemptEventType.LAUNCHED event
-
-### RMAppAttemptState ALLOCATED -> LAUNCHED
+```
+## RMAppAttemptState ALLOCATED -> LAUNCHED
+```
 AMLaunchedTransition handles the RMAppAttemptEventType.LAUNCHED event
     -> register RMAppEventType.ATTEMPT_LAUNCHED event
-
-### RMAppState ACCEPTED -> ACCEPTED
+```
+## RMAppState ACCEPTED -> ACCEPTED
+```
 AttemptLaunchedTransition (update the launchTime and publish to ATS)
     -> dispatch RMStateStoreEventType.UPDATE_APP event
         -> UpdateAppTransition handles RMStateStoreEventType.UPDATE_APP event
             -> store the state and dispatch APP_UPDATE_SAVED event
-
-### RMAppAttemptState LAUNCHED -> RUNNING, RMAppState ACCETPTED -> RUNNING
+```
+## RMAppAttemptState LAUNCHED -> RUNNING, RMAppState ACCETPTED -> RUNNING
+```
 (AM) Application master (MRAppMaster) start
     -> (AM) ContainerAllocatorRouter service is created to handle container allocation
         -> (AM) if uber mode, use LocalContainerAllocator
@@ -231,8 +239,9 @@ AttemptLaunchedTransition (update the launchTime and publish to ATS)
                         -> (RM) dispatch RMAppAttemptEventType.REGISTERED event
                             -> (RM) AMRegisteredTransition handles the event, and RMAppAttemptState LAUNCHED -> RUNNING
                                 -> (RM) dispatch RMAppEventType.ATTEMPT_REGISTERED event, WritingHistoryEventType.APP_ATTEMPT_START event
-
-### Appliation master allocate resource from resource manager, start container by communicating with node manager, run map reduce tasks in the container
+```
+## Appliation master allocate resource from resource manager, start container by communicating with node manager, run map reduce tasks in the container
+```
 (AM)
 Inside RMCommunicator.serviceStart, it creates a thread (AllocatorRunnable) for allocating containers for every 1 second.
     -> RMContainerAllocator.heartbeat
@@ -251,8 +260,9 @@ Inside RMCommunicator.serviceStart, it creates a thread (AllocatorRunnable) for 
                             ->LaunchedContainerTransition handles the event, TaskAttemptStateInternal.ASSIGNED => TaskAttemptStateInternal.RUNNING
                                 -> dispatch TaskEventType.T_ATTEMPT_LAUNCHED event
                                     -> LaunchTransition handles the event TaskStateInternal.SCHEDULED => TaskStateInternal.RUNNING
-
-### YarnChild works and perform map tasks
+```
+## YarnChild works and perform map tasks
+```
 YarnChild.main
     -> read arguments : TaskUmbilicalProtocol's host and port(which is application master MRAppMaster) for providing service, task attempt's TaskAttemptID, task attemp's JVMId
         -> get map task from application master through TaskUmbilicalProtocal and run it.
@@ -263,8 +273,10 @@ YarnChild.main
                     -> write output data to NewDirectOutputCollector(reducer is 0) or NewOutputCollector(reducer is not 0)
                         -> MapOutputBuffer.collect put the result in the memory buffer as intermediate storage
                 -> ... (There is a lot of logic here, we won't go into much details)
-
-### Similar progress as above and reducer task starts
+```
+## Similar progress as above and reducer task starts, until job ends
+```
+...(omit some part)...
 YarnChild.main
     -> read arguments : TaskUmbilicalProtocol's host and port(which is application master MRAppMaster) for providing service, task attempt's TaskAttemptID, task attemp's JVMId
         -> get reducer task from application master through TaskUmbilicalProtocal and run it.
@@ -279,6 +291,8 @@ YarnChild.main
                                 -> (AM) TaskImpl.AttemptSucceededTransition handle the event, TaskStateInternal.RUNNING => TaskStateInternal.SUCCEEDED
                                     -> (AM) trigger JobEventType.JOB_TASK_ATTEMPT_COMPLETED event
                                         -> (AM) JobImpl.TaskAttemptCompletedEventTransition handles the event, JobStateInternal.RUNNING => JobStateInternal.RUNNING
+                                        -> ...
+```
 
 
 
