@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="kAOvMqtVPZIG4a0ZLSVJqbTDcVIgC3IrQdIOtsYAukI">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/my-icon.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/my-icon-32.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/my-icon-16.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="DescriptionIn this blog, we will look into the execution flow of hadoop mapreduce job (word count) in detail. Word count job is simple and straightforward, so it is an good example to show how hadoop">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hadoop mapreduce job execution flow in detail">
+<meta property="og:url" content="https://tiana528.github.io/2019/12/14/hadoop-mapreduce-job-execution-flow-in-detail/index.html">
+<meta property="og:site_name" content="Yan&#39;s Notes">
+<meta property="og:description" content="DescriptionIn this blog, we will look into the execution flow of hadoop mapreduce job (word count) in detail. Word count job is simple and straightforward, so it is an good example to show how hadoop">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://tiana528.github.io/2019/12/14/hadoop-mapreduce-job-execution-flow-in-detail/hadoop_rpc_example.jpg">
+<meta property="og:updated_time" content="2020-01-13T07:04:28.341Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="hadoop mapreduce job execution flow in detail">
+<meta name="twitter:description" content="DescriptionIn this blog, we will look into the execution flow of hadoop mapreduce job (word count) in detail. Word count job is simple and straightforward, so it is an good example to show how hadoop">
+<meta name="twitter:image" content="https://tiana528.github.io/2019/12/14/hadoop-mapreduce-job-execution-flow-in-detail/hadoop_rpc_example.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://tiana528.github.io/2019/12/14/hadoop-mapreduce-job-execution-flow-in-detail/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>hadoop mapreduce job execution flow in detail | Yan's Notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yan's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2019/12/14/hadoop-mapreduce-job-execution-flow-in-detail/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wang Yan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yan's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">hadoop mapreduce job execution flow in detail
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-12-14 09:11:29" itemprop="dateCreated datePublished" datetime="2019-12-14T09:11:29+09:00">2019-12-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2020-01-13 16:04:28" itemprop="dateModified" datetime="2020-01-13T16:04:28+09:00">2020-01-13</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/12/14/hadoop-mapreduce-job-execution-flow-in-detail/#comments" itemprop="discussionUrl">
+                
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/12/14/hadoop-mapreduce-job-execution-flow-in-detail/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Description"><a href="#Description" class="headerlink" title="Description"></a>Description</h1><p>In this blog, we will look into the execution flow of hadoop mapreduce job (word count) in detail.</p>
+<p>Word count job is simple and straightforward, so it is an good example to show how hadoop is working internally.</p>
+<p>We will try to go through the whole lifecycle of the jobs, see how components are interacting by looking into the source codes.</p>
+<p>We mainly look into client side logic, resource manager, node manager, application master, and do not look much into the internal of datanode or namenode.</p>
+<p>Hadoop source code version is based on 3.3.0-SNAPSHOT, which is the latest at this point.</p>
+<h1 id="Understand-hadoop-RPC"><a href="#Understand-hadoop-RPC" class="headerlink" title="Understand hadoop RPC"></a>Understand hadoop RPC</h1><p>Considering RPC is heavily used in hadoop, so understanding it is important for reading source codes.</p>
+<p>There are already many articles written by other people about the hadoop RPC, I will just show one graph about it.</p>
+<p><img src="/2019/12/14/hadoop-mapreduce-job-execution-flow-in-detail/hadoop_rpc_example.jpg" alt=""></p>
+<p>This graph shows the class relationship around namenode client-server RPC call.</p>
+<p>As we can see, the protobuffer specification is written in ClientNamenodeProtocal.proto file.</p>
+<p>ClientNamenodeProtocal.java is an interface generated from the proto file.</p>
+<p>All other classes(in client and server side), contains the functions provided by the ClientNamnodeProtocal interface, either by extends relationship or by associate relationship.</p>
+<p>One an api call in invoked, data flow is : ClientNamenodeProtocalTranslatorPB(client side) -&gt; ClientNamenodeProtocalServerSideTranslatorPB(server side) -&gt; NamenodeRpcServer</p>
+<h1 id="Job-execution-flow"><a href="#Job-execution-flow" class="headerlink" title="Job execution flow"></a>Job execution flow</h1><h2 id="Job-submission"><a href="#Job-submission" class="headerlink" title="Job submission"></a>Job submission</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">WordCount(hadoop-mapreduce-examples)</span><br><span class="line">-&gt; Job.waitForCompletion  (hadoop-mapreduce-client-core)</span><br><span class="line">	-&gt; JobSubmitter.submitJobInternal (hadoop-mapreduce-client-core)</span><br><span class="line">		-&gt; submitClient.getNewJobID (hadoop-mapreduce-client-core)</span><br><span class="line">			-&gt; YARNRunner.getNewJobID (hadoop-mapreduce-client-jobclient)</span><br><span class="line">				-&gt; ResourceMgrDelegate.getNewJobID (hadoop-mapreduce-client-jobclient)</span><br><span class="line">					-&gt; YarnClientImpl.createApplication() (hadoop-yarn-client)</span><br><span class="line">						-&gt; get ApplicationSubmissionContext which is actually ApplicationSubmissionContextPBImpl</span><br><span class="line">						-&gt; get GetNewApplicationRequest which is actually GetNewApplicationRequestPBImpl</span><br><span class="line">						-&gt; has a field rmClient which is a proxy (ApplicationClientProtocol) , created by `ClientRMProxy.createRMProxy`</span><br><span class="line">						-&gt; rmClient.getNewApplication </span><br><span class="line">							-&gt; ApplicationClientProtocolPBClientImpl.getNewApplication (hadoop-yarn-common)</span><br><span class="line">								=&gt; ApplicationClientProtocolPBServiceImpl.getNewApplication (hadoop-yarn-common)</span><br><span class="line">									=&gt; ClientRMService.getNewApplication (hadoop-yarn-server-resourcemanager)</span><br><span class="line">									=&gt; generate real ApplicationId which is incremental</span><br><span class="line">		-&gt; copyAndConfigureFiles</span><br><span class="line">			-&gt; JobResourceUploader.uploadResources (hadoop-mapreduce-client-core)</span><br><span class="line">				-&gt; upload resource that are added by the command line , tmpfiles, tmpjars ,tmparchives, jar file , log4j property file</span><br><span class="line">		-&gt; writeSplits</span><br><span class="line">			-&gt; get InputFormat through getInputFormatClass, then invoke InputFormat.getSplits to calculate splits, then upload split info to the staging directory</span><br><span class="line">                -&gt; As for word count, FileInputFormat.getSplits() is invoked</span><br><span class="line">		-&gt; upload job.xml configs </span><br><span class="line">		-&gt; submitClient.submitJob</span><br><span class="line">			-&gt; YarnRunner.submitJob</span><br><span class="line">				-&gt; ResourceMgrDelegate.submitApplication</span><br><span class="line">				-&gt; ResourceMgrDelegate.getApplicationReport</span><br><span class="line">					... =&gt;ClientRMService.submitApplication (hadoop-yarn-server-resourcemanager)</span><br></pre></td></tr></table></figure>
+<h2 id="Resource-manager-application-lifecycle-RMAppState-NEW-gt-NEW-SAVING"><a href="#Resource-manager-application-lifecycle-RMAppState-NEW-gt-NEW-SAVING" class="headerlink" title="Resource manager application lifecycle : RMAppState NEW -&gt; NEW_SAVING"></a>Resource manager application lifecycle : RMAppState NEW -&gt; NEW_SAVING</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">State machine : RMAppImpl.StateMachineFactory(hadoop-yarn-server-resourcemanager)</span><br><span class="line">RMStateStore : handles RMStateStoreAppEvent event</span><br><span class="line">RMAppImpl : handles RMAppEventType event</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ClientRMService.submitApplication (hadoop-yarn-server-resourcemanager)</span><br><span class="line">	=&gt; rmContext getRMApps : all apps that have been put into rmContext</span><br><span class="line">	=&gt; RMAppManager.submitApplication</span><br><span class="line">		=&gt; createAndPopulateNewRMApp : create RMApp, put into rmContext.getRMApps</span><br><span class="line">		=&gt; this.rmContext.getDispatcher().getEventHandler().handle(new RMAppEvent(applicationId, RMAppEventType.START));</span><br><span class="line">		=&gt; trigger the event of RMAppEventType.START</span><br><span class="line">			... =&gt; AsyncDispatcher is the dispatcher (hadoop-yarn-common)</span><br><span class="line">					=&gt; eventHandler is GenericEventHandler, the event is put into a queue, and AsyncDispatcher has a thread to loop checking all queued events, and dispatch the events(void dispatch(Event event) ).</span><br><span class="line">						=&gt; In ResourceManager, ApplicationEventDispatcher is registered to handle event type of RMAppEventType, so the RMAppEventType.START event will be dispatched to ApplicationEventDispatcher.</span><br><span class="line">							=&gt; RMAppImpl.handle() handles the event</span><br><span class="line">							=&gt; the state machine factory(StateMachineFactory) is also initialized in the ResourceManager, the initial state is NEW.</span><br><span class="line">							=&gt; We can see one registered transaction is : addTransition(RMAppState.NEW, RMAppState.NEW_SAVING,  RMAppEventType.START, new RMAppNewlySavingTransition()). It means if the current state is NEW, and RMAppEventType.START event happens, then invoke RMAppNewlySavingTransition and convert the state to NEW_SAVING.</span><br><span class="line"></span><br><span class="line">## RMAppState NEW_SAVING -&gt; APP_NEW_SAVED</span><br><span class="line"></span><br><span class="line">At the end of RMAppNewlySavingTransition, RMStateStore.storeNewApplication</span><br><span class="line">    =&gt; stores application state, and triggers RMStateStoreAppEvent event, event type is RMStateStoreEventType.STORE_APP</span><br><span class="line">        =&gt; RMStateStore.StoreAppTransition handles the event</span><br><span class="line">            =&gt; LeveldbRMStateStore.storeApplicationStateInternal : (if leveldb is configured to be used) saves the appid-&gt;appdata mapping to leveldb.</span><br><span class="line">            =&gt; trigger event RMAppEventType.APP_NEW_SAVED</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## RMAppState APP_NEW_SAVED -&gt; SUBMITTED</span><br><span class="line">RMAppImpl.AddApplicationToSchedulerTransition handles the APP_NEW_SAVED type event</span><br><span class="line">    =&gt; dispatch AppAddedSchedulerEvent event</span><br><span class="line">        =&gt; CapacityScheduler.handle (yarn.resourcemanager.scheduler.class)</span><br><span class="line">            =&gt; CapacityScheduler.addApplication</span><br><span class="line">                =&gt; CSQueue.submitApplication : Submit a new application to the queue</span><br><span class="line">                =&gt; Put the application into a field of : applications</span><br><span class="line">                =&gt; dispatch RMAppEventType.APP_ACCEPTED event</span><br><span class="line">    =&gt; if timeline server is enabled (yarn.timeline-service.generic-application-history.enabled)</span><br><span class="line">        =&gt; dispatch WritingApplicationStartEvent event, event type is WritingHistoryEventType.APP_START</span><br><span class="line">            =&gt; RMApplicationHistoryWriter.handleWritingApplicationHistoryEvent</span><br><span class="line">                =&gt; ApplicationHistoryWriter.applicationStarted</span><br><span class="line">                    =&gt; FileSystemApplicationHistoryStore.applicationStarted (yarn.timeline-service.generic-application-history.store-class)</span><br><span class="line">                        =&gt; working path : yarn.timeline-service.generic-application-history.fs-history-store.uri or &quot;\$&#123;hadoop.tmp.dir&quot;&#125;/yarn/timeline/generic-history&quot;</span><br><span class="line">                        =&gt; root dir : working path + ApplicationHistoryDataRoot</span><br><span class="line">                        =&gt; application history file : root dir + application id (This is the file in the local file system of resource manager for saving one application history. )</span><br><span class="line">                        =&gt; write ApplicationStartDataPBImpl to the application history file</span><br><span class="line">        =&gt; if system publisher is enabled(yarn.system-metrics-publisher.enabled) and timeline server v1 is enabled</span><br><span class="line">            =&gt; TimelineServiceV1Publisher.appCreated</span><br><span class="line">                =&gt; publish application name, application type, user, tags, priority, and so on to timelineserver.</span><br><span class="line">                    ... =&gt; TimelineServiceV1Publisher.putEntity ...</span><br><span class="line">                            =&gt; Go to the timelineserver world</span><br></pre></td></tr></table></figure>
+<h2 id="RMAppState-SUBMITTED-gt-ACCEPTED"><a href="#RMAppState-SUBMITTED-gt-ACCEPTED" class="headerlink" title="RMAppState SUBMITTED -&gt; ACCEPTED"></a>RMAppState SUBMITTED -&gt; ACCEPTED</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">RMAppImpl.StartAppAttemptTransition</span><br><span class="line">    =&gt; RMAppImpl.createAndStartNewAttempt</span><br><span class="line">        =&gt; create new application attempt = appId + attemptId(increase by 1 : 1, 2, 3...)</span><br><span class="line">        =&gt; create RMAppAttemptImpl, put to attempts field, update the currentAttempt</span><br><span class="line">        =&gt; trigger RMAppStartAttemptEvent event with the attempt id, event type : RMAppAttemptEventType.START</span><br></pre></td></tr></table></figure>
+<h2 id="RMAppAttemptState-NEW-gt-SUBMITTED"><a href="#RMAppAttemptState-NEW-gt-SUBMITTED" class="headerlink" title="RMAppAttemptState NEW -&gt; SUBMITTED"></a>RMAppAttemptState NEW -&gt; SUBMITTED</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">RMAppAttemptImpl.AttemptStartedTransition handles RMAppAttemptEventType.START : RMAppAttemptState NEW -&gt; SUBMITTED</span><br><span class="line">    =&gt; appAttempt.masterService.registerAppAttempt : Register with the ApplicationMasterService</span><br><span class="line">         =&gt; Note that ApplicationMasterService is created in the ResourceManager</span><br><span class="line">         =&gt; ApplicationMasterService.registerAppAttempt</span><br><span class="line">         =&gt; trigger AppAttemptAddedSchedulerEvent event(SchedulerEventType.APP_ATTEMPT_ADDED)</span><br><span class="line">             =&gt; CapacityScheduler.handle deal with the above event</span><br><span class="line">                 =&gt; CapacityScheduler.addApplicationAttempt</span><br><span class="line">                     =&gt; get SchedulerApplication from applications fields, create new FiCaSchedulerApp(for the attempt), set the attempt to the application as the current app attempt.</span><br><span class="line">                     =&gt; queue.submitApplicationAttempt</span><br><span class="line">                         =&gt; LeafQueue.submitApplicationAttempt, put into applicationAttemptMap</span><br><span class="line">                         =&gt; use yarn.scheduler.capacity.resource-calculator(or DefaultResourceCalculator) as calculator to calculate whether resource is enough</span><br><span class="line">                             =&gt; if resource is enough(lastClusterResource is larger than 0), activateApplications</span><br><span class="line">                                 =&gt; configure the queue(internal datastructure) for the resource of application master</span><br><span class="line">                             =&gt; if resource is not enough, do not activeApplication now</span><br><span class="line">                     =&gt; dispatch RMAppAttemptEventType.ATTEMPT_ADDED event</span><br></pre></td></tr></table></figure>
+<h2 id="RMAppAttemptState-SUBMITTED-gt-SCHEDULED"><a href="#RMAppAttemptState-SUBMITTED-gt-SCHEDULED" class="headerlink" title="RMAppAttemptState SUBMITTED -&gt; SCHEDULED"></a>RMAppAttemptState SUBMITTED -&gt; SCHEDULED</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ScheduleTransition handles the RMAppAttemptEventType.ATTEMPT_ADDED event</span><br><span class="line">    =&gt; allocate container for the application master</span><br><span class="line">        =&gt; CapacityScheduler.allocate (A view of the resources that will be allocated from this application)</span><br><span class="line">            =&gt; create an Allocation object, with the request content inside</span><br></pre></td></tr></table></figure>
+<h2 id="RMAppAttemptState-SCHEDULED-gt-ALLOCATED-SAVING"><a href="#RMAppAttemptState-SCHEDULED-gt-ALLOCATED-SAVING" class="headerlink" title="RMAppAttemptState SCHEDULED -&gt; ALLOCATED_SAVING"></a>RMAppAttemptState SCHEDULED -&gt; ALLOCATED_SAVING</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">This is not very straightforward.</span><br><span class="line"></span><br><span class="line">(NM) When NodeManager service starts, NodeManager create NodeStatusUpdater service</span><br><span class="line">(NM)     -&gt; NodeStatusUpdater.registerWithRM</span><br><span class="line">(NM)          -&gt; ResourceTracker.registerNodeManager, get node id, host, port, capacity</span><br><span class="line">(RM)                -&gt; create RMNodeImpl(Node managers information on available resources)</span><br><span class="line">(...)                   -&gt; Dispatch RMNodeEventType.STARTED event</span><br><span class="line">                            -&gt; AddNodeTransition handles the event, NodeState changed from NEW to RUNNING</span><br><span class="line">                                -&gt; dispatch SchedulerEventType.NODE_ADDED event and NodesListManagerEventType.NODE_USABLE event</span><br><span class="line">                                    -&gt; CapacityScheduler handles SchedulerEventType.NODE_ADDED event, create FiCaSchedulerNode</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(NN) NodeStatusUpdateImpl.StatusUpdaterRunnable send heartbeat to resourcemanager regularly</span><br><span class="line">(RM)    -&gt; NodeManager.heartbeat</span><br><span class="line">            -&gt; ResourceTrackerService.nodeHeartbeat</span><br><span class="line">                -&gt; dispatch RMNodeEventType.STATUS_UPDATE event</span><br><span class="line">                    -&gt; StatusUpdateWhenHealthyTransition handles the event</span><br><span class="line">                        -&gt; dispatch SchedulerEventType.NODE_UPDATE event</span><br><span class="line">                            -&gt; CapacityScheduler handles the event, invoke CapacityScheduler.nodeUpdate(), try to do scheduling</span><br><span class="line">                                -&gt; CapacityScheduler.allocateContainersToNode</span><br><span class="line">                                    -&gt; CapacityScheduler.allocateContainerOnSingleNode</span><br><span class="line">                                        -&gt; CapacityScheduler.allocateOrReserveNewContainers</span><br><span class="line">                                            -&gt; LeafQueue.assignContainers</span><br><span class="line">                                                -&gt; FiCaSchedulerApp.assignContainerys</span><br><span class="line">                                                    -&gt; ContainerAllocator.assignContainers</span><br><span class="line">                                                        -&gt; RegularContainerAllocator.assignContainers</span><br><span class="line">                                                            -&gt; RegularContainerAllocator.allocate, it invokes tryAllocateOnNode which actually allocate the resource on node</span><br><span class="line">                                                                -&gt; RegularContainerAllocator.doAllocation</span><br><span class="line">                                                                    -&gt; RegularContainerAllocator.handleNewContainerAllocation</span><br><span class="line">                                                                        -&gt; FiCaSchedulerApp.allocate</span><br><span class="line">                                                                            -&gt; creat RMContainerImpl(Represents the ResourceManager&apos;s view of an application container.)</span><br><span class="line"></span><br><span class="line">                                            -&gt; CapacityScheduler.submitResourceCommitRequest</span><br><span class="line">                                                -&gt; CapacityScheduler.tryCommit</span><br><span class="line">                                                    -&gt; CapacityScheduler.submitResourceCommitRequest</span><br><span class="line">                                                        -&gt; FiCaSchedulerApp.apply</span><br><span class="line">                                                            -&gt; dispatch event RMContainerEventType.START</span><br><span class="line">                                                                -&gt; ContainerStartedTransition handles the event, and RMContainerEventType NEW-&gt;ALLOCATED</span><br><span class="line">                                                                    -&gt; dispatch RMAppAttemptEventType.CONTAINER_ALLOCATED event</span><br><span class="line">                                                                        -&gt; RMAppAttemptImpl.AMContainerAllocatedTransition handles the event and RMAppAttemptState SCHEDULED-&gt;ALLOCATED_SAVING</span><br><span class="line">                                                                            -&gt; set master container, RMContainerImpl.setAMContainer(true), trigger RMStateStoreEventType.STORE_APP_ATTEMPT event to store the state of RM</span><br><span class="line">                                                                                -&gt; StoreAppAttemptTransition handles the event, saves the state to leveldb(for example), then dispatch event RMAppAttemptEventType.ATTEMPT_NEW_SAVED</span><br></pre></td></tr></table></figure>
+<h2 id="RMAppAttemptState-ALLOCATED-SAVING-gt-ALLOCATED"><a href="#RMAppAttemptState-ALLOCATED-SAVING-gt-ALLOCATED" class="headerlink" title="RMAppAttemptState ALLOCATED_SAVING -&gt; ALLOCATED"></a>RMAppAttemptState ALLOCATED_SAVING -&gt; ALLOCATED</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">AttemptStoredTransition handles the RMAppAttemptEventType.ATTEMPT_NEW_SAVED event</span><br><span class="line">    -&gt; RMAppAttemptImpl.launchAttempt, trigger AMLauncherEventType.LAUNCH event</span><br><span class="line">        -&gt; ApplicationMasterLauncher.launch</span><br><span class="line">            -&gt; Use ContainerManagementProtocol protocal to interact with NodeManager, connect nodemanager</span><br><span class="line">            -&gt; Create ContainerLaunchContext(represents all of the information needed by the &#123;@code NodeManager&#125; to launch a container.)</span><br><span class="line">            -&gt; Send StartContainerRequest request to NodeManager and get response.</span><br><span class="line">                (NM) -&gt; ContainerManagerImpl.startContainers</span><br><span class="line">                    (NM) -&gt; get ContainerLaunchContext, create ContainerImpl, create ApplicationImpl, dispatch ApplicationInitEvent</span><br><span class="line">                        (NM) -&gt; ...... -&gt; DefaultContainerExecutor.launchContainer</span><br><span class="line">                                            -&gt; exec /bin/bash -c &quot;JAVA_HOME/bin/java org.apache.hadoop.mapreduce.v2.app.MRAppMaster&quot;</span><br><span class="line">                                            -&gt; Then application master service process is created</span><br><span class="line">            -&gt; dispatch RMAppAttemptEventType.LAUNCHED event</span><br></pre></td></tr></table></figure>
+<h2 id="RMAppAttemptState-ALLOCATED-gt-LAUNCHED"><a href="#RMAppAttemptState-ALLOCATED-gt-LAUNCHED" class="headerlink" title="RMAppAttemptState ALLOCATED -&gt; LAUNCHED"></a>RMAppAttemptState ALLOCATED -&gt; LAUNCHED</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">AMLaunchedTransition handles the RMAppAttemptEventType.LAUNCHED event</span><br><span class="line">    -&gt; register RMAppEventType.ATTEMPT_LAUNCHED event</span><br></pre></td></tr></table></figure>
+<h2 id="RMAppState-ACCEPTED-gt-ACCEPTED"><a href="#RMAppState-ACCEPTED-gt-ACCEPTED" class="headerlink" title="RMAppState ACCEPTED -&gt; ACCEPTED"></a>RMAppState ACCEPTED -&gt; ACCEPTED</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">AttemptLaunchedTransition (update the launchTime and publish to ATS)</span><br><span class="line">    -&gt; dispatch RMStateStoreEventType.UPDATE_APP event</span><br><span class="line">        -&gt; UpdateAppTransition handles RMStateStoreEventType.UPDATE_APP event</span><br><span class="line">            -&gt; store the state and dispatch APP_UPDATE_SAVED event</span><br></pre></td></tr></table></figure>
+<h2 id="RMAppAttemptState-LAUNCHED-gt-RUNNING-RMAppState-ACCETPTED-gt-RUNNING"><a href="#RMAppAttemptState-LAUNCHED-gt-RUNNING-RMAppState-ACCETPTED-gt-RUNNING" class="headerlink" title="RMAppAttemptState LAUNCHED -&gt; RUNNING, RMAppState ACCETPTED -&gt; RUNNING"></a>RMAppAttemptState LAUNCHED -&gt; RUNNING, RMAppState ACCETPTED -&gt; RUNNING</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">(AM) Application master (MRAppMaster) start</span><br><span class="line">    -&gt; (AM) ContainerAllocatorRouter service is created to handle container allocation</span><br><span class="line">        -&gt; (AM) if uber mode, use LocalContainerAllocator</span><br><span class="line">        -&gt; (AM) if not uber mode, use RMContainerAllocator, note that RMContainerAllocator is also RMCommunicator</span><br><span class="line">            -&gt; (AM) RMCommunicator.serviceStart</span><br><span class="line">                -&gt; (AM) RMCommunicator.register : registerApplicationMaster , this will communicate with the Resource Manager.</span><br><span class="line">                    -&gt; (RM) DefaultAMSProcessor.registerApplicationMaster : resource manager side handles the request</span><br><span class="line">                        -&gt; (RM) dispatch RMAppAttemptEventType.REGISTERED event</span><br><span class="line">                            -&gt; (RM) AMRegisteredTransition handles the event, and RMAppAttemptState LAUNCHED -&gt; RUNNING</span><br><span class="line">                                -&gt; (RM) dispatch RMAppEventType.ATTEMPT_REGISTERED event, WritingHistoryEventType.APP_ATTEMPT_START event</span><br></pre></td></tr></table></figure>
+<h2 id="Appliation-master-allocate-resource-from-resource-manager-start-container-by-communicating-with-node-manager-run-map-reduce-tasks-in-the-container"><a href="#Appliation-master-allocate-resource-from-resource-manager-start-container-by-communicating-with-node-manager-run-map-reduce-tasks-in-the-container" class="headerlink" title="Appliation master allocate resource from resource manager, start container by communicating with node manager, run map reduce tasks in the container"></a>Appliation master allocate resource from resource manager, start container by communicating with node manager, run map reduce tasks in the container</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">(AM)</span><br><span class="line">Inside RMCommunicator.serviceStart, it creates a thread (AllocatorRunnable) for allocating containers for every 1 second.</span><br><span class="line">    -&gt; RMContainerAllocator.heartbeat</span><br><span class="line">        -&gt; RMContainerAllocator.getResources</span><br><span class="line">            -&gt; RMContainerAllocator.makeRemoteRequest</span><br><span class="line">                -&gt; ... ApplicationMasterProtocolPBClientImpl.allocate()</span><br><span class="line">                    -&gt; (RM) ApplicationMasterService.allocate and response</span><br><span class="line">        -&gt; (AM) loop all assigned containers, check memory requirements, blacklists, and so on, then assign the container : RMContainerAllocator.assignContainers</span><br><span class="line">            -&gt; dispatch TaskAttemptContainerAssignedEvent event (assign container X to task Y on node Z)</span><br><span class="line">                -&gt; TaskAttemptImpl.ContainerAssignedTransition handles the event, state : TaskAttemptStateInternal.ASSIGNED =&gt; TaskAttemptEventType.TA_ASSIGNED</span><br><span class="line">                    -&gt; create ContainerLaunchContext, setup commands for creating the container(MapReduceChildJVM.getVMCommand): /bin/java ... YarnChild</span><br><span class="line">                    -&gt; dispatch ContainerRemoteLaunchEvent event</span><br><span class="line">                        -&gt; ContainerLauncherImpl.launch, connect nodemanager, start actual container</span><br><span class="line">                           -&gt; org.apache.hadoop.mapred.YarnChild#main, args : TaskUmbilicalProtocol&apos;s host and port for providing service, task attempt&apos;s TaskAttemptID, task attemp&apos;s JVMId</span><br><span class="line">                        -&gt; dispatch TaskAttemptContainerLaunchedEvent event</span><br><span class="line">                            -&gt;LaunchedContainerTransition handles the event, TaskAttemptStateInternal.ASSIGNED =&gt; TaskAttemptStateInternal.RUNNING</span><br><span class="line">                                -&gt; dispatch TaskEventType.T_ATTEMPT_LAUNCHED event</span><br><span class="line">                                    -&gt; LaunchTransition handles the event TaskStateInternal.SCHEDULED =&gt; TaskStateInternal.RUNNING</span><br></pre></td></tr></table></figure>
+<h2 id="YarnChild-works-and-perform-map-tasks"><a href="#YarnChild-works-and-perform-map-tasks" class="headerlink" title="YarnChild works and perform map tasks"></a>YarnChild works and perform map tasks</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">YarnChild.main</span><br><span class="line">    -&gt; read arguments : TaskUmbilicalProtocol&apos;s host and port(which is application master MRAppMaster) for providing service, task attempt&apos;s TaskAttemptID, task attemp&apos;s JVMId</span><br><span class="line">        -&gt; get map task from application master through TaskUmbilicalProtocal and run it.</span><br><span class="line">            -&gt; MapTask.run</span><br><span class="line">                -&gt; create mapper, inputFormat, read split</span><br><span class="line">                -&gt; mapper.run() : this is the actual word count mapper(WordCount.TokenizerMapper)</span><br><span class="line">                    -&gt; Context is : org.apache.hadoop.mapreduce.lib.map.WrappedMapper, which is a wrapped of MapContextImpl</span><br><span class="line">                    -&gt; write output data to NewDirectOutputCollector(reducer is 0) or NewOutputCollector(reducer is not 0)</span><br><span class="line">                        -&gt; MapOutputBuffer.collect put the result in the memory buffer as intermediate storage</span><br><span class="line">                -&gt; ... (There is a lot of logic here, we won&apos;t go into much details)</span><br></pre></td></tr></table></figure>
+<h2 id="Similar-progress-as-above-and-reducer-task-starts-until-job-ends"><a href="#Similar-progress-as-above-and-reducer-task-starts-until-job-ends" class="headerlink" title="Similar progress as above and reducer task starts, until job ends"></a>Similar progress as above and reducer task starts, until job ends</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">...(omit some part)...</span><br><span class="line">YarnChild.main</span><br><span class="line">    -&gt; read arguments : TaskUmbilicalProtocol&apos;s host and port(which is application master MRAppMaster) for providing service, task attempt&apos;s TaskAttemptID, task attemp&apos;s JVMId</span><br><span class="line">        -&gt; get reducer task from application master through TaskUmbilicalProtocal and run it.</span><br><span class="line">            -&gt; ReduceTask.run</span><br><span class="line">                -&gt; create reducer</span><br><span class="line">                -&gt; reducer.run() : this is the actual word count mapper(WordCount.IntSumReducer)</span><br><span class="line">                -&gt; ... (There is a lot of logic here, we won&apos;t go into much details)</span><br><span class="line">                -&gt; umbilical.done</span><br><span class="line">                    -&gt; (AM) TaskAttemptListenerImpl.done() : trigger TaskAttemptEventType.TA_DONE event</span><br><span class="line">                        -&gt; (AM) TaskAttemptImpl.MoveContainerToSucceededFinishingTransition handles the event, TaskAttemptStateInternal RUNNING -&gt; SUCCESS_FINISHING_CONTAINER</span><br><span class="line">                            -&gt; (AM) triggers event TaskEventType.T_ATTEMPT_SUCCEEDED</span><br><span class="line">                                -&gt; (AM) TaskImpl.AttemptSucceededTransition handle the event, TaskStateInternal.RUNNING =&gt; TaskStateInternal.SUCCEEDED</span><br><span class="line">                                    -&gt; (AM) trigger JobEventType.JOB_TASK_ATTEMPT_COMPLETED event</span><br><span class="line">                                        -&gt; (AM) JobImpl.TaskAttemptCompletedEventTransition handles the event, JobStateInternal.RUNNING =&gt; JobStateInternal.RUNNING</span><br><span class="line">                                        -&gt; ...</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/07/run-work-count-by-hadoop-3-and-debug-hadoop/" rel="next" title="run work count by hadoop 3 and debug hadoop by eclipse in mac">
+                <i class="fa fa-chevron-left"></i> run work count by hadoop 3 and debug hadoop by eclipse in mac
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Wang Yan</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">17</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Description"><span class="nav-text">Description</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Understand-hadoop-RPC"><span class="nav-text">Understand hadoop RPC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Job-execution-flow"><span class="nav-text">Job execution flow</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Job-submission"><span class="nav-text">Job submission</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Resource-manager-application-lifecycle-RMAppState-NEW-gt-NEW-SAVING"><span class="nav-text">Resource manager application lifecycle : RMAppState NEW -&gt; NEW_SAVING</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RMAppState-SUBMITTED-gt-ACCEPTED"><span class="nav-text">RMAppState SUBMITTED -&gt; ACCEPTED</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RMAppAttemptState-NEW-gt-SUBMITTED"><span class="nav-text">RMAppAttemptState NEW -&gt; SUBMITTED</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RMAppAttemptState-SUBMITTED-gt-SCHEDULED"><span class="nav-text">RMAppAttemptState SUBMITTED -&gt; SCHEDULED</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RMAppAttemptState-SCHEDULED-gt-ALLOCATED-SAVING"><span class="nav-text">RMAppAttemptState SCHEDULED -&gt; ALLOCATED_SAVING</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RMAppAttemptState-ALLOCATED-SAVING-gt-ALLOCATED"><span class="nav-text">RMAppAttemptState ALLOCATED_SAVING -&gt; ALLOCATED</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RMAppAttemptState-ALLOCATED-gt-LAUNCHED"><span class="nav-text">RMAppAttemptState ALLOCATED -&gt; LAUNCHED</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RMAppState-ACCEPTED-gt-ACCEPTED"><span class="nav-text">RMAppState ACCEPTED -&gt; ACCEPTED</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RMAppAttemptState-LAUNCHED-gt-RUNNING-RMAppState-ACCETPTED-gt-RUNNING"><span class="nav-text">RMAppAttemptState LAUNCHED -&gt; RUNNING, RMAppState ACCETPTED -&gt; RUNNING</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Appliation-master-allocate-resource-from-resource-manager-start-container-by-communicating-with-node-manager-run-map-reduce-tasks-in-the-container"><span class="nav-text">Appliation master allocate resource from resource manager, start container by communicating with node manager, run map reduce tasks in the container</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YarnChild-works-and-perform-map-tasks"><span class="nav-text">YarnChild works and perform map tasks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Similar-progress-as-above-and-reducer-task-starts-until-job-ends"><span class="nav-text">Similar progress as above and reducer task starts, until job ends</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yan</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v6.5.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+  
+    <script id="dsq-count-scr" src="https://tiana528.disqus.com/count.js" async></script>
+  
+
+  
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://tiana528.github.io/2019/12/14/hadoop-mapreduce-job-execution-flow-in-detail/';
+        this.page.identifier = '2019/12/14/hadoop-mapreduce-job-execution-flow-in-detail/';
+        this.page.title = 'hadoop mapreduce job execution flow in detail';
+        };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://tiana528.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('3');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://tiana528.github.io/2019/12/14/hadoop-mapreduce-job-execution-flow-in-detail/</loc>
+    
+    <lastmod>2020-01-13T07:04:28.341Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://tiana528.github.io/2019/12/07/run-work-count-by-hadoop-3-and-debug-hadoop/</loc>
     
     <lastmod>2019-12-08T13:02:53.071Z</lastmod>
