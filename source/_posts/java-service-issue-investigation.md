@@ -5,7 +5,7 @@ tags:
 ---
 
 # cpu
-## top
+### top
 ```
 ps aux |grep java
 top -H -p pid # -H : check threads cpu usage
@@ -13,20 +13,20 @@ top # check processes cpu usage
 ```
 
 # memory
-## free
+### free
 ```
 free -m
               total        used        free      shared  buff/cache   available
 Mem:           7982         830         437           3        6714        6795
 Swap:          1023         131         892
 ```
-## dmesg
+### dmesg
 If process is killed by the OS due to OOM, we can get logs from here.
 ```
 sudo dmesg | grep -i kill 
 ```
 
-## vmstat
+### vmstat
 Check memroy, cpu, io ...
 ```
 vmstat 2 10 -t # 2 : interval, 10 : times
@@ -69,7 +69,7 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 ```
 
 # disk
-## df
+### df
 ```
 df -h
 
@@ -94,7 +94,7 @@ du -m /mnt | sort -rn | head -3
 
 
 # network
-## netstat
+### netstat
 ```
 netstat -nat | awk '{print $6}' | sort | uniq -c | sort -rn # check socket status
 ```
@@ -102,13 +102,13 @@ netstat -nat | awk '{print $6}' | sort | uniq -c | sort -rn # check socket statu
 
 
 # java process
-## jstack
+### jstack
 Check status status of a java process
 ```
 sudo jstack -F 1423 # 1423 is process id
 ```
 
-## jinfo
+### jinfo
 ```
 sudo jinfo -flags 13474
 
@@ -120,7 +120,7 @@ Non-default VM flags: -XX:CICompilerCount=2 -XX:+CMSParallelRemarkEnabled -XX:In
 Command line:  -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=18288 -Xmx1024m -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled
 
 ```
-## jmap
+### jmap
 check heap usage status of a java process
 ```
 sudo jmap -heap 13474
@@ -175,7 +175,18 @@ concurrent mark-sweep generation:
    51.71887534005301% used
 ```
 
-## jstat
+check what live objects takes up the memory
+```
+jmap -histo:live 5409 # first execute GC once, then show the summary information
+```
+
+create dump of the memory
+```
+sudo jmap -dump:live,format=b,file=dump.hprof 9557
+# live : only dump the live objects, don't dump the objects that are going to be GC. This is helpful for reducing the dump size.
+```
+
+### jstat
 ```
 sudo jstat  -gc 13474 2000 10 
 # 13474 : process id, 2000 : print for every 2000 second, 10 : print 10 times
@@ -203,7 +214,7 @@ sudo jstat  -gc 13474 2000 10
 # GCT	Total garbage collection time.
 ```
 
-# jps
+### jps
 Check all java process information
 ```
 sudo jps -mlvV 
@@ -218,17 +229,17 @@ sudo jps -mlvV
 
 
 # others
-## tail
+### tail
 ```
 tail -100f server.log #  Show last 100 lines and show new lines in realtime
 ```
-## awk
+### awk
 ```
 awk '{print $1,$2}' a.txt
 awk '{print NR,$0}' a.txt # NR is number of records, usually equal to line number
 ```
 
-## find
+### find
 ```
 find /tmp/ /user/ -name *.log
 find . -iname *.txt # iname : case insensitive
