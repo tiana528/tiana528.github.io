@@ -109,24 +109,24 @@
 
 
 
-  <meta name="description" content="BackgroundThis article aims at discussing how hive generic User-defined function(GenericUDF) works. In the java doc, it says GenericUDF can do short-circuit evaluations using DeferedObject. But what i">
+  <meta name="description" content="cputop123ps aux |grep javatop -H -p pid # -H : check threads cpu usagetop # check processes cpu usage memoryfree1234free -m              total        used        free      shared  buff/cache   availab">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hive GenericUDF and DeferredJavaObject analysis">
-<meta property="og:url" content="https://tiana528.github.io/2019/01/09/hive-DeferredJavaObject/index.html">
+<meta property="og:title" content="java service issue investigation">
+<meta property="og:url" content="https://tiana528.github.io/2020/02/08/java-service-issue-investigation/index.html">
 <meta property="og:site_name" content="Yan&#39;s Notes">
-<meta property="og:description" content="BackgroundThis article aims at discussing how hive generic User-defined function(GenericUDF) works. In the java doc, it says GenericUDF can do short-circuit evaluations using DeferedObject. But what i">
+<meta property="og:description" content="cputop123ps aux |grep javatop -H -p pid # -H : check threads cpu usagetop # check processes cpu usage memoryfree1234free -m              total        used        free      shared  buff/cache   availab">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-01-16T15:09:40.518Z">
+<meta property="og:updated_time" content="2020-02-08T11:24:06.898Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="hive GenericUDF and DeferredJavaObject analysis">
-<meta name="twitter:description" content="BackgroundThis article aims at discussing how hive generic User-defined function(GenericUDF) works. In the java doc, it says GenericUDF can do short-circuit evaluations using DeferedObject. But what i">
+<meta name="twitter:title" content="java service issue investigation">
+<meta name="twitter:description" content="cputop123ps aux |grep javatop -H -p pid # -H : check threads cpu usagetop # check processes cpu usage memoryfree1234free -m              total        used        free      shared  buff/cache   availab">
 
 
 
 
 
 
-  <link rel="canonical" href="https://tiana528.github.io/2019/01/09/hive-DeferredJavaObject/">
+  <link rel="canonical" href="https://tiana528.github.io/2020/02/08/java-service-issue-investigation/">
 
 
 
@@ -136,7 +136,7 @@
   };
 </script>
 
-  <title>hive GenericUDF and DeferredJavaObject analysis | Yan's Notes</title>
+  <title>java service issue investigation | Yan's Notes</title>
   
 
 
@@ -364,7 +364,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2019/01/09/hive-DeferredJavaObject/">
+    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2020/02/08/java-service-issue-investigation/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Wang Yan">
@@ -381,7 +381,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">hive GenericUDF and DeferredJavaObject analysis
+          <h1 class="post-title" itemprop="name headline">java service issue investigation
               
             
           </h1>
@@ -406,24 +406,12 @@
                 
               
 
-              <time title="Created: 2019-01-09 22:06:25" itemprop="dateCreated datePublished" datetime="2019-01-09T22:06:25+09:00">2019-01-09</time>
+              <time title="Created: 2020-02-08 12:33:36 / Modified: 20:24:06" itemprop="dateCreated datePublished" datetime="2020-02-08T12:33:36+09:00">2020-02-08</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2019-01-17 00:09:40" itemprop="dateModified" datetime="2019-01-17T00:09:40+09:00">2019-01-17</time>
               
             
           </span>
@@ -437,9 +425,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2019/01/09/hive-DeferredJavaObject/#comments" itemprop="discussionUrl">
+                <a href="/2020/02/08/java-service-issue-investigation/#comments" itemprop="discussionUrl">
                 
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/01/09/hive-DeferredJavaObject/" itemprop="commentCount"></span>
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/08/java-service-issue-investigation/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -474,107 +462,21 @@
       
 
       
-        <h1 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h1><p>This article aims at discussing how hive generic User-defined function(GenericUDF) works. In the java doc, it says GenericUDF can do short-circuit evaluations using DeferedObject. But what is short-circuit evaluation and how DeferedObject works?</p>
-<h1 id="Description"><a href="#Description" class="headerlink" title="Description"></a>Description</h1><p>Basicly, use GenericUDF when the input or output is complex type, or input arguments have variable length.</p>
-<p>GenericUDF use DeferedObject to pass arguments and achieve lazy-evaluation and short-circuiting.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">interface</span> <span class="title">DeferredObject</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">prepare</span><span class="params">(<span class="keyword">int</span> version)</span> <span class="keyword">throws</span> HiveException</span>;</span><br><span class="line">  <span class="function">Object <span class="title">get</span><span class="params">()</span> <span class="keyword">throws</span> HiveException</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<h1 id="Source-code-analysis"><a href="#Source-code-analysis" class="headerlink" title="Source code analysis"></a>Source code analysis</h1><p>We run a sql <code>select abs(c1) from t1</code> and try to analysis how UDF is initialized and processed.</p>
-<ul>
-<li>Class structure and relationship<ul>
-<li>SelectOperator<ul>
-<li>ExprNodeEvaluator[] eval<ul>
-<li>(actually it is ExprNodeGenericFuncEvaluator)</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>ExprNodeGenericFuncEvaluator<ul>
-<li>ExprNodeEvaluator[] children; <ul>
-<li>(actually it is [ExprNodeColumnEvaluator[Column[c1]]])</li>
-</ul>
-</li>
-<li>GenericUDF.DeferredObject[] deferredChildren;<ul>
-<li>(actually it is org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator$DeferredExprObject and contains the ExprNodeEvaluator)</li>
-</ul>
-</li>
-<li>GenericUDF.DeferredObject[] childrenNeedingPrepare;<ul>
-<li>(actually it contains the same object as deferredChildren in this example)</li>
-</ul>
-</li>
-<li>GenericUDF genericUDF;<ul>
-<li>(actually it is GenericUDFAbs)</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li><p>During initialization</p>
-<ul>
-<li>Generate query plan tree<ul>
-<li>SemanticAnalyzer.genPlan</li>
-</ul>
-</li>
-<li><p>Create ExprNodeGenericFuncDesc based on genericUDFClass</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc</span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExprNodeGenericFuncDesc <span class="title">newInstance</span><span class="params">(GenericUDF genericUDF,</span></span></span><br><span class="line"><span class="function"><span class="params">      String funcText,</span></span></span><br><span class="line"><span class="function"><span class="params">      List&lt;ExprNodeDesc&gt; children)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    ObjectInspector oi = genericUDF.initializeAndFoldConstants(childrenOIs);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Initialize GenericUDF</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.udf.generic.GenericUDF</span><br><span class="line"><span class="function"><span class="keyword">public</span> ObjectInspector <span class="title">initializeAndFoldConstants</span><span class="params">(ObjectInspector[] arguments)</span></span></span><br><span class="line"><span class="function">      <span class="keyword">throws</span> UDFArgumentException </span>&#123;</span><br><span class="line"></span><br><span class="line">    ObjectInspector oi = initialize(arguments);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.udf.generic.GenericUDFAbs</span><br><span class="line">  <span class="function"><span class="keyword">public</span> ObjectInspector <span class="title">initialize</span><span class="params">(ObjectInspector[] arguments)</span> <span class="keyword">throws</span> UDFArgumentException </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Initial select operator</p>
-<ul>
-<li><p>Create ExprNodeGenericFuncEvaluator</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.SelectOperator</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initializeOp</span><span class="params">(Configuration hconf)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  eval[i] = ExprNodeEvaluatorFactory.get(colList.get(i), hconf);</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ExprNodeGenericFuncEvaluator</span><span class="params">(ExprNodeGenericFuncDesc expr, Configuration conf)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    children = <span class="keyword">new</span> ExprNodeEvaluator[expr.getChildren().size()];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; children.length; i++) &#123;</span><br><span class="line">      ExprNodeDesc child = expr.getChildren().get(i);</span><br><span class="line">      ExprNodeEvaluator nodeEvaluator = ExprNodeEvaluatorFactory.get(child, conf);</span><br><span class="line">      children[i] = nodeEvaluator;</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Init ExprNodeGenericFuncEvaluator and create DeferredExprObject</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> ObjectInspector <span class="title">initialize</span><span class="params">(ObjectInspector rowInspector)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">     deferredChildren = <span class="keyword">new</span> GenericUDF.DeferredObject[children.length];</span><br><span class="line">     </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ExprNodeGenericFuncEvaluator.DeferredExprObject</span><br><span class="line"> DeferredExprObject(ExprNodeEvaluator eval, <span class="keyword">boolean</span> eager) &#123;</span><br><span class="line">      <span class="keyword">this</span>.eval = eval; <span class="comment">//(ExprNodeEvaluator[Column[c1]])</span></span><br><span class="line">      <span class="keyword">this</span>.eager = eager; (<span class="keyword">false</span>)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>During processing data</p>
-<ul>
-<li><p>select operator process one row</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.SelectOperator</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(Object row, <span class="keyword">int</span> tag)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    output[i] = eval[i].evaluate(row); <span class="comment">//(eval[i] is actually ExprNodeGenericFuncEvaluator)</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>Note that <code>row</code> is an LazyStruct object which holds data in binary format</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> Object <span class="title">_evaluate</span><span class="params">(Object row, <span class="keyword">int</span> version)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> genericUDF.evaluate(deferredChildren);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.udf.generic.GenericUDFAbs</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Object <span class="title">evaluate</span><span class="params">(DeferredObject[] arguments)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    Object valObject = arguments[<span class="number">0</span>].get();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>Note that arguments[0] is ExprNodeGenericFuncEvaluator&amp;DeferredExprObject</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeGenericFuncEvaluator</span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">get</span><span class="params">()</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">     ...</span><br><span class="line">     obj = eval.evaluate(rowObject, version); <span class="comment">//(eval is ExprNodeColumnEvaluator)</span></span><br><span class="line">     ...</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">org.apache.hadoop.hive.ql.exec.ExprNodeColumnEvaluator</span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> Object <span class="title">_evaluate</span><span class="params">(Object row, <span class="keyword">int</span> version)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">   ...</span><br><span class="line">   <span class="keyword">return</span> inspector.getStructFieldData(row, field); <span class="comment">//(inspector is LazySimpleStructObjectInspector)</span></span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-<h1 id="Summarize"><a href="#Summarize" class="headerlink" title="Summarize"></a>Summarize</h1><ul>
-<li>Processing<ul>
-<li>During intilization<ul>
-<li>hive creates SelectOperator, SelectOperator contains ExprNodeGenericFuncEvaluator, ExprNodeGenericFuncEvaluator contains GenericUDFAbs and DeferredExprObject (DeferredObject), DeferredExprObject contains ExprNodeColumnEvaluator (column[c1]).</li>
-</ul>
-</li>
-<li>During executing<ul>
-<li>SelectOperator processes row which is LazyStruct, and at last passed to LazySimpleStructObjectInspector (getStructFieldData) to get the actual data from binary data.</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>lazy-evaluation and short-circuiting<ul>
-<li>We can notice that the value of the attribute which is involved in the UDF calculation is only evaluated just before use. The value is analyzed from binary format. This is very efficient.</li>
-</ul>
-</li>
-</ul>
-<h1 id="Cache-approach-in-GenericUDF"><a href="#Cache-approach-in-GenericUDF" class="headerlink" title="Cache approach in GenericUDF"></a>Cache approach in GenericUDF</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Object <span class="title">evaluate</span><span class="params">(DeferredObject[] arguments)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">    Object obj = arguments[<span class="number">0</span>].get();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>The obj got DeferredObject in GenericUDF evaluate function is  an LazyInteger object, it is always the same object even if evaluate function is invoked for processing a different row.</p>
-<p>We should be careful when making use of cache to speedup GenericUDF calculation. Buffer the input and output, and returns buffered output if historical input comes. Since we always get the same object from the DeferredObject, if we use <code>equals</code> function to compare, it will always be true. We need to deep copy the inputs for further comparison. </p>
+        <h1 id="cpu"><a href="#cpu" class="headerlink" title="cpu"></a>cpu</h1><h2 id="top"><a href="#top" class="headerlink" title="top"></a>top</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ps aux |grep java</span><br><span class="line">top -H -p pid # -H : check threads cpu usage</span><br><span class="line">top # check processes cpu usage</span><br></pre></td></tr></table></figure>
+<h1 id="memory"><a href="#memory" class="headerlink" title="memory"></a>memory</h1><h2 id="free"><a href="#free" class="headerlink" title="free"></a>free</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">free -m</span><br><span class="line">              total        used        free      shared  buff/cache   available</span><br><span class="line">Mem:           7982         830         437           3        6714        6795</span><br><span class="line">Swap:          1023         131         892</span><br></pre></td></tr></table></figure>
+<h2 id="dmesg"><a href="#dmesg" class="headerlink" title="dmesg"></a>dmesg</h2><p>If process is killed by the OS due to OOM, we can get logs from here.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo dmesg | grep -i kill</span><br></pre></td></tr></table></figure></p>
+<h2 id="vmstat"><a href="#vmstat" class="headerlink" title="vmstat"></a>vmstat</h2><p>Check memroy, cpu, io …<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">vmstat 2 10 -t # 2 : interval, 10 : times</span><br><span class="line"></span><br><span class="line">procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu----- -----timestamp-----</span><br><span class="line"> r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st                 UTC</span><br><span class="line"> 3  0 134548 400884 152320 6737836    0    0     3    54    3    8  5  1 94  0  0 2020-02-08 08:35:06</span><br><span class="line"> 0  0 134548 401940 152320 6737808    0    0     0    54 1309 1883  1  1 98  0  0 2020-02-08 08:35:08</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># Procs</span><br><span class="line">#   r: The number of processes waiting for run time.</span><br><span class="line">#   b: The number of processes in uninterruptible sleep.</span><br><span class="line"># Memory</span><br><span class="line">#   swpd: the amount of virtual memory used. (is the value is larger than 0, it means the memory is not enough)</span><br><span class="line">#   free: the amount of idle memory.</span><br><span class="line">#   buff: the amount of memory used as buffers.</span><br><span class="line">#   cache: the amount of memory used as cache.</span><br><span class="line">#   inact: the amount of inactive memory. (-a option)</span><br><span class="line">#   active: the amount of active memory. (-a option)</span><br><span class="line"># Swap</span><br><span class="line">#   si: Amount of memory swapped in from disk (/s).</span><br><span class="line">#   so: Amount of memory swapped to disk (/s).</span><br><span class="line">#   (If si and so is not 0 for a while, it means memory is not enough)</span><br><span class="line"># IO</span><br><span class="line">#   bi: Blocks received from a block device (blocks/s).</span><br><span class="line">#   bo: Blocks sent to a block device (blocks/s).</span><br><span class="line">#   (if bi+bo&gt;1000, and wa value is large, then IO is bottleneck)</span><br><span class="line"># System</span><br><span class="line">#   in: The number of interrupts per second, including the clock.</span><br><span class="line">#   cs: The number of context switches per second.</span><br><span class="line"># CPU</span><br><span class="line">#   These are percentages of total CPU time.</span><br><span class="line">#   us: Time spent running non-kernel code. (user time, including nice time)</span><br><span class="line">#   sy: Time spent running kernel code. (system time)</span><br><span class="line">#   id: Time spent idle. Prior to Linux 2.5.41, this includes IO-wait time.</span><br><span class="line">#   wa: Time spent waiting for IO. Prior to Linux 2.5.41, included in idle.</span><br><span class="line">#   st: Time stolen from a virtual machine. Prior to Linux 2.6.11, unknown.</span><br></pre></td></tr></table></figure></p>
+<h1 id="disk"><a href="#disk" class="headerlink" title="disk"></a>disk</h1><h2 id="df"><a href="#df" class="headerlink" title="df"></a>df</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">df -h</span><br><span class="line"></span><br><span class="line">Filesystem      Size  Used Avail Use% Mounted on</span><br><span class="line">udev            3.9G     0  3.9G   0% /dev</span><br><span class="line">tmpfs           799M  4.0M  795M   1% /run</span><br><span class="line">/dev/xvda1       31G   16G   16G  49% /</span><br><span class="line">tmpfs           3.9G     0  3.9G   0% /dev/shm</span><br><span class="line">tmpfs           5.0M     0  5.0M   0% /run/lock</span><br><span class="line">tmpfs           3.9G     0  3.9G   0% /sys/fs/cgroup</span><br><span class="line">/dev/md0         80G  2.5G   78G   4% /mnt</span><br><span class="line">tmpfs           799M     0  799M   0% /run/user/21363</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">du -m /mnt | sort -rn | head -3</span><br><span class="line"></span><br><span class="line">2413	/mnt</span><br><span class="line">1389	/mnt/abc</span><br><span class="line">1322	/mnt/abc/def</span><br></pre></td></tr></table></figure>
+<h1 id="network"><a href="#network" class="headerlink" title="network"></a>network</h1><h2 id="netstat"><a href="#netstat" class="headerlink" title="netstat"></a>netstat</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netstat -nat | awk &apos;&#123;print $6&#125;&apos; | sort | uniq -c | sort -rn # check socket status</span><br></pre></td></tr></table></figure>
+<h1 id="java-process"><a href="#java-process" class="headerlink" title="java process"></a>java process</h1><h2 id="jstack"><a href="#jstack" class="headerlink" title="jstack"></a>jstack</h2><p>Check status status of a java process<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo jstack -F 1423 # 1423 is process id</span><br></pre></td></tr></table></figure></p>
+<h2 id="jinfo"><a href="#jinfo" class="headerlink" title="jinfo"></a>jinfo</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sudo jinfo -flags 13474</span><br><span class="line"></span><br><span class="line">Attaching to process ID 13474, please wait...</span><br><span class="line">Debugger attached successfully.</span><br><span class="line">Server compiler detected.</span><br><span class="line">JVM version is 25.152-b16</span><br><span class="line">Non-default VM flags: -XX:CICompilerCount=2 -XX:+CMSParallelRemarkEnabled -XX:InitialHeapSize=132120576 -XX:+ManagementServer -XX:MaxHeapSize=1073741824 -XX:MaxNewSize=174456832 -XX:MaxTenuringThreshold=6 -XX:MinHeapDeltaBytes=196608 -XX:NewSize=44040192 -XX:OldPLABSize=16 -XX:OldSize=88080384 -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+UseParNewGC</span><br><span class="line">Command line:  -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=18288 -Xmx1024m -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled</span><br></pre></td></tr></table></figure>
+<h2 id="jmap"><a href="#jmap" class="headerlink" title="jmap"></a>jmap</h2><p>check heap usage status of a java process<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">sudo jmap -heap 13474</span><br><span class="line">Attaching to process ID 13474, please wait...</span><br><span class="line">Debugger attached successfully.</span><br><span class="line">Server compiler detected.</span><br><span class="line">JVM version is 25.152-b16</span><br><span class="line"></span><br><span class="line">using parallel threads in the new generation.</span><br><span class="line">using thread-local object allocation.</span><br><span class="line">Concurrent Mark-Sweep GC</span><br><span class="line"></span><br><span class="line">Heap Configuration:</span><br><span class="line">   MinHeapFreeRatio         = 40</span><br><span class="line">   MaxHeapFreeRatio         = 70</span><br><span class="line">   MaxHeapSize              = 1073741824 (1024.0MB)</span><br><span class="line">   NewSize                  = 44040192 (42.0MB)</span><br><span class="line">   MaxNewSize               = 174456832 (166.375MB)</span><br><span class="line">   OldSize                  = 88080384 (84.0MB)</span><br><span class="line">   NewRatio                 = 2</span><br><span class="line">   SurvivorRatio            = 8</span><br><span class="line">   MetaspaceSize            = 21807104 (20.796875MB)</span><br><span class="line">   CompressedClassSpaceSize = 1073741824 (1024.0MB)</span><br><span class="line">   MaxMetaspaceSize         = 17592186044415 MB</span><br><span class="line">   G1HeapRegionSize         = 0 (0.0MB)</span><br><span class="line"></span><br><span class="line">Heap Usage:</span><br><span class="line">New Generation (Eden + 1 Survivor Space):</span><br><span class="line">   capacity = 39649280 (37.8125MB)</span><br><span class="line">   used     = 5273360 (5.0290679931640625MB)</span><br><span class="line">   free     = 34375920 (32.78343200683594MB)</span><br><span class="line">   13.300014527376034% used</span><br><span class="line">Eden Space:</span><br><span class="line">   capacity = 35258368 (33.625MB)</span><br><span class="line">   used     = 4555320 (4.344291687011719MB)</span><br><span class="line">   free     = 30703048 (29.28070831298828MB)</span><br><span class="line">   12.919826578473513% used</span><br><span class="line">From Space:</span><br><span class="line">   capacity = 4390912 (4.1875MB)</span><br><span class="line">   used     = 718040 (0.6847763061523438MB)</span><br><span class="line">   free     = 3672872 (3.5027236938476562MB)</span><br><span class="line">   16.352867012593283% used</span><br><span class="line">To Space:</span><br><span class="line">   capacity = 4390912 (4.1875MB)</span><br><span class="line">   used     = 0 (0.0MB)</span><br><span class="line">   free     = 4390912 (4.1875MB)</span><br><span class="line">   0.0% used</span><br><span class="line">concurrent mark-sweep generation:</span><br><span class="line">   capacity = 88080384 (84.0MB)</span><br><span class="line">   used     = 45554184 (43.44385528564453MB)</span><br><span class="line">   free     = 42526200 (40.55614471435547MB)</span><br><span class="line">   51.71887534005301% used</span><br></pre></td></tr></table></figure></p>
+<h2 id="jstat"><a href="#jstat" class="headerlink" title="jstat"></a>jstat</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">sudo jstat  -gc 13474 2000 10 </span><br><span class="line"># 13474 : process id, 2000 : print for every 2000 second, 10 : print 10 times</span><br><span class="line"></span><br><span class="line"> S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT</span><br><span class="line">4288.0 4288.0  0.0   755.6  34432.0  11079.1   86016.0    44522.9   57912.0 56542.0 7064.0 6771.9    221    1.105   4      0.035    1.140</span><br><span class="line">4288.0 4288.0  0.0   755.6  34432.0  11124.5   86016.0    44522.9   57912.0 56542.0 7064.0 6771.9    221    1.105   4      0.035    1.140</span><br><span class="line">4288.0 4288.0  0.0   755.6  34432.0  11152.6   86016.0    44522.9   57912.0 56542.0 7064.0 6771.9    221    1.105   4      0.035    1.140</span><br><span class="line">4288.0 4288.0  0.0   755.6  34432.0  11737.6   86016.0    44522.9   57912.0 56542.0 7064.0 6771.9    221    1.105   4      0.035    1.140</span><br><span class="line"></span><br><span class="line"># S0C	Current survivor space 0 capacity (KB).</span><br><span class="line"># S1C	Current survivor space 1 capacity (KB).</span><br><span class="line"># S0U	Survivor space 0 utilization (KB).</span><br><span class="line"># S1U	Survivor space 1 utilization (KB).</span><br><span class="line"># EC	Current eden space capacity (KB).</span><br><span class="line"># EU	Eden space utilization (KB).</span><br><span class="line"># OC	Current old space capacity (KB).</span><br><span class="line"># OU	Old space utilization (KB).</span><br><span class="line"># PC	Current permanent space capacity (KB).</span><br><span class="line"># PU	Permanent space utilization (KB).</span><br><span class="line"># YGC	Number of young generation GC Events.</span><br><span class="line"># YGCT	Young generation garbage collection time.</span><br><span class="line"># FGC	Number of full GC events.</span><br><span class="line"># FGCT	Full garbage collection time.</span><br><span class="line"># GCT	Total garbage collection time.</span><br></pre></td></tr></table></figure>
+<h1 id="jps"><a href="#jps" class="headerlink" title="jps"></a>jps</h1><p>Check all java process information<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo jps -mlvV </span><br><span class="line"># m : print main method argument</span><br><span class="line"># l : print whole package name, main class, jar full path</span><br><span class="line"># v : print jvm parameter</span><br><span class="line"># V : print JVM parameter passed by flag file</span><br></pre></td></tr></table></figure></p>
+<h1 id="others"><a href="#others" class="headerlink" title="others"></a>others</h1><h2 id="tail"><a href="#tail" class="headerlink" title="tail"></a>tail</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tail -100f server.log #  Show last 100 lines and show new lines in realtime</span><br></pre></td></tr></table></figure>
+<h2 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">awk &apos;&#123;print $1,$2&#125;&apos; a.txt</span><br><span class="line">awk &apos;&#123;print NR,$0&#125;&apos; a.txt # NR is number of records, usually equal to line number</span><br></pre></td></tr></table></figure>
+<h2 id="find"><a href="#find" class="headerlink" title="find"></a>find</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">find /tmp/ /user/ -name *.log</span><br><span class="line">find . -iname *.txt # iname : case insensitive</span><br><span class="line">find . -type d # get all sub-dir of current dir</span><br><span class="line">find . -type l # get all symlkink</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -605,8 +507,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/12/15/create_git_hooks_in_mac/" rel="next" title="create git hooks in mac">
-                <i class="fa fa-chevron-left"></i> create git hooks in mac
+              <a href="/2019/12/14/hadoop-mapreduce-job-execution-flow-in-detail/" rel="next" title="hadoop mapreduce job execution flow in detail">
+                <i class="fa fa-chevron-left"></i> hadoop mapreduce job execution flow in detail
               </a>
             
           </div>
@@ -614,10 +516,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/01/19/basic-understanding-of-cap-theorem/" rel="prev" title="Very basic understanding of CAP theorem">
-                Very basic understanding of CAP theorem <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -769,7 +667,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Description"><span class="nav-text">Description</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Source-code-analysis"><span class="nav-text">Source code analysis</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Summarize"><span class="nav-text">Summarize</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Cache-approach-in-GenericUDF"><span class="nav-text">Cache approach in GenericUDF</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#cpu"><span class="nav-text">cpu</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#top"><span class="nav-text">top</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#memory"><span class="nav-text">memory</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#free"><span class="nav-text">free</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dmesg"><span class="nav-text">dmesg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vmstat"><span class="nav-text">vmstat</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#disk"><span class="nav-text">disk</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#df"><span class="nav-text">df</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#network"><span class="nav-text">network</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#netstat"><span class="nav-text">netstat</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#java-process"><span class="nav-text">java process</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#jstack"><span class="nav-text">jstack</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jinfo"><span class="nav-text">jinfo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jmap"><span class="nav-text">jmap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jstat"><span class="nav-text">jstat</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#jps"><span class="nav-text">jps</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#others"><span class="nav-text">others</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#tail"><span class="nav-text">tail</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#awk"><span class="nav-text">awk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#find"><span class="nav-text">find</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -932,9 +830,9 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'https://tiana528.github.io/2019/01/09/hive-DeferredJavaObject/';
-        this.page.identifier = '2019/01/09/hive-DeferredJavaObject/';
-        this.page.title = 'hive GenericUDF and DeferredJavaObject analysis';
+        this.page.url = 'https://tiana528.github.io/2020/02/08/java-service-issue-investigation/';
+        this.page.identifier = '2020/02/08/java-service-issue-investigation/';
+        this.page.title = 'java service issue investigation';
         };
       function loadComments () {
         var d = document, s = d.createElement('script');
