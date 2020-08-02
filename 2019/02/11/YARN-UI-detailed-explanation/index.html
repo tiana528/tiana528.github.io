@@ -116,7 +116,7 @@
 <meta property="og:site_name" content="Yan&#39;s Notes">
 <meta property="og:description" content="DescriptionYARN UI url is {hadoop_master_ip:8088}. There is a lot of information in this UI as follows which is very helpful for analyzing issues. This article aims at explaning everything in detail.1">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-08-01T02:05:32.044Z">
+<meta property="og:updated_time" content="2020-08-01T02:53:25.949Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="YARN UI detailed explanation">
 <meta name="twitter:description" content="DescriptionYARN UI url is {hadoop_master_ip:8088}. There is a lot of information in this UI as follows which is very helpful for analyzing issues. This article aims at explaning everything in detail.1">
@@ -423,7 +423,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2020-08-01 11:05:32" itemprop="dateModified" datetime="2020-08-01T11:05:32+09:00">2020-08-01</time>
+                <time title="Modified: 2020-08-01 11:53:25" itemprop="dateModified" datetime="2020-08-01T11:53:25+09:00">2020-08-01</time>
               
             
           </span>
@@ -640,7 +640,7 @@
 <h2 id="Local-logs"><a href="#Local-logs" class="headerlink" title="Local logs"></a>Local logs</h2><p>yarn logs</p>
 <h2 id="Server-stacks"><a href="#Server-stacks" class="headerlink" title="Server stacks"></a>Server stacks</h2><p>Stack trace of the resource manager.</p>
 <h2 id="Metrics"><a href="#Metrics" class="headerlink" title="Metrics"></a>Metrics</h2><p>JMX metrics of the resource manager.</p>
-<h1 id="Check-job-detailed-information"><a href="#Check-job-detailed-information" class="headerlink" title="Check job detailed information"></a>Check job detailed information</h1><p>This is a complex part, it is not as straightforward as other parts because there are many logs and UIs involved.<br>Yarn log aggregation needs to be enabled for checking the logs. (<a href="https://tiana528.github.io/2018/11/19/hive-configuration-best-practise/">Enable yarn log aggregation</a>)</p>
+<h1 id="Check-job-detailed-information"><a href="#Check-job-detailed-information" class="headerlink" title="Check job detailed information"></a>Check job detailed information</h1><p>This is a complex part, it is not as straightforward as other parts because there are many logs and UIs involved.<br>Yarn log aggregation needs to be enabled for checking the logs.</p>
 <h2 id="Check-application-detailed-info"><a href="#Check-application-detailed-info" class="headerlink" title="Check application detailed info"></a>Check application detailed info</h2><p>Click application id such as <code>application_1542608710651_1268349</code>, then the application UI will open. URL is : {master_ip:8088}/cluster/app/application_1549418419376_658006</p>
 <p>The bottom part shows the application attempts if there are any. If an application attemp fails, another application attempt will be triggered until the attempt number meets the configured maximum value. We can know how many times of the application attempts have been tried/trying from this UI.</p>
 <p>It is able to check the logs of the corresponding application master by clicking the <code>logs</code> in each row.</p>

@@ -116,7 +116,7 @@
 <meta property="og:site_name" content="Yan&#39;s Notes">
 <meta property="og:description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-08-01T02:05:31.961Z">
+<meta property="og:updated_time" content="2020-08-02T01:59:58.762Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Basic understanding of debian packaging">
 <meta name="twitter:description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
@@ -423,7 +423,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2020-08-01 11:05:31" itemprop="dateModified" datetime="2020-08-01T11:05:31+09:00">2020-08-01</time>
+                <time title="Modified: 2020-08-02 10:59:58" itemprop="dateModified" datetime="2020-08-02T10:59:58+09:00">2020-08-02</time>
               
             
           </span>
@@ -698,6 +698,23 @@
 </ul>
 </li>
 </ul>
+<h1 id="Best-practise-of-deploying-debian-packages"><a href="#Best-practise-of-deploying-debian-packages" class="headerlink" title="Best practise of deploying debian packages"></a>Best practise of deploying debian packages</h1><ul>
+<li>Safe in-place release<br>If there are senarios that we want to versioning up debian packages in-place without affecting running service, we must be very careful.</li>
+</ul>
+<p>The flow of updating one debian package is first deleting all files installed by the current debian package(e.g. dpkg -L hadoop-master), then install the new one. Such flow creates a small time window that there is no available files installed. If the files are necessary for the execution of some service, the missing of such files in the short time window might cause job failure.</p>
+<p>There are several work around of this issue as follows</p>
+<p>(1)Install files through post-inst. The files installed through post-inst won’t be remove during package version up(unless they are removed by pre-rm).</p>
+<p>(2)Never version up the package, and always install new packages to a difference place and change the symlink pointing to the new place.</p>
+<ul>
+<li><p>Create symlink correctly<br>If we run ln -s folder_a folder_b multiple times, it will fail at the third time ending up a nested folder which we don’t intent to have. The correct way of creating symlink should be remove existing symlink then create, or create symlink with the fT option.</p>
+</li>
+<li><p>Write file safely<br>When writing a file using python or so, the writing process is usually done little by little. If there is some other process reading this file, such processes might read a file which has been written halfly thus causing some issues. It will always be safer to write a temporal file then rename to the final name.</p>
+</li>
+<li><p>Write safe shell script<br>Always use set -euo pipefail in all shell scripts, and use shellcheck tool for checking.</p>
+</li>
+<li><p>Check cron job configs<br>Use <a href="https://crontab.guru/" target="_blank" rel="noopener">https://crontab.guru/</a> to check whether the cron configuration is as expected.</p>
+</li>
+</ul>
 <h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ul>
 <li><a href="https://www.debian.org/doc/manuals/debian-faq/ch-pkgtools.en.html" target="_blank" rel="noopener">FAQ</a> of dpkg tools</li>
 <li>How to use <a href="https://help.ubuntu.com/community/AptGet/Howto" target="_blank" rel="noopener">apt-get</a>?</li>
@@ -902,7 +919,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#What-is-a-debian-package"><span class="nav-text">What is a debian package</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Create-debian-packages"><span class="nav-text">Create debian packages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example1"><span class="nav-text">Example1</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example2"><span class="nav-text">Example2</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#Debian-package-management-tools"><span class="nav-text">Debian package management tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg"><span class="nav-text">dpkg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aptitude"><span class="nav-text">aptitude</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg-deb"><span class="nav-text">dpkg-deb</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Common-questions"><span class="nav-text">Common questions</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Scenarios"><span class="nav-text">Scenarios</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-text">References</span></a></li></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#What-is-a-debian-package"><span class="nav-text">What is a debian package</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Create-debian-packages"><span class="nav-text">Create debian packages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example1"><span class="nav-text">Example1</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example2"><span class="nav-text">Example2</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#Debian-package-management-tools"><span class="nav-text">Debian package management tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg"><span class="nav-text">dpkg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aptitude"><span class="nav-text">aptitude</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg-deb"><span class="nav-text">dpkg-deb</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Common-questions"><span class="nav-text">Common questions</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Scenarios"><span class="nav-text">Scenarios</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Best-practise-of-deploying-debian-packages"><span class="nav-text">Best practise of deploying debian packages</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-text">References</span></a></li></div>
             
 
           </div>

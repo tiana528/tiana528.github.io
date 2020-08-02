@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://tiana528.github.io/2019/02/07/Basic_understanding_of_debian_packaging/</loc>
+    
+    <lastmod>2020-08-02T01:59:58.762Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tiana528.github.io/2019/02/11/YARN-UI-detailed-explanation/</loc>
+    
+    <lastmod>2020-08-01T02:53:25.949Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://tiana528.github.io/2019/12/07/run-work-count-by-hadoop-3-and-debug-hadoop/</loc>
     
     <lastmod>2020-08-01T02:05:32.671Z</lastmod>
@@ -107,23 +121,9 @@
   </url>
   
   <url>
-    <loc>https://tiana528.github.io/2019/02/11/YARN-UI-detailed-explanation/</loc>
-    
-    <lastmod>2020-08-01T02:05:32.044Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://tiana528.github.io/2019/02/09/HDFS_UI_detailed_description/</loc>
     
     <lastmod>2020-08-01T02:05:32.003Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://tiana528.github.io/2019/02/07/Basic_understanding_of_debian_packaging/</loc>
-    
-    <lastmod>2020-08-01T02:05:31.961Z</lastmod>
     
   </url>
   
