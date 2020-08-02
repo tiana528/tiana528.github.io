@@ -8,7 +8,7 @@ tags: debian package
 
 It never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments.
 
-## What is a debian package
+# What is a debian package
 
 - Linux
     - [Linux](https://en.wikipedia.org/wiki/Linux) is a family of free and open-source software operating systems based on the Linux kernel.
@@ -31,7 +31,7 @@ It is possible to use the official tool(dpkg-deb) to create debian packages. But
 
 Refer [this](https://fpm.readthedocs.io/en/latest/installing.html) to install fpm.
 
-### Example1
+## Example1
 Create a debian package whose name is "hello_world", and what it do is installing a file "hello world" in the path of /tmp/hi.txt
 
 It is very easy, just execute 3 commands.
@@ -200,27 +200,23 @@ Here we discuss some scenarios.
 
 # Best practise of deploying debian packages
 - Safe in-place release
-If there are senarios that we want to versioning up debian packages in-place without affecting running service, we must be very careful.
-
-The flow of updating one debian package is first deleting all files installed by the current debian package(e.g. dpkg -L hadoop-master), then install the new one. Such flow creates a small time window that there is no available files installed. If the files are necessary for the execution of some service, the missing of such files in the short time window might cause job failure.
-
-There are several work around of this issue as follows
-
-(1)Install files through post-inst. The files installed through post-inst won't be remove during package version up(unless they are removed by pre-rm).
-
-(2)Never version up the package, and always install new packages to a difference place and change the symlink pointing to the new place.
+    - If there are senarios that we want to versioning up debian packages in-place without affecting running service, we must be very careful.
+    - The flow of updating one debian package is first deleting all files installed by the current debian package(e.g. dpkg -L {package_name}), then install the new one. Such flow creates a small time window that there is no available files installed. If the files are necessary for the execution of some service, the missing of such files in the short time window might cause job failure.
+    - There are several work around of this issue as follows
+        - (1) Install files through post-inst. The files installed through post-inst won't be remove during package version up(unless they are removed by pre-rm).
+        - (2) Never version up the package, and always install new packages to a difference place and change the symlink pointing to the new place.
 
 - Create symlink correctly
-If we run ln -s folder_a folder_b multiple times, it will fail at the third time ending up a nested folder which we don't intent to have. The correct way of creating symlink should be remove existing symlink then create, or create symlink with the fT option.
+    - If we run ln -s folder_a folder_b multiple times, it will fail at the third time ending up a nested folder which we don't intent to have. The correct way of creating symlink should be remove existing symlink then create, or create symlink with the fT option.
 
 - Write file safely
-When writing a file using python or so, the writing process is usually done little by little. If there is some other process reading this file, such processes might read a file which has been written halfly thus causing some issues. It will always be safer to write a temporal file then rename to the final name.
+    - When writing a file using python or so, the writing process is usually done little by little. If there is some other process reading this file, such processes might read a file which has been written halfly thus causing some issues. It will always be safer to write a temporal file then rename to the final name.
 
 - Write safe shell script
-Always use set -euo pipefail in all shell scripts, and use shellcheck tool for checking.
+    - Always use set -euo pipefail in all shell scripts, and use shellcheck tool for checking.
 
 - Check cron job configs
-Use https://crontab.guru/ to check whether the cron configuration is as expected.
+    - Use https://crontab.guru/ to check whether the cron configuration is as expected.
 
 
 # References
