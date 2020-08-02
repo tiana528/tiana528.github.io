@@ -186,8 +186,7 @@ JMX metrics of the resource manager.
 
 # Check job detailed information
 This is a complex part, it is not as straightforward as other parts because there are many logs and UIs involved.
-Yarn log aggregation needs to be enabled for checking the logs. ([Enable yarn log aggregation](https://tiana528.github.io/2018/11/19/hive-configuration-best-practise/))
-
+Yarn log aggregation needs to be enabled for checking the logs.
 
 ## Check application detailed info
 Click application id such as `application_1542608710651_1268349`, then the application UI will open. URL is : {master_ip:8088}/cluster/app/application_1549418419376_658006
