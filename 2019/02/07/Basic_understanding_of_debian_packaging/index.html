@@ -111,11 +111,11 @@
 <meta name="keywords" content="debian package">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Basic understanding of debian packaging">
-<meta property="og:url" content="https://tiana528.github.io/2019/02/07/Basic_understanding_of_debian_packaging/index.html">
+<meta property="og:url" content="https://www.mingyue.me/2019/02/07/Basic_understanding_of_debian_packaging/index.html">
 <meta property="og:site_name" content="Yan&#39;s Notes">
 <meta property="og:description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-08-02T01:59:58.762Z">
+<meta property="og:updated_time" content="2020-08-02T12:21:16.850Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Basic understanding of debian packaging">
 <meta name="twitter:description" content="BackgroundIt never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments. What is a debian package Linux">
@@ -125,7 +125,7 @@
 
 
 
-  <link rel="canonical" href="https://tiana528.github.io/2019/02/07/Basic_understanding_of_debian_packaging/">
+  <link rel="canonical" href="https://www.mingyue.me/2019/02/07/Basic_understanding_of_debian_packaging/">
 
 
 
@@ -363,7 +363,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://tiana528.github.io/2019/02/07/Basic_understanding_of_debian_packaging/">
+    <link itemprop="mainEntityOfPage" href="https://www.mingyue.me/2019/02/07/Basic_understanding_of_debian_packaging/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Wang Yan">
@@ -422,7 +422,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2020-08-02 10:59:58" itemprop="dateModified" datetime="2020-08-02T10:59:58+09:00">2020-08-02</time>
+                <time title="Modified: 2020-08-02 21:21:16" itemprop="dateModified" datetime="2020-08-02T21:21:16+09:00">2020-08-02</time>
               
             
           </span>
@@ -474,7 +474,7 @@
 
       
         <h1 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h1><p>It never becomes easy to setup/install/upgrade environments. This article aims at describing how to use/create debian packages to help setup the environments.</p>
-<h2 id="What-is-a-debian-package"><a href="#What-is-a-debian-package" class="headerlink" title="What is a debian package"></a>What is a debian package</h2><ul>
+<h1 id="What-is-a-debian-package"><a href="#What-is-a-debian-package" class="headerlink" title="What is a debian package"></a>What is a debian package</h1><ul>
 <li>Linux<ul>
 <li><a href="https://en.wikipedia.org/wiki/Linux" target="_blank" rel="noopener">Linux</a> is a family of free and open-source software operating systems based on the Linux kernel.</li>
 </ul>
@@ -504,7 +504,7 @@
 </ul>
 <h1 id="Create-debian-packages"><a href="#Create-debian-packages" class="headerlink" title="Create debian packages"></a>Create debian packages</h1><p>It is possible to use the official tool(dpkg-deb) to create debian packages. But here we use <a href="https://github.com/jordansissel/fpm" target="_blank" rel="noopener">fpm</a> to create debian packages. It is very simple to use.</p>
 <p>Refer <a href="https://fpm.readthedocs.io/en/latest/installing.html" target="_blank" rel="noopener">this</a> to install fpm.</p>
-<h3 id="Example1"><a href="#Example1" class="headerlink" title="Example1"></a>Example1</h3><p>Create a debian package whose name is “hello_world”, and what it do is installing a file “hello world” in the path of /tmp/hi.txt</p>
+<h2 id="Example1"><a href="#Example1" class="headerlink" title="Example1"></a>Example1</h2><p>Create a debian package whose name is “hello_world”, and what it do is installing a file “hello world” in the path of /tmp/hi.txt</p>
 <p>It is very easy, just execute 3 commands.</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p working_folder/tmp</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"hello world"</span> &gt; working_folder/tmp/hi.txt</span><br><span class="line">fpm \</span><br><span class="line">  --architecture=amd64 \</span><br><span class="line">  --<span class="built_in">chdir</span>=working_folder \</span><br><span class="line">  --input-type=dir \</span><br><span class="line">  --output-type=deb \</span><br><span class="line">  --name=hello_world \</span><br><span class="line">  --version=<span class="string">"0.0.1"</span> \</span><br><span class="line">  --iteration=<span class="string">"001"</span> \</span><br><span class="line">  --description=<span class="string">"This is an example"</span> \</span><br><span class="line">  --deb-user=<span class="string">"root"</span> \</span><br><span class="line">  --deb-group=<span class="string">"root"</span> \</span><br><span class="line">  --deb-priority=<span class="string">"extra"</span> \</span><br><span class="line">  <span class="string">"."</span></span><br></pre></td></tr></table></figure>
 <p>Then a file of hello-world_0.0.1-001_amd64.deb will be created in the current folder.<br>Use <code>sudo dpkg -i hello-world_0.0.1-001_amd64.deb</code> to install the deb file, and then you can see a file(/tmp/hi.txt) containing “hello world” is created.</p>
@@ -698,20 +698,36 @@
 </li>
 </ul>
 <h1 id="Best-practise-of-deploying-debian-packages"><a href="#Best-practise-of-deploying-debian-packages" class="headerlink" title="Best practise of deploying debian packages"></a>Best practise of deploying debian packages</h1><ul>
-<li>Safe in-place release<br>If there are senarios that we want to versioning up debian packages in-place without affecting running service, we must be very careful.</li>
-</ul>
-<p>The flow of updating one debian package is first deleting all files installed by the current debian package(e.g. dpkg -L hadoop-master), then install the new one. Such flow creates a small time window that there is no available files installed. If the files are necessary for the execution of some service, the missing of such files in the short time window might cause job failure.</p>
-<p>There are several work around of this issue as follows</p>
-<p>(1)Install files through post-inst. The files installed through post-inst won’t be remove during package version up(unless they are removed by pre-rm).</p>
-<p>(2)Never version up the package, and always install new packages to a difference place and change the symlink pointing to the new place.</p>
+<li><p>Safe in-place release</p>
 <ul>
-<li><p>Create symlink correctly<br>If we run ln -s folder_a folder_b multiple times, it will fail at the third time ending up a nested folder which we don’t intent to have. The correct way of creating symlink should be remove existing symlink then create, or create symlink with the fT option.</p>
+<li>If there are senarios that we want to versioning up debian packages in-place without affecting running service, we must be very careful.</li>
+<li>The flow of updating one debian package is first deleting all files installed by the current debian package(e.g. dpkg -L {package_name}), then install the new one. Such flow creates a small time window that there is no available files installed. If the files are necessary for the execution of some service, the missing of such files in the short time window might cause job failure.</li>
+<li>There are several work around of this issue as follows<ul>
+<li>(1) Install files through post-inst. The files installed through post-inst won’t be remove during package version up(unless they are removed by pre-rm).</li>
+<li>(2) Never version up the package, and always install new packages to a difference place and change the symlink pointing to the new place.</li>
+</ul>
 </li>
-<li><p>Write file safely<br>When writing a file using python or so, the writing process is usually done little by little. If there is some other process reading this file, such processes might read a file which has been written halfly thus causing some issues. It will always be safer to write a temporal file then rename to the final name.</p>
+</ul>
 </li>
-<li><p>Write safe shell script<br>Always use set -euo pipefail in all shell scripts, and use shellcheck tool for checking.</p>
+<li><p>Create symlink correctly</p>
+<ul>
+<li>If we run ln -s folder_a folder_b multiple times, it will fail at the third time ending up a nested folder which we don’t intent to have. The correct way of creating symlink should be remove existing symlink then create, or create symlink with the fT option.</li>
+</ul>
 </li>
-<li><p>Check cron job configs<br>Use <a href="https://crontab.guru/" target="_blank" rel="noopener">https://crontab.guru/</a> to check whether the cron configuration is as expected.</p>
+<li><p>Write file safely</p>
+<ul>
+<li>When writing a file using python or so, the writing process is usually done little by little. If there is some other process reading this file, such processes might read a file which has been written halfly thus causing some issues. It will always be safer to write a temporal file then rename to the final name.</li>
+</ul>
+</li>
+<li><p>Write safe shell script</p>
+<ul>
+<li>Always use set -euo pipefail in all shell scripts, and use shellcheck tool for checking.</li>
+</ul>
+</li>
+<li><p>Check cron job configs</p>
+<ul>
+<li>Use <a href="https://crontab.guru/" target="_blank" rel="noopener">https://crontab.guru/</a> to check whether the cron configuration is as expected.</li>
+</ul>
 </li>
 </ul>
 <h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ul>
@@ -918,7 +934,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#What-is-a-debian-package"><span class="nav-text">What is a debian package</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Create-debian-packages"><span class="nav-text">Create debian packages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example1"><span class="nav-text">Example1</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example2"><span class="nav-text">Example2</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#Debian-package-management-tools"><span class="nav-text">Debian package management tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg"><span class="nav-text">dpkg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aptitude"><span class="nav-text">aptitude</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg-deb"><span class="nav-text">dpkg-deb</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Common-questions"><span class="nav-text">Common questions</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Scenarios"><span class="nav-text">Scenarios</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Best-practise-of-deploying-debian-packages"><span class="nav-text">Best practise of deploying debian packages</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-text">References</span></a></li></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#What-is-a-debian-package"><span class="nav-text">What is a debian package</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Create-debian-packages"><span class="nav-text">Create debian packages</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Example1"><span class="nav-text">Example1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example2"><span class="nav-text">Example2</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Debian-package-management-tools"><span class="nav-text">Debian package management tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg"><span class="nav-text">dpkg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aptitude"><span class="nav-text">aptitude</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dpkg-deb"><span class="nav-text">dpkg-deb</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Common-questions"><span class="nav-text">Common questions</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Scenarios"><span class="nav-text">Scenarios</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Best-practise-of-deploying-debian-packages"><span class="nav-text">Best practise of deploying debian packages</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-text">References</span></a></li></ol></div>
             
 
           </div>
@@ -1081,7 +1097,7 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'https://tiana528.github.io/2019/02/07/Basic_understanding_of_debian_packaging/';
+        this.page.url = 'https://www.mingyue.me/2019/02/07/Basic_understanding_of_debian_packaging/';
         this.page.identifier = '2019/02/07/Basic_understanding_of_debian_packaging/';
         this.page.title = 'Basic understanding of debian packaging';
         };
