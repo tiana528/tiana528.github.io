@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://www.mingyue.me/2018/11/15/hive-job-fast-fail/</loc>
+    <lastmod>2020-08-04T14:09:21.342Z</lastmod>
+  </url>  <url>
     <loc>https://www.mingyue.me/2019/02/07/Basic_understanding_of_debian_packaging/</loc>
     <lastmod>2020-08-02T12:21:16.850Z</lastmod>
   </url>  <url>
@@ -24,9 +27,6 @@
   </url>  <url>
     <loc>https://www.mingyue.me/2018/11/17/hive-scratch-working-directory/</loc>
     <lastmod>2020-08-01T02:05:32.463Z</lastmod>
-  </url>  <url>
-    <loc>https://www.mingyue.me/2018/11/15/hive-job-fast-fail/</loc>
-    <lastmod>2020-08-01T02:05:32.423Z</lastmod>
   </url>  <url>
     <loc>https://www.mingyue.me/2018/11/19/hive-configuration-understanding/</loc>
     <lastmod>2020-08-01T02:05:32.384Z</lastmod>
