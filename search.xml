@@ -3,6 +3,23 @@
   
     
     <entry>
+      <title>basic paxos execution flow examples</title>
+      <link href="/2020/11/08/basic-paxos-execution-flow-examples/"/>
+      <url>/2020/11/08/basic-paxos-execution-flow-examples/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h1><p>The paper of <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/12/paxos-simple-Copy.pdf" target="_blank" rel="noopener">Paxos Made Simple</a> and the video of <a href="https://www.youtube.com/watch?v=JEpsBg0AO6o&amp;ab_channel=DiegoOngaro" target="_blank" rel="noopener">implementing replicated logs with paxos</a> are very good materials for learning Paxos.</p><p>It is not very easy to understand Paxos algorithm, and there are not many examples to show how it is working.</p><p>Some readers might be confusing about how Paxos algorithm can help achieve the consensus, and this articles aims at providing some execution examples to help understand it.</p><h1 id="Features-and-constraints"><a href="#Features-and-constraints" class="headerlink" title="Features and constraints"></a>Features and constraints</h1><ul><li>It ensures that a single one among the proposed values is chosen.</li><li>It is fault tolerant, everything will work properly when only less than a half of acceptors fail.</li><li>Messages can take arbitrarily long to be delivered, can be duplicated,<br>and can be lost, but they are not corrupted.</li><li>A value is chosen : A value is chosen when a single proposal with that value has been accepted by a majority of the acceptors. </li></ul><h1 id="Procedure"><a href="#Procedure" class="headerlink" title="Procedure"></a>Procedure</h1><p>Two phrases</p><ul><li>Phase 1. (prepare phrase)<ul><li>(a) A proposer selects a proposal number n and sends a prepare request with number n to a majority of acceptors.</li><li>(b) If an acceptor receives a prepare request with number n greater than that of any prepare request to which it has already responded, then it responds to the request with a promise not to accept any more proposals numbered less than n and with the highest-numbered proposal (if any) that it has accepted.</li></ul></li><li>Phase 2. (accept phrase)<ul><li>(a) If the proposer receives a response to its prepare requests (numbered n) from a majority of acceptors, then it sends an accept request to each of those acceptors for a proposal numbered n with a value v, where v is the value of the highest-numbered proposal among<br>the responses, or is any value if the responses reported no proposals. </li><li>(b) If an acceptor receives an accept request for a proposal numbered n, it accepts the proposal unless it has already responded to a prepare request having a number greater than n.</li></ul></li></ul><h1 id="Examples"><a href="#Examples" class="headerlink" title="Examples"></a>Examples</h1><h2 id="1"><a href="#1" class="headerlink" title="1"></a>1</h2><p>One node.<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_1.png" alt=""></p><ul><li><p>how to read this graph</p><ul><li>Then there is only one node(which acts both as proposers and acceptors, the node’s name is s1</li><li>“s1,x” means that s1 tries to propose the value of x</li><li>“P1” means prepare phrase with proposal number 1</li><li>“A1,x” means accept phrase with proposal number 1 and value x</li></ul></li><li><p>this examples shows that</p><ul><li>With only 1 node, the node itself can achieve consensus, the chosen value is x</li><li>With only 1 node, if this node crashes, then we will lose the information that which value has been chosen</li></ul></li></ul><h2 id="2"><a href="#2" class="headerlink" title="2"></a>2</h2><p>Two nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_2.png" alt=""></p><ul><li><p>how to read this graph</p><ul><li>There are two nodes, s1 tries to propose value x, s2 does not propose values.</li><li>Prepare phrase of proposal number 1 finishes successfully on both nodes, then the accept phrase also finishes successfully on both nodes, the chosen value is x.</li></ul></li><li><p>this examples shows that</p><ul><li>With 2 nodes, it can achieve consensus if no nodes fail.</li></ul></li></ul>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> distributed system </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
       <title>java service issue investigation</title>
       <link href="/2020/02/08/java-service-issue-investigation/"/>
       <url>/2020/02/08/java-service-issue-investigation/</url>
