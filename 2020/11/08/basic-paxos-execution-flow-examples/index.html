@@ -117,7 +117,24 @@
 <meta property="og:locale" content="default">
 <meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_1.png">
 <meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_2.png">
-<meta property="og:updated_time" content="2020-11-08T07:25:55.058Z">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_3.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_4.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_5.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_6.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_7.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_8.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_9.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_10.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_11.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_12.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_13.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_14.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_15.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_16.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_17.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_18.png">
+<meta property="og:image" content="https://www.mingyue.me/2020/11/08/basic-paxos-execution-flow-examples/paxos_19.png">
+<meta property="og:updated_time" content="2020-11-08T08:59:52.790Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="basic paxos execution flow examples">
 <meta name="twitter:description" content="BackgroundThe paper of Paxos Made Simple and the video of implementing replicated logs with paxos are very good materials for learning Paxos. It is not very easy to understand Paxos algorithm, and the">
@@ -408,7 +425,7 @@
                 
               
 
-              <time title="Created: 2020-11-08 15:37:49 / Modified: 16:25:55" itemprop="dateCreated datePublished" datetime="2020-11-08T15:37:49+09:00">2020-11-08</time>
+              <time title="Created: 2020-11-08 15:37:49 / Modified: 17:59:52" itemprop="dateCreated datePublished" datetime="2020-11-08T15:37:49+09:00">2020-11-08</time>
             
 
             
@@ -469,11 +486,11 @@
 <p>Some readers might be confusing about how Paxos algorithm can help achieve the consensus, and this articles aims at providing some execution examples to help understand it.</p>
 <h1 id="Features-and-constraints"><a href="#Features-and-constraints" class="headerlink" title="Features and constraints"></a>Features and constraints</h1><ul>
 <li>It ensures that a single one among the proposed values is chosen.</li>
-<li>It is fault tolerant, everything will work properly when only less than a half of acceptors fail.</li>
-<li>Messages can take arbitrarily long to be delivered, can be duplicated,<br>and can be lost, but they are not corrupted.</li>
 <li>A value is chosen : A value is chosen when a single proposal with that value has been accepted by a majority of the acceptors. </li>
+<li>It is fault tolerant. In general, a system which supports F failures must have 2F+1 replicas.</li>
+<li>Messages can take arbitrarily long to be delivered, can be duplicated, and can be lost, but they are not corrupted.</li>
 </ul>
-<h1 id="Procedure"><a href="#Procedure" class="headerlink" title="Procedure"></a>Procedure</h1><p>Two phrases</p>
+<h1 id="Procedure"><a href="#Procedure" class="headerlink" title="Procedure"></a>Procedure</h1><p>There two phrases according to the above paper.</p>
 <ul>
 <li>Phase 1. (prepare phrase)<ul>
 <li>(a) A proposer selects a proposal number n and sends a prepare request with number n to a majority of acceptors.</li>
@@ -481,7 +498,7 @@
 </ul>
 </li>
 <li>Phase 2. (accept phrase)<ul>
-<li>(a) If the proposer receives a response to its prepare requests (numbered n) from a majority of acceptors, then it sends an accept request to each of those acceptors for a proposal numbered n with a value v, where v is the value of the highest-numbered proposal among<br>the responses, or is any value if the responses reported no proposals. </li>
+<li>(a) If the proposer receives a response to its prepare requests (numbered n) from a majority of acceptors, then it sends an accept request to each of those acceptors for a proposal numbered n with a value v, where v is the value of the highest-numbered proposal among the responses, or is any value if the responses reported no proposals. </li>
 <li>(b) If an acceptor receives an accept request for a proposal numbered n, it accepts the proposal unless it has already responded to a prepare request having a number greater than n.</li>
 </ul>
 </li>
@@ -490,10 +507,10 @@
 <ul>
 <li><p>how to read this graph</p>
 <ul>
-<li>Then there is only one node(which acts both as proposers and acceptors, the node’s name is s1</li>
+<li>There is only one node(which acts both as proposer and acceptor), the node’s name is s1</li>
 <li>“s1,x” means that s1 tries to propose the value of x</li>
-<li>“P1” means prepare phrase with proposal number 1</li>
-<li>“A1,x” means accept phrase with proposal number 1 and value x</li>
+<li>“P1” means prepare phrase with proposal number 1 finishes properly</li>
+<li>“A1,x” means accept phrase with proposal number 1 and value x finishes properly</li>
 </ul>
 </li>
 <li><p>this examples shows that</p>
@@ -514,6 +531,113 @@
 <li><p>this examples shows that</p>
 <ul>
 <li>With 2 nodes, it can achieve consensus if no nodes fail.</li>
+</ul>
+</li>
+</ul>
+<h2 id="3"><a href="#3" class="headerlink" title="3"></a>3</h2><p>Two nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_3.png" alt=""></p>
+<ul>
+<li><p>how to read this graph</p>
+<ul>
+<li>s3 crashes, and s1 cannot get majority of instances to finish the prepare phrase, so it fails to propose.</li>
+</ul>
+</li>
+<li><p>this examples shows that</p>
+<ul>
+<li>With 2 nodes, if 1 node fail, then it cannot achieve consensus.</li>
+</ul>
+</li>
+</ul>
+<h2 id="4"><a href="#4" class="headerlink" title="4"></a>4</h2><p>Two nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_4.png" alt=""></p>
+<ul>
+<li><p>how to read this graph</p>
+<ul>
+<li>X means the phrase fails</li>
+</ul>
+</li>
+<li><p>this examples shows that</p>
+<ul>
+<li>When s1 submits accept requests of proposal number 1 to s1 and s2, it fails on both nodes. Because both nodes have finished responding the prepare request of proposal number 2, and promise that they won’t accept any proposal number less than 2(according to rule phrase1b).</li>
+<li>The chosen value is y</li>
+</ul>
+</li>
+</ul>
+<h2 id="5"><a href="#5" class="headerlink" title="5"></a>5</h2><p>Two nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_5.png" alt=""></p>
+<ul>
+<li>this examples shows that<ul>
+<li>The chosen value is y, the reason is the same as above</li>
+</ul>
+</li>
+</ul>
+<h2 id="6"><a href="#6" class="headerlink" title="6"></a>6</h2><p>Two nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_6.png" alt=""></p>
+<ul>
+<li>this examples shows that<ul>
+<li>The chosen value is y, the reason is the same as above</li>
+</ul>
+</li>
+</ul>
+<h2 id="7"><a href="#7" class="headerlink" title="7"></a>7</h2><p>Two nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_7.png" alt=""></p>
+<ul>
+<li>this examples shows that<ul>
+<li>When s1 submits prepare request to s2, it will be rejected because s2 has already responded to a higher proposal number((according to rule phrase1b)).</li>
+</ul>
+</li>
+</ul>
+<h2 id="8"><a href="#8" class="headerlink" title="8"></a>8</h2><p>Three nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_8.png" alt=""></p>
+<ul>
+<li>this examples shows that<ul>
+<li>When s1 submits prepare requests to 3 nodes, all of them failed because all 3 nodes have promised that they won’t accept proposal number which is smaller than 2.</li>
+<li>value y is chosen.</li>
+</ul>
+</li>
+</ul>
+<h2 id="9"><a href="#9" class="headerlink" title="9"></a>9</h2><p>Three nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_9.png" alt=""></p>
+<ul>
+<li>this examples shows that<ul>
+<li>When s3 gets the majority responses for the proposal 2, it knows that s1 has already accepted value x, so s3 also updates its value to x(according to rule phrase 2a).</li>
+<li>value x is chosen.</li>
+</ul>
+</li>
+</ul>
+<h2 id="10"><a href="#10" class="headerlink" title="10"></a>10</h2><p>Three nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_10.png" alt=""></p>
+<ul>
+<li>this examples shows that<ul>
+<li>When 1 node crashes among 3 nodes, it can still achieve the consensus.</li>
+<li>The chosen value is y. Note that it is fine that the chosen value is not x since x is not accepted by the majority.</li>
+</ul>
+</li>
+</ul>
+<h2 id="11"><a href="#11" class="headerlink" title="11"></a>11</h2><p>Three nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_11.png" alt=""></p>
+<ul>
+<li>this examples shows that<ul>
+<li>When 1 node crashes among 3 nodes, it can still achieve the consensus.</li>
+<li>The chosen value is x since x is accepted by the majority.</li>
+</ul>
+</li>
+</ul>
+<h2 id="12"><a href="#12" class="headerlink" title="12"></a>12</h2><p>Three nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_12.png" alt=""></p>
+<ul>
+<li>this examples shows that<ul>
+<li>The chosen value is x</li>
+<li>Note that only s1 and s3 knows that value is chosen because they are proposals, if s2 wants to know what value has been chosen, it can try to propose.</li>
+</ul>
+</li>
+</ul>
+<h2 id="13"><a href="#13" class="headerlink" title="13"></a>13</h2><p>Three nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_13.png" alt=""></p>
+<h2 id="14"><a href="#14" class="headerlink" title="14"></a>14</h2><p>Three nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_14.png" alt=""></p>
+<h2 id="15"><a href="#15" class="headerlink" title="15"></a>15</h2><p>Three nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_15.png" alt=""></p>
+<h2 id="16"><a href="#16" class="headerlink" title="16"></a>16</h2><p>Three nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_16.png" alt=""></p>
+<h2 id="17"><a href="#17" class="headerlink" title="17"></a>17</h2><p>Three nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_17.png" alt=""></p>
+<h2 id="18"><a href="#18" class="headerlink" title="18"></a>18</h2><p>Three nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_18.png" alt=""></p>
+<ul>
+<li>this examples shows that<ul>
+<li>If 2 nodes among 3 crash, then we will not be able to know what has been chosen.</li>
+</ul>
+</li>
+</ul>
+<h2 id="19"><a href="#19" class="headerlink" title="19"></a>19</h2><p>Three nodes<br><img src="/2020/11/08/basic-paxos-execution-flow-examples/paxos_19.png" alt=""></p>
+<ul>
+<li>this examples shows that<ul>
+<li>it is possible that livelock happens, every proposal propose with a new number when it is rejected</li>
 </ul>
 </li>
 </ul>
@@ -715,7 +839,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Features-and-constraints"><span class="nav-text">Features and constraints</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Procedure"><span class="nav-text">Procedure</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Examples"><span class="nav-text">Examples</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1"><span class="nav-text">1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2"><span class="nav-text">2</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Background"><span class="nav-text">Background</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Features-and-constraints"><span class="nav-text">Features and constraints</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Procedure"><span class="nav-text">Procedure</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Examples"><span class="nav-text">Examples</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1"><span class="nav-text">1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2"><span class="nav-text">2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3"><span class="nav-text">3</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4"><span class="nav-text">4</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5"><span class="nav-text">5</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6"><span class="nav-text">6</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7"><span class="nav-text">7</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8"><span class="nav-text">8</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9"><span class="nav-text">9</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10"><span class="nav-text">10</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11"><span class="nav-text">11</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12"><span class="nav-text">12</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#13"><span class="nav-text">13</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14"><span class="nav-text">14</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#15"><span class="nav-text">15</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#16"><span class="nav-text">16</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#17"><span class="nav-text">17</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#18"><span class="nav-text">18</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#19"><span class="nav-text">19</span></a></li></ol></li></ol></div>
             
 
           </div>
